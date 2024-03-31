@@ -8,6 +8,7 @@ import { SERVER_URL } from '../../../env';
   styleUrl: './auth.component.scss'
 })
 export class AuthComponent {
+  id = '9fjf34h4fuhf3'
   constructor (
     @Inject(HttpClient) private http: HttpClient
   ) {}
