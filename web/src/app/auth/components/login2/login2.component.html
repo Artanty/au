@@ -1,0 +1,32 @@
+
+  <div class="login-container">
+    <ng-container *ngIf="(isLoaderVisible$ | async) === true">
+      <div class="loader-backdrop-container">
+        <app-dynamic-component [componentName]="'LoadingComponent'"></app-dynamic-component>
+      </div>
+    </ng-container>
+
+    <form (ngSubmit)="onLogin()" class="form-login">
+
+      <label for="login-input-user" class="login__label">
+        Логин
+      </label>
+      <input id="login-input-user" class="login__input"  [(ngModel)]="username" name="username" type="text" />
+      <label for="login-input-password" class="login__label">
+        Пароль
+      </label>
+      <input id="login-input-password" class="login__input"  [(ngModel)]="password" name="password" type="password" />
+
+      <button class="login__submit" type="submit">Войти</button>
+
+      <div class="messageWrapper">
+        <ng-container *ngIf="(formMessage$ | async) as message">
+          <div class="message"
+          *ngIf="message.action === 'DISPLAY_ERROR'"
+          >{{ message.payload?.['message'] }}</div>
+        </ng-container>
+      </div>
+    </form>
+
+  </div>
+

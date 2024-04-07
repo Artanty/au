@@ -3,12 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { AuthComponent } from './auth.component';
-import { LoginComponent } from './login/login.component';
+import { Login2Component } from './components/login2/login2.component';
+import { DynamicComponent } from './components/dynamic/dynamic.component'
 
 @NgModule({
   declarations: [
+    DynamicComponent,
     AuthComponent,
-    LoginComponent
+    Login2Component
   ],
   imports: [
     CommonModule,
@@ -22,6 +24,7 @@ import { LoginComponent } from './login/login.component';
   ],
   exports: [
     AuthComponent
-  ]
+  ],
+  providers: []
 })
 export class AuthModule { }
