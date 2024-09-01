@@ -63,10 +63,11 @@ export const EVENT_BUS_PUSHER = new InjectionToken<(authDto: IAuthDto) => void>(
 })
 export class AuthComponent {
   constructor(
-    @Inject(EVENT_BUS_LISTENER) private readonly eventBusListener$: BehaviorSubject<IAuthDto>,
+    @Inject(EVENT_BUS_LISTENER) private readonly eventBusListener$: Observable<IAuthDto>,
     @Inject(ConfigService) private ConfigServ: ConfigService,
     @Inject(AuthStrategyService) private AuthStrategyServ: AuthStrategyService // do not remove: used to bootstrap it's constructor
   ) {
+    console.log(1)
     this.eventBusListener$
     .subscribe((dto: IAuthDto) => {
       this.ConfigServ.setConfig(dto)

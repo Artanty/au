@@ -13,7 +13,7 @@ export class DisplayInvalidDataErrorAction implements IAuthAction {
 
   public execute (err: HttpErrorResponse) {
 
-    const errMessage = this. _translateErrMessage(err.error.message)
+    const errMessage = this._translateErrMessage(err.error.message)
     const viewState: IViewState = {
       scope: 'FORM',
       action: 'DISPLAY_ERROR',

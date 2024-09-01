@@ -16,7 +16,7 @@ export class DisplayUnknownErrorAction implements IAuthAction {
       scope: 'FORM',
       action: 'DISPLAY_ERROR',
       payload: {
-        message: err.error.message || 'Неизвестная ошибка'
+        message: err.error?.message || 'Неизвестная ошибка'
       }
     }
     this.ViewServ.setViewState(viewState)

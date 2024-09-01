@@ -23,12 +23,14 @@ export class BackendAuthStrategy implements IAuthStrategy {
     @Inject(UserActionService) private readonly UserActionServ: UserActionService,
     private injector: Injector
   ) {
+    console.log('inited strategy')
     this.UserActionServ.listenUserAction()
     .pipe(
       takeUntil(this.unsubscribe$),
       filter(Boolean)
     )
     .subscribe((res: IUserAction) => {
+      console.log(99)
       this.runScenario(res?.action, res?.payload as any)
     })
   }

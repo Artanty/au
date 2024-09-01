@@ -5,7 +5,8 @@
     "ng": "ng",
     "start": "ng serve -o",
     "build": "ng build",
-    "watch": "ng build --watch --configuration development",
+    "prebuild": "node ../build/prebuild.js",
+    "postbuild": "node ../build/postbuild.js --distFolderPath=dist/au",
     "test": "ng test",
     "run:all": "node node_modules/@angular-architects/module-federation/src/server/mf-dev-server.js"
   },

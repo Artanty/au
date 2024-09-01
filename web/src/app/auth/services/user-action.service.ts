@@ -18,6 +18,7 @@ export class UserActionService {
   constructor() { }
 
   public setUserAction (data: Nullable<IUserAction>) {
+    console.log(data)
     this.userAction$.next(data)
   }
   public getUserAction (): Nullable<IUserAction> {
