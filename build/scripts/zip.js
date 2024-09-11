@@ -28,7 +28,7 @@ async function zip() {
     upload(filePath).then((res) => {
       saveToDb({
         discId: res.fileId,
-        project: process.env.BAG_SERVICE
+        project: process.env.APP
       })
     })
 

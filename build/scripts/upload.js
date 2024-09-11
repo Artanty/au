@@ -17,10 +17,10 @@ async function upload(filePath) {
       headers: formData.getHeaders(),
     });
 
-    console.log('File uploaded successfully:', response.data);
+    console.log('DISC: File uploaded successfully:', response.data);
     return response.data
   } catch (error) {
-    console.error('Error uploading file:', error.response ? error.response.data : error.message);
+    console.error('DISC: Error uploading file:', error.response ? error.response.data : error.message);
   }
 }
 
@@ -30,7 +30,7 @@ async function isDiscAlive() {
     console.log(res.data.status)
     return true
   } catch (error) {
-    console.error('DISC service error: ', error.response ? error.response.data : error.message);
+    throw new Error('DISC service error: ', error.response ? error.response.data : error.message);
   }
 }
 

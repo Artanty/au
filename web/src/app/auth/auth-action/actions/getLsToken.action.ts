@@ -1,16 +1,12 @@
-import { PRODUCT_NAME } from "typlib";
-import { IAuthAction } from "../auth-action.model";
-import { Inject, Injectable } from "@angular/core";
+import { Inject, Injectable } from '@angular/core';
+import { HOST_NAME } from 'typlib';
+import { IAuthAction } from '../auth-action.model';
 
 @Injectable()
 export class GetProductAuthTokenAction implements IAuthAction {
+  constructor(@Inject(HOST_NAME) private readonly hostName: string) {}
 
-  constructor (
-    @Inject(PRODUCT_NAME) private readonly productName: string
-  ) {}
-
-  public execute () {
-    return localStorage.getItem(`${this.productName}__authToken`);
+  public execute() {
+    return localStorage.getItem(`${this.hostName}__authToken`);
   }
-
 }

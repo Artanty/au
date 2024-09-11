@@ -1,28 +1,28 @@
-import { Inject, NgModule} from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
+import { Inject, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BehaviorSubject } from 'rxjs';
+import { BusEvent, EVENT_BUS, HOST_NAME } from 'typlib';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { HttpClientModule } from '@angular/common/http';
-import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import { AuthModule } from './auth/auth.module';
-import { BehaviorSubject } from 'rxjs';
-import { EVENT_BUS, IAuthDto, PRODUCT_NAME } from 'typlib';
-// import { AUTH_DTO_STRING } from './auth/auth.component';
 
-export const standAloneEventBusData = {
-  productName: 'self',
-  authStrategy: 'backend',
+export const standAloneEventBusData: BusEvent = {
+  from: 'AU',
+  to: 'AU',
+  event: 'authStrategy',
   payload: {
-    'link': 'www'
+    authStrategy: 'backend',
+    checkBackendUrl: 'http://localhost:3600/check',
+    signInByDataUrl: 'http://localhost:3600/login',
+    signInByTokenUrl: 'http://localhost:3600/loginByToken',
+    status: 'init',
   },
-  from: 'product',
-  status: 'init'
-}
+};
 
 @NgModule({
-  declarations: [
-    AppComponent,
-  ],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -32,19 +32,20 @@ export const standAloneEventBusData = {
   ],
   providers: [
     { provide: EVENT_BUS, useValue: new BehaviorSubject('') },
-    { provide: PRODUCT_NAME, useValue: 'au' },
-    // { provide: AUTH_DTO_STRING, useValue: '' },
-
+    { provide: HOST_NAME, useValue: 'AU' },
+    {
+      provide: 'components',
+      useValue: {},
+      multi: true,
+    },
   ],
   bootstrap: [AppComponent],
   schemas: [],
 })
-
 export class AppModule {
   constructor(
-    @Inject(EVENT_BUS) private readonly eventBus$: BehaviorSubject<IAuthDto>,
+    @Inject(EVENT_BUS) private readonly eventBus$: BehaviorSubject<BusEvent>
   ) {
-    this.eventBus$.next(standAloneEventBusData as any)
+    this.eventBus$.next(standAloneEventBusData);
   }
 }
-

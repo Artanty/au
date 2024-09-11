@@ -36,7 +36,6 @@ class InitController {
   }
 
   async checkTable(tableName = Object.keys(TABLES_CONFIG)) {
-    console.log(tableName)
     let count
     if (!tableName || (Array.isArray(tableName) && !tableName.length)) {
       throw new Error('Invalid table names provided.');
@@ -60,11 +59,9 @@ class InitController {
           return true
         })
     } catch (error) {
-      // console.error(error.message)
       throw new Error(error.message)
     }
   }
-
 }
 
 const instance = new InitController()

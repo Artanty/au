@@ -1,30 +1,26 @@
-
-import { IAuthDto, PRODUCT_NAME } from "typlib";
-import { IAuthAction } from "../auth-action.model";
-import { Inject, Injectable } from "@angular/core";
-import { EVENT_BUS_PUSHER } from "../../auth.component";
-import { ConfigService } from "../../services/config.service";
+import { Inject, Injectable } from '@angular/core';
+import { BusEvent, HOST_NAME } from 'typlib';
+import { EVENT_BUS_PUSHER } from '../../auth.component';
+import { ConfigService } from '../../services/config.service';
+import { IAuthAction } from '../auth-action.model';
 
 @Injectable()
 export class GrantAccessAction implements IAuthAction {
-
-  constructor (
-    @Inject(PRODUCT_NAME) private readonly productName: string,
+  constructor(
+    @Inject(HOST_NAME) private readonly hostName: string,
     @Inject(ConfigService) private ConfigServ: ConfigService,
-    @Inject(EVENT_BUS_PUSHER) private eventBusPusher: (authDto: IAuthDto) => void,
+    @Inject(EVENT_BUS_PUSHER)
+    private eventBusPusher: (busEvent: BusEvent) => void
   ) {}
 
-  public execute () {
-
-    const authDto: IAuthDto = {
-      productName: this.productName,
-      authStrategy: this.ConfigServ.getConfigAuthStrategy(),
-      from: 'auth',
-      status: 'ACCESS_GRANTED',
-      payload: {}
+  public execute() {
+    const busEvent: BusEvent = {
+      from: process.env['APP']!,
+      to: this.hostName,
+      event: 'auth',
+      payload: { status: 'ACCESS_GRANTED' },
     };
 
-    this.eventBusPusher(authDto)
+    this.eventBusPusher(busEvent);
   }
-
 }
