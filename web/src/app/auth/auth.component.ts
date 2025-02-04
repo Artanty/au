@@ -1,4 +1,4 @@
-import { Component, Inject, InjectionToken, Injector } from '@angular/core';
+import { Component, Inject, InjectionToken, Injector, OnInit } from '@angular/core';
 
 import { BehaviorSubject, Observable, filter } from 'rxjs';
 import { BusEvent, EVENT_BUS } from 'typlib';
@@ -63,7 +63,7 @@ export const EVENT_BUS_PUSHER = new InjectionToken<
     },
   ],
 })
-export class AuthComponent {
+export class AuthComponent implements OnInit {
   constructor(
     private injector: Injector,
     @Inject(EVENT_BUS_LISTENER)
@@ -80,9 +80,19 @@ export class AuthComponent {
       this.ConfigServ.setConfig(authStrategyAdapter(busEvent));
     });
   }
+
+  ngOnInit (): void {
+    const busEvent: BusEvent = {
+      from: `${process.env['PROJECT_ID']}@${process.env['NAMESPACE']}`,
+      to: `faq@web-host`,
+      event: 'RENDER_COMPONENTS',
+      payload: {},
+    }
+    this.eventBusPusher(busEvent);
+  }
 }
 
-// ADAPTER FUNCTION FORM:
+// ADAPTER FUNCTION FROM:
 // export const authStrategyBusEvent: BusEvent = {
 //   from: 'DORO',
 //   to: 'AU',

@@ -22,7 +22,7 @@ export class AuthStrategyService {
           );
           if (!this.authStrategy)
             throw new Error(
-              `status '${dto.authStrategy}' doesn't exist in AuthStrategyMap`
+              `strategy '${dto.authStrategy}' doesn't exist in AuthStrategyMap`
             );
           this.authStrategy.runScenario(dto.status);
         } catch (err) {

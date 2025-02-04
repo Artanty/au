@@ -3,7 +3,7 @@
   "version": "0.0.7",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve -o",
+    "start": "ng serve",
     "build": "ng build",
     "prebuild": "node ../build/prebuild.js",
     "postbuild": "node ../build/postbuild.js --distFolderPath=dist/au",
@@ -25,7 +25,8 @@
     "date-fns": "^3.3.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.14.0"
+    "zone.js": "~0.14.0",
+    "typlib": "^0.0.6"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^17.0.5",
@@ -42,7 +43,6 @@
     "karma-jasmine-html-reporter": "~2.0.0",
     "ngx-build-plus": "^17.0.0",
     "typescript": "~5.2.0",
-    "typlib": "^0.0.4",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4"
   }
