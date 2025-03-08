@@ -25,8 +25,9 @@
           *ngIf="message.action === 'DISPLAY_ERROR'"
           >{{ message.payload?.['message'] }}</div>
         </ng-container>
-      </div>
+      </div> 
+      <button class="login__default-btn" type="button" [routerLink]="routerPath">Регистрация</button>
     </form>
 
+    
   </div>
-

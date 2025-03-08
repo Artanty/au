@@ -8,6 +8,20 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthModule } from './auth/auth.module';
 
+export const defaultEventBusData: BusEvent = {
+  from: 'AU',
+  to: 'AU',
+  event: 'authStrategy',
+  payload: {
+    authStrategy: 'backend',
+    checkBackendUrl: `${process.env['AU_BACK_URL']}/getUpdates`,
+    signUpByDataUrl: `${process.env['AU_BACK_URL']}/auth/signup`,
+    signInByDataUrl: `${process.env['AU_BACK_URL']}/auth/login`,
+    signInByTokenUrl: "",
+    status: 'init',
+  },
+};
+
 export const standAloneEventBusData: BusEvent = {
   from: 'AU',
   to: 'AU',

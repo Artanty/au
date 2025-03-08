@@ -1,0 +1,46 @@
+<div class="login-container">
+    <ng-container *ngIf="(isLoaderVisible$ | async) === true">
+      <div class="loader-backdrop-container">
+        <app-dynamic-component [componentName]="'LoadingComponent'"></app-dynamic-component>
+      </div>
+    </ng-container>
+
+    <form (ngSubmit)="onSubmit()" class="form-login">
+
+      <label for="login-input-user" class="login__label">
+        Логин
+      </label>
+      <input id="login-input-user" class="login__input"  [(ngModel)]="username" name="username" type="text" />
+      <label for="login-input-password" class="login__label">
+        Пароль
+      </label>
+      <input id="login-input-password" class="login__input"  [(ngModel)]="password" name="password" type="password" />
+
+      <label for="login-input-repeat-password" class="login__label">
+        Повторите пароль
+      </label>
+      <input id="login-input-repeat-password" class="login__input" [(ngModel)]="repeatPassword" name="repeatPassword" type="password" required />
+
+      <button class="login__submit" type="submit">Зарегистрироваться</button>
+
+      <div class="messageWrapper">
+        <ng-container *ngIf="(formMessage$ | async) as message">
+          <div class="message"
+          *ngIf="message.action === 'DISPLAY_ERROR'"
+          >{{ message.payload?.['message'] }}</div>
+        </ng-container>
+        <div class="message" *ngIf="passwordsMissmatch">
+            Пароли не совпадают
+        </div>
+      </div>
+
+      <button class="login__default-btn" type="button" 
+        [routerLink]="routerPath"
+        [routerLinkActive]="'active'"
+        [routerLinkActiveOptions]="{ exact: false }"
+      >Войти</button>
+
+    </form>
+
+  </div>
+

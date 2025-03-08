@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, Inject } from '@angular/core';
 import { IUserAction, UserActionService } from '../../services/user-action.service';
 import { IViewState, ViewService } from '../../services/view.service';
-import { Observable, filter, map, startWith } from 'rxjs';
+import { BehaviorSubject, Observable, filter, map, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-login2',
@@ -15,15 +15,23 @@ export class Login2Component {
   formMessage$: Observable<IViewState>
   isLoaderVisible$: Observable<boolean>
 
+  routerPath: string = ''
+
+
   constructor(
     @Inject(UserActionService) private UserActionServ: UserActionService,
     @Inject(ViewService) private ViewServ: ViewService,
-  ) {
+    @Inject('ROUTER_PATH') private _routerPath$: BehaviorSubject<string>,
+    ) {
+      this._routerPath$.asObservable().subscribe((res: string) => {
+        this.routerPath = `/${res}/signup`
+      })
     this.formMessage$ = this.ViewServ.listenViewState()
     .pipe(
       filter(Boolean),
       filter((res: IViewState) => res.scope === 'FORM'),
     )
+
     this.isLoaderVisible$ = this.ViewServ.listenViewState()
     .pipe(
       filter(Boolean),

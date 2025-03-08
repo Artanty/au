@@ -1,0 +1,35 @@
+{
+    "event_bus_hooks": [
+        {
+            "trigger": {
+                "event": "EAGER_ADD_REMOTES_DONE"
+            },
+            "action": "GO_TO_LOGIN",
+            "lives": "once"
+        },
+        {
+            "trigger": {
+                "event": "MOCK1"
+            },
+            "action": "TEST",
+            "lives": "once"
+        },
+        {
+            "trigger": {
+                "event": "MOCK2"
+            },
+            "action": "GO_TO_LOGIN",
+            "lives": "forever"
+        }
+    ],
+    "interceptors": [
+        {
+            "trigger": "401",
+            "action": "GO_TO_LOGIN"
+        }
+    ],
+    "todo": "Перенести все из remotes сюда",
+    "todo1": "добавить порядок для отображения кнопок приложений",
+    "todo2": "event_hooks trigger can be with conditions",
+    "todo3": "add event - connected to eventBus?"
+}
