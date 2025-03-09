@@ -3,8 +3,8 @@
   "version": "0.0.7",
   "scripts": {
     "ng": "ng",
-    "start1": "ng serve",
-    "start": "start-apps.bat",
+    "start": "ng serve",
+    "start2": "start-apps.bat",
     "build": "ng build",
     "prebuild": "node ../build/prebuild.js",
     "postbuild": "node ../build/postbuild.js --distFolderPath=dist/au",

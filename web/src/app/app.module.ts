@@ -7,6 +7,7 @@ import { BusEvent, EVENT_BUS, HOST_NAME } from 'typlib';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthModule } from './auth/auth.module';
+import { TestApiModule } from './test-api/test-api.module';
 
 export const defaultEventBusData: BusEvent = {
   from: 'AU',
@@ -43,6 +44,7 @@ export const standAloneEventBusData: BusEvent = {
     BrowserAnimationsModule,
     AuthModule,
     HttpClientModule,
+    TestApiModule,
   ],
   providers: [
     { provide: EVENT_BUS, useValue: new BehaviorSubject('') },
