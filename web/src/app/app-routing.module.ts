@@ -4,13 +4,13 @@ import { AuthComponent } from './auth/auth.component';
 import { TestApiComponent } from './test-api/components/test-api/test-api.component';
 
 const routes: Routes = [
-  { 
-    path: '', 
-    redirectTo: '/test-api', 
-    pathMatch: 'full' 
-  },
+  // { 
+  //   path: '', 
+  //   redirectTo: '/test-api', 
+  //   pathMatch: 'full' 
+  // },
   { path: 'auth', component: AuthComponent },
-  { path: 'test-api', component: TestApiComponent }
+  // { path: 'test-api', component: TestApiComponent }
 ];
 
 @NgModule({

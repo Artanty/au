@@ -1,13 +1,12 @@
 const express = require('express');
 
 const dotenv = require('dotenv');
-const authRoutes = require('./routes/authRoutes');
+const authToken = require('./routes/authToken');
+const authCookies = require('./routes/authCookies');
+const authTokenShare = require('./routes/authTokenShare');
+
 
 const cookieParser = require('cookie-parser');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-
-const axios = require('axios');
 const cors = require('cors');
 
 const checkDBConnection = require('./core/db_check_connection')
@@ -16,18 +15,27 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const corsOptions = {
-  origin: 'http://localhost:4204', // Allow requests from this origin
-  credentials: true, // Allow credentials (cookies)
-};
-// Middleware
-app.use(cors(corsOptions));
+// Global Middlewares
 app.use(express.json());
 app.use(cookieParser()); 
 
-// Routes
-app.use('/auth', authRoutes);
+// authCookies middleware
+const allowedOrigins = [
+  /^https?:\/\/localhost:4204$/,
+  /^https?:\/\/localhost:4222$/,
+  'http://localhost:4204',
+  'http://localhost:4222'
+];
 
+const corsOptions = {
+  origin: allowedOrigins, // Allow requests from this origin
+  credentials: true, // Allow credentials (cookies)
+};
+
+// Routes
+app.use('/auth-token', cors(), authToken);
+app.use('/auth-token-share', cors(), authTokenShare);
+app.use('/auth-cookies', cors(corsOptions), authCookies);
 
 
 // Start the server

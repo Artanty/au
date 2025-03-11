@@ -1,52 +1,13 @@
 const express = require('express');
-const AuthController = require('../controllers/authController');
 const authenticate = require('../middlewares/auth.middleware')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
 const router = express.Router();
 
-// Authentication Routes
-router.post('/signup', async (req, res) => {
-  try {
-    const result = await AuthController.signup(req.body);
-    res.status(201).json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// router.post('/login', async (req, res) => {
-//   try {
-//     const result = await AuthController.login(req.body);
-//     res.status(200).json(result);
-//   } catch (error) {
-//     res.status(400).json({ error: error.message });
-//   }
-// });
-
-// router.post('/logout', async (req, res) => {
-//   try {
-//     const result = await AuthController.logout(req.body);
-//     res.status(200).json(result);
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// });
-
-router.post('/refresh-token', async (req, res) => {
-  try {
-    const result = await AuthController.refreshToken(req.body);
-    res.status(200).json(result);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-});
-
 
 const users = [];
 const JWT_SECRET = 'your-secret-key';
-
 
 router.post('/register', async (req, res) => {
   const { username, password } = req.body;
@@ -85,7 +46,7 @@ router.post('/login', async (req, res) => {
 
   // Set the token as a cookie
   res.cookie('token', token, { 
-    // httpOnly: true, // прячет куки для js
+    httpOnly: true, // прячет куки для js
     maxAge: 3600000 
   }); // 1 hour
 

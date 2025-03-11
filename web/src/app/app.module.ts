@@ -16,8 +16,8 @@ export const defaultEventBusData: BusEvent = {
   payload: {
     authStrategy: 'backend',
     checkBackendUrl: `${process.env['AU_BACK_URL']}/getUpdates`,
-    signUpByDataUrl: `${process.env['AU_BACK_URL']}/auth/signup`,
-    signInByDataUrl: `${process.env['AU_BACK_URL']}/auth/login`,
+    signUpByDataUrl: `${process.env['AU_BACK_URL']}/auth-token/signup`,
+    signInByDataUrl: `${process.env['AU_BACK_URL']}/auth-token/login`,
     signInByTokenUrl: "",
     status: 'init',
   },
@@ -44,7 +44,7 @@ export const standAloneEventBusData: BusEvent = {
     BrowserAnimationsModule,
     AuthModule,
     HttpClientModule,
-    TestApiModule,
+    // TestApiModule,
   ],
   providers: [
     { provide: EVENT_BUS, useValue: new BehaviorSubject('') },

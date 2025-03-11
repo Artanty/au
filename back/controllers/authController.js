@@ -14,9 +14,12 @@ class AuthController {
   }
 
   static generateRefreshToken(userId) {
-    return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-      expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN,
-    });
+    console.log(userId)
+    return jwt.sign(
+      { id: userId }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN }
+    );
   }
 
   // Signup
@@ -94,7 +97,7 @@ class AuthController {
     } catch (error) {
       connection.release();
       throw new Error(error.message);
-    }
+    } 
   }
 
   // Refresh Token

@@ -28,6 +28,7 @@ import { TestApiComponent } from './components/test-api/test-api.component';
             // ]
           },
         ]),
-  ]
+  ],
+  exports: [TestApiComponent]
 })
 export class TestApiModule { }

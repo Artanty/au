@@ -13,6 +13,8 @@ import { AuthActionMap as AuthActionMap1 } from './strategies/auth/backend-auth.
 import { AuthActionMap as AuthActionMap2 } from './strategies/token-share/save-temp-duplicate.strategy';
 import { IAuthAction } from './models/action.model';
 import { GoToLoginAction } from './actions/auth/goToLogin.action';
+import { TestApiComponent } from '../test-api/components/test-api/test-api.component';
+import { TestApiModule } from '../test-api/test-api.module';
 
 export const eventBusFilterByProject = (res: BusEvent) => {
   return res.to === `${process.env['PROJECT_ID']}@${process.env['NAMESPACE']}`
@@ -23,7 +25,8 @@ export const eventBusFilterByProject = (res: BusEvent) => {
     DynamicComponent, 
     AuthComponent, 
     Login2Component,
-    SignupComponent
+    SignupComponent,
+    // TestApiComponent 
   ],
   imports: [
     CommonModule,
@@ -45,6 +48,7 @@ export const eventBusFilterByProject = (res: BusEvent) => {
         ]
       },
     ]),
+    TestApiModule
   ],
   exports: [AuthComponent],
   providers: [

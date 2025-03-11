@@ -1,6 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 
+/**
+ * Для тестирования аутентификации с помощью кукис
+ */
 @Component({
   selector: 'app-test-api',
   // standalone: true,
@@ -13,7 +16,7 @@ export class TestApiComponent {
   localStorage: any = {};
   apiResponse: any = null;
 
-  urlBase = `${process.env['AU_BACK_URL']}/auth`
+  urlBase = `${process.env['AU_BACK_URL']}/auth-cookies`
 
   constructor(private http: HttpClient) {
     this.updateCookiesAndLocalStorage();
@@ -55,7 +58,7 @@ export class TestApiComponent {
     this.http.post(`${this.urlBase}/login`, user, { withCredentials: true }).subscribe(
       (response) => {
         this.apiResponse = response;
-        this.updateCookiesAndLocalStorage();
+        // this.updateCookiesAndLocalStorage();
       },
       (error) => {
         this.apiResponse = error.error;

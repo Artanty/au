@@ -10,8 +10,8 @@ const defaultConfig: IAuthDto = {
   tokenShareStrategy: 'saveTempDuplicate',
   payload: {
     checkBackendUrl: `${process.env['AU_BACK_URL']}/getUpdates`,
-    signUpByDataUrl: `${process.env['AU_BACK_URL']}/auth/signup`,
-    signInByDataUrl: `${process.env['AU_BACK_URL']}/auth/login`,
+    signUpByDataUrl: `${process.env['AU_BACK_URL']}/auth-token/signup`,
+    signInByDataUrl: `${process.env['AU_BACK_URL']}/auth-token/login`,
     signInByTokenUrl: "",
   },
   from: "AU",
