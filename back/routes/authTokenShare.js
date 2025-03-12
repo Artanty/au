@@ -3,6 +3,13 @@ const AuthController = require('../controllers/authController');
 
 const router = express.Router();
 
+// tokenRecord = {
+//   user: number | string,
+//   expires_at: string,
+//   token: string
+// }
+tokenRecords = []
+
 router.post('/signup', async (req, res) => {
   try {
     const result = await AuthController.signup(req.body);
@@ -15,6 +22,7 @@ router.post('/signup', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const result = await AuthController.login(req.body);
+    const { user } = result
     res.status(200).json(result);
   } catch (error) {
     res.status(400).json({ error: error.message });

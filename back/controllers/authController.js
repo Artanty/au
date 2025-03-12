@@ -6,22 +6,6 @@ const createPool = require('../core/db_connection');
 dotenv.config();
 
 class AuthController {
-  // Helper function to generate tokens
-  static generateToken(userId) {
-    return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN,
-    });
-  }
-
-  static generateRefreshToken(userId) {
-    console.log(userId)
-    return jwt.sign(
-      { id: userId }, 
-      process.env.JWT_SECRET, 
-      { expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN }
-    );
-  }
-
   // Signup
   static async signup({ username, email, password }) {
     const pool = createPool();
@@ -44,7 +28,7 @@ class AuthController {
       throw new Error(error.message);
     }
   }
-
+  static arr = [] // todo  mb add source if login?
   // Login
   static async login({ email, password }) {
     const pool = createPool();
@@ -58,7 +42,8 @@ class AuthController {
       }
 
       const user = users[0];
-
+      AuthController.arr.push(user)
+      console.log(AuthController.arr)
       // Compare passwords
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
@@ -74,9 +59,9 @@ class AuthController {
         'INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY))',
         [user.id, refreshToken]
       );
-
+      
       connection.release();
-      return { accessToken, refreshToken };
+      return { accessToken, refreshToken, user };
     } catch (error) {
       connection.release();
       throw new Error(error.message);
@@ -87,7 +72,7 @@ class AuthController {
   static async logout({ refreshToken }) {
     const pool = createPool();
     const connection = await pool.getConnection();
-
+  
     try {
       // Delete the refresh token from the database
       await connection.query('DELETE FROM refresh_tokens WHERE token = ?', [refreshToken]);
@@ -124,6 +109,23 @@ class AuthController {
       connection.release();
       throw new Error(error.message);
     }
+  }
+
+  // Helper function to generate tokens
+  static generateToken(userId) {
+    return jwt.sign(
+      { id: userId }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: process.env.JWT_EXPIRES_IN }
+    );
+  }
+
+  static generateRefreshToken(userId) {
+    return jwt.sign(
+      { id: userId }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN }
+    );
   }
 }
 

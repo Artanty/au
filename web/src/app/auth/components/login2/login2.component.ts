@@ -1,8 +1,10 @@
-import { ChangeDetectorRef, Component, Inject } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, Injector } from '@angular/core';
 import { IUserAction, UserActionService } from '../../services/user-action.service';
 import { IViewState, ViewService } from '../../services/view.service';
 import { BehaviorSubject, Observable, filter, map, startWith } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { IAuthAction } from '../../models/action.model';
+import { AuthActionMap } from '../../strategies/auth/backend-auth.strategy';
 
 @Component({
   selector: 'app-login2',
@@ -24,6 +26,7 @@ export class Login2Component {
     @Inject(ViewService) private ViewServ: ViewService,
     @Inject('ROUTER_PATH') private _routerPath$: BehaviorSubject<string>,
     @Inject(HttpClient) private readonly http: HttpClient,
+    private injector: Injector
     ) {
       this._routerPath$.asObservable().subscribe((res: string) => {
         this.routerPath = `/${res}/signup`
@@ -53,18 +56,26 @@ export class Login2Component {
     }
     this.UserActionServ.setUserAction(data)
   }
-
-  test () {
-    this.http.get('http://localhost:3204/auth-token/profile').subscribe(res => {
-      console.log(res)
-    })
+  
+  profile() {
+    const token = localStorage.getItem(`faq@web-host__accessToken`);
+    console.log(token)
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+    this.http.post('http://localhost:3204/auth-token/profile', null, { headers })
+    .subscribe(res => {
+        console.log(res)
+      })
   }
-  test1 () {
-    this.http.post('http://localhost:3204/auth-token/register', {
-      "username": "qq",
-      "password": "qq",
-  }).subscribe(res => {
-      console.log(res)
+
+  logOut () {
+    const refreshToken = localStorage.getItem(`faq@web-host__refreshToken`);
+    console.log(refreshToken)
+    this.http.post('http://localhost:3204/auth-token/logout', { refreshToken }).subscribe(res => {
+      this.injector
+      .get<IAuthAction>(AuthActionMap.get('REMOVE_TOKEN'))
+      .execute();
     })
   }
 }

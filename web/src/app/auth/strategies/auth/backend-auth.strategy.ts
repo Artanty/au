@@ -17,7 +17,7 @@ import { GetProductAuthTokenAction } from '../../actions/auth/getLsToken.action'
 import { GrantAccessAction } from '../../actions/auth/grantAccess.action';
 import { ResetFormValidatorsAction } from '../../actions/auth/resetFormValidators.action';
 import { SaveTokenInLsAction } from '../../actions/auth/saveLsToken.action';
-import { SignInByDataAction } from '../../actions/auth/singInByData.action';
+import { LoginResponse, SignInByDataAction } from '../../actions/auth/singInByData.action';
 import { IAuthAction } from '../../models/action.model';
 import {
   IUserAction,
@@ -90,10 +90,10 @@ export class BackendAuthStrategy implements IAuthStrategy {
       .execute()
       .pipe(
         takeUntil(this.unsubscribe$),
-        tap((response: { token: string }) => {
+        tap((res: LoginResponse) => {
           this.injector
             .get<IAuthAction>(AuthActionMap.get('SAVE_TOKEN_IN_LS'))
-            .execute(response.token);
+            .execute(res);
           // this.injector
           //   .get<IAuthAction>(AuthActionMap.get('GRANT_ACCESS'))
           //   .execute();

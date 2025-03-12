@@ -7,6 +7,8 @@ export class RemoveProductAuthTokenAction implements IAuthAction {
   constructor(@Inject(HOST_NAME) private readonly hostName: string) {}
 
   public execute() {
-    return localStorage.removeItem(`${this.hostName}__authToken`);
+    localStorage.removeItem(`${this.hostName}__accessToken`);
+    localStorage.removeItem(`${this.hostName}__refreshToken`);
+    return true
   }
 }
