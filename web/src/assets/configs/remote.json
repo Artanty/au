@@ -2,9 +2,9 @@
     "event_bus_hooks": [
         {
             "trigger": {
-                "event": "EAGER_ADD_REMOTES_DONE"
+                "event": "SET_REMOTES_CONFIGS_DONE"
             },
-            "action": "GO_TO_LOGIN",
+            "action": "INIT_AUTH_STRATEGY",
             "lives": "once"
         },
         {

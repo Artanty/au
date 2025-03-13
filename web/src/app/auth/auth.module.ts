@@ -6,7 +6,7 @@ import { AuthComponent } from './auth.component';
 import { DynamicComponent } from './components/dynamic/dynamic.component';
 import { Login2Component } from './components/login2/login2.component';
 import { SignupComponent } from './components/signup/signup.component';
-import { BehaviorSubject, filter, Observable } from 'rxjs'; 
+import { BehaviorSubject, filter, Observable, take } from 'rxjs'; 
 import { BusEvent, EVENT_BUS, EVENT_BUS_LISTENER, EVENT_BUS_PUSHER } from 'typlib';
 import { CoreService } from './services/core.service';
 import { AuthActionMap as AuthActionMap1 } from './strategies/auth/backend-auth.strategy';
@@ -53,9 +53,9 @@ export const eventBusFilterByProject = (res: BusEvent) => {
   exports: [AuthComponent],
   providers: [
     CoreService,
-    {
-      provide: 'ROUTER_PATH', useValue: new BehaviorSubject<string>('')
-    },
+    // {
+    //   provide: 'ROUTER_PATH', useValue: new BehaviorSubject<string>('')
+    // },
     // { provide: EVENT_BUS, useValue: new BehaviorSubject('') },
     { 
       provide: EVENT_BUS_LISTENER, 
@@ -83,9 +83,9 @@ export const eventBusFilterByProject = (res: BusEvent) => {
   ],
 })
 export class AuthModule {
- 
+  ngDoBootstrap() {}
   private eventBusListener$: Observable<BusEvent>
-  // private eventBusPusher: (busEvent: BusEvent) => void
+  private eventBusPusher: (busEvent: BusEvent) => void
 
   constructor (
     // @Inject(EVENT_BUS)
@@ -98,7 +98,7 @@ export class AuthModule {
     // @Inject(EVENT_BUS_PUSHER)
     // private readonly eventBusPusher: (busEvent: BusEvent) => void,
   ) {
-
+    console.log('AuthModule CONSTRUCTOR')
     // const injector = Injector.create({
     //   providers: [
     //     { provide: Router, useClass: Router },
@@ -108,7 +108,6 @@ export class AuthModule {
     // });
     
     const eventBus$ = this.injector.get(EVENT_BUS);
-
     
     this.eventBusListener$ = eventBus$
     .asObservable()
@@ -117,7 +116,7 @@ export class AuthModule {
         return res.to === `${process.env['PROJECT_ID']}@${process.env['NAMESPACE']}`
       }),
     );
-    // this.eventBusPusher = (busEvent) => this.eventBus$.next(busEvent)
+    this.eventBusPusher = (busEvent) => eventBus$.next(busEvent)
 
     this.eventBusListener$
     .pipe(
@@ -126,6 +125,9 @@ export class AuthModule {
       console.log(res)
       if (res.event === 'TRIGGER_ACTION') {
         console.log('action: ' + res.payload.action)
+        if (res.payload.action === 'INIT_AUTH_STRATEGY') {
+          this.initAuthStrategy()
+        }
         // const map = new Map([...AuthActionMap1, ...AuthActionMap2])
         // const result = map.get(res.payload.action)
         // console.log(result)
@@ -139,13 +141,11 @@ export class AuthModule {
         // const goToLoginAction = new GoToLoginAction(injector);    
         // goToLoginAction.execute()
         
-        
-      }
-      if (res.event === 'ROUTER_PATH') {
+        // if ROUTER_PATH:
         // this._coreService.setRouterPath((res.payload as any).routerPath).then(() => {
-        //   this.routerPath.next(res.payload.routerPath)
-        //   this._sendDoneEvent(res, 'self')
-        // })
+        //     this.routerPath.next(res.payload.routerPath)
+        //     this._sendDoneEvent(res, 'self')
+        //   })
       }
     })
     
@@ -161,5 +161,60 @@ export class AuthModule {
       payload: null
     }
     // this.eventBusPusher(doneBusEvent)
+  }
+
+  /**
+   * Понять, откуда брать конфиг
+   * для этого понять, ремоут мы или элоун.
+   * для этого запросить ROUTE_PATH 
+   */
+  private initAuthStrategy () {
+    this.eventBusListener$.pipe(
+      filter((res: BusEvent) => res.event === 'AUTH_CONFIG'),
+      take(1)
+    ).subscribe(res => {
+      
+    })
+    
+    /**
+     * Подписываемся, джем прихода ROUTER_PATH и отписываемся
+     */
+    this.eventBusListener$.pipe(
+      filter((res: BusEvent) => res.event === 'ROUTER_PATH'),
+      take(1)
+    ).subscribe(res => {
+      /**
+       * Убеждаемся, что мы ремоут
+       */
+      const currentBaseUrl$ = this.injector.get('ROUTER_PATH') as BehaviorSubject<string>
+      const isRemote = currentBaseUrl$.getValue() !== '/'
+      /**
+       * Если мы ремоут - запрашиваем конфиг у хоста
+       */
+      if (isRemote) {
+        this._sendEventToHost('ASK_AUTH_CONFIG')
+      }
+      console.log()
+      
+    })
+
+    this.eventBusPusher({
+      from: `${process.env['PROJECT_ID']}@${process.env['NAMESPACE']}`,
+      to: `faq@web-host`,
+      event: 'ASK_ROUTER_PATH',
+      payload: {
+        projectId: `${process.env['PROJECT_ID']}`
+      }
+    })
+  }
+
+  private _sendEventToHost(eventName: string, payload: any = null): void {
+    const busEvent: BusEvent = {
+      from: `${process.env['PROJECT_ID']}@${process.env['NAMESPACE']}`,
+      to: 'faq@web-host',
+      event: `${eventName}`,
+      payload: payload
+    }
+    this.eventBusPusher(busEvent)
   }
 }

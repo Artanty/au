@@ -29,17 +29,17 @@ module.exports = {
   plugins: [
     new ModuleFederationPlugin({
       name: "au",
-      filename: "remoteEntry.js",
+      filename: "remoteEntry2.js",
       exposes: {
-        './Module': './src/app/auth/auth.module.ts',
+        './AuthModule': './src/app/auth/auth.module.ts',
         './Component': './src/app/auth/auth.component.ts',
       },
       shared: share({
-        "@angular/core": { singleton: true, strictVersion: true, requiredVersion: 'auto' },
-        "@angular/common": { singleton: true, strictVersion: true, requiredVersion: 'auto' },
-        "@angular/common/http": { singleton: true, strictVersion: true, requiredVersion: 'auto' },
-        "@angular/router": { singleton: true, strictVersion: true, requiredVersion: 'auto' },
-        "typlib": { singleton: true, strictVersion: true, requiredVersion: 'auto' },
+        "@angular/core": { singleton: true, strictVersion: true, requiredVersion: '17.0.5', eager: true  },
+        "@angular/common": { singleton: true, strictVersion: true, requiredVersion: '17.0.5', eager: true  },
+        // "@angular/common/http": { singleton: true, strictVersion: true, requiredVersion: 'auto', eager: true  },
+        "@angular/router": { singleton: true, strictVersion: true, requiredVersion: '17.0.5', eager: true  },
+        "typlib": { singleton: true, strictVersion: true, requiredVersion: 'auto', eager: true  },
         ...sharedMappings.getDescriptors(),
       })
     }),
