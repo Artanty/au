@@ -9,12 +9,32 @@ import { SignupComponent } from './components/signup/signup.component';
 import { BehaviorSubject, filter, Observable, take } from 'rxjs'; 
 import { BusEvent, EVENT_BUS, EVENT_BUS_LISTENER, EVENT_BUS_PUSHER } from 'typlib';
 import { CoreService } from './services/core.service';
-import { AuthActionMap as AuthActionMap1 } from './strategies/auth/backend-auth.strategy';
-import { AuthActionMap as AuthActionMap2 } from './strategies/token-share/save-temp-duplicate.strategy';
+import { AuthActionMap as AuthActionMap1, BackendAuthStrategy } from './strategies/auth/backend-auth.strategy';
+import { AuthActionMap as AuthActionMap2, SaveTempDuplicateStrategy } from './strategies/token-share/save-temp-duplicate.strategy';
 import { IAuthAction } from './models/action.model';
 import { GoToLoginAction } from './actions/auth/goToLogin.action';
 import { TestApiComponent } from '../test-api/components/test-api/test-api.component';
 import { TestApiModule } from '../test-api/test-api.module';
+import { ConfigService } from './services/config.service';
+import { AuthStrategyService } from './strategies/auth-strategy.service';
+import { BackendTokenStrategy } from './strategies/auth/backend-token.strategy';
+import { DisplayInvalidDataErrorAction } from './actions/auth/displayInvalidDataError.action';
+import { DisplayLoaderAction } from './actions/auth/displayLoader.action';
+import { DisplayLoginFormAction } from './actions/auth/displayLoginForm.action';
+import { DisplayUnknownErrorAction } from './actions/auth/displayUnknownError.action';
+import { GetProductAuthTokenAction } from './actions/auth/getLsToken.action';
+import { GrantAccessAction } from './actions/auth/grantAccess.action';
+import { InitTokenStrategyAction } from './actions/auth/initTokenShareStrategy.action';
+import { RemoveProductAuthTokenAction } from './actions/auth/removeLsToken.action';
+import { ResetFormValidatorsAction } from './actions/auth/resetFormValidators.action';
+import { SaveTokenInLsAction } from './actions/auth/saveLsToken.action';
+import { SignInByDataAction } from './actions/auth/singInByData.action';
+import { SignUpByDataAction } from './actions/auth/singUpByData.action';
+import { AskProjectIdsAction } from './actions/token-share/askProjectsIds.action';
+import { TokenShareService } from './services/token-share.service';
+import { UserActionService } from './services/user-action.service';
+import { ViewService } from './services/view.service';
+import { TokenShareStrategyService } from './strategies/token-share-strategy.service';
 
 export const eventBusFilterByProject = (res: BusEvent) => {
   return res.to === `${process.env['PROJECT_ID']}@${process.env['NAMESPACE']}`
@@ -53,6 +73,31 @@ export const eventBusFilterByProject = (res: BusEvent) => {
   exports: [AuthComponent],
   providers: [
     CoreService,
+    ConfigService,
+    AuthStrategyService,
+    BackendTokenStrategy,
+    GetProductAuthTokenAction,
+    DisplayLoginFormAction,
+    SignInByDataAction,
+    SaveTokenInLsAction,
+    DisplayInvalidDataErrorAction,
+    DisplayUnknownErrorAction,
+    DisplayLoaderAction,
+    GoToLoginAction,
+    ResetFormValidatorsAction,
+    DynamicComponent,
+    GrantAccessAction,
+    BackendAuthStrategy,
+    ViewService,
+    UserActionService,
+    RemoveProductAuthTokenAction,
+    SignInByDataAction,
+    SignUpByDataAction,
+    TokenShareStrategyService,
+    TokenShareService,
+    InitTokenStrategyAction,
+    SaveTempDuplicateStrategy,
+    AskProjectIdsAction,
     // {
     //   provide: 'ROUTER_PATH', useValue: new BehaviorSubject<string>('')
     // },
@@ -97,6 +142,9 @@ export class AuthModule {
     // private readonly eventBusListener$: Observable<BusEvent>,
     // @Inject(EVENT_BUS_PUSHER)
     // private readonly eventBusPusher: (busEvent: BusEvent) => void,
+    private readonly _coreService: CoreService,
+    private readonly _configService: ConfigService,
+    private readonly _authStrategyService: AuthStrategyService
   ) {
     console.log('AuthModule CONSTRUCTOR')
     // const injector = Injector.create({
@@ -125,8 +173,8 @@ export class AuthModule {
       console.log(res)
       if (res.event === 'TRIGGER_ACTION') {
         console.log('action: ' + res.payload.action)
-        if (res.payload.action === 'INIT_AUTH_STRATEGY') {
-          this.initAuthStrategy()
+        if (res.payload.action === 'INIT_AUTH_CONFIG') {
+          this.initAuthConfig()
         }
         // const map = new Map([...AuthActionMap1, ...AuthActionMap2])
         // const result = map.get(res.payload.action)
@@ -168,34 +216,35 @@ export class AuthModule {
    * для этого понять, ремоут мы или элоун.
    * для этого запросить ROUTE_PATH 
    */
-  private initAuthStrategy () {
+  private initAuthConfig () {
+    
     this.eventBusListener$.pipe(
+      filter(eventBusFilterByProject),
       filter((res: BusEvent) => res.event === 'AUTH_CONFIG'),
       take(1)
     ).subscribe(res => {
-      
+      this._configService.setConfig(res.payload)
+      this._authStrategyService.select(res.payload.authStrategy)
     })
     
     /**
-     * Подписываемся, джем прихода ROUTER_PATH и отписываемся
+     * Подписываемся, ждём прихода ROUTER_PATH и отписываемся
      */
     this.eventBusListener$.pipe(
+      filter(eventBusFilterByProject),
       filter((res: BusEvent) => res.event === 'ROUTER_PATH'),
       take(1)
-    ).subscribe(res => {
-      /**
-       * Убеждаемся, что мы ремоут
-       */
-      const currentBaseUrl$ = this.injector.get('ROUTER_PATH') as BehaviorSubject<string>
-      const isRemote = currentBaseUrl$.getValue() !== '/'
-      /**
-       * Если мы ремоут - запрашиваем конфиг у хоста
-       */
-      if (isRemote) {
-        this._sendEventToHost('ASK_AUTH_CONFIG')
-      }
-      console.log()
-      
+    ).subscribe(res => { 
+      console.log(res)
+      this._coreService.setRouterPath(res.payload.routerPath)
+      .then(() => {
+        /**
+         * Если мы ремоут - запрашиваем конфиг у хоста
+         */
+        if (this._coreService.isInsideHost()) {
+          this._sendEventToHost('ASK_AUTH_CONFIG')
+        }
+      })
     })
 
     this.eventBusPusher({

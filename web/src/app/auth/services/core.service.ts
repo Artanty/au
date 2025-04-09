@@ -7,6 +7,9 @@ export class CoreService {
     private _routerPath = '/'
     
     private _isRouterPathSet$ = new BehaviorSubject<boolean>(false)
+    
+    private _authConfig$ = new BehaviorSubject<any>('')
+
     public listenRouterPathSet$ = this._isRouterPathSet$.asObservable()
     public isRouterPathSet (): boolean {
         return this._isRouterPathSet$.getValue()
@@ -34,4 +37,14 @@ export class CoreService {
     public getBaseUrl (): string {
         return __webpack_public_path__;
     }
+
+    public async setAuthConfig (data: any): Promise<void> {
+        this._authConfig$.next(data)
+        return Promise.resolve()
+    }
+
+    public getAuthConfig(): any {
+        return this._authConfig$.getValue()
+    }
+
 }

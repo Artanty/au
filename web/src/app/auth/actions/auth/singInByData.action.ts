@@ -29,19 +29,20 @@ export class SignInByDataAction implements IAuthAction {
 
   public execute(): Observable<LoginResponse> {
     const formDataUserAction = this.UserActionServ.getUserAction()?.payload
-    const config = this.ConfigServ.getConfig()
+
     let requestData = {} as any
-    if (config?.from === 'AU') {
-      requestData.username = formDataUserAction?.['username']
+
+    requestData.username = formDataUserAction?.['username']
+    requestData.password = formDataUserAction?.['password']
+
+    if (!formDataUserAction?.['email']) {
       requestData.email = formDataUserAction?.['username']
-      requestData.password = formDataUserAction?.['password']
-    } else {
-      requestData.username = formDataUserAction?.['username']
-      requestData.password = formDataUserAction?.['password']
     }
 
-    const signInUrl = config?.payload?.['signInByDataUrl'];
-    if (!signInUrl) throw new Error('No signInByDataUrl in payload');
-    return this.http.post<LoginResponse>(signInUrl, requestData);
+    if (!process.env['AU_BACK_URL']) throw new Error('No URL PROVIDED');
+
+    const url = `${process.env['AU_BACK_URL']}/auth-token/login`
+
+    return this.http.post<LoginResponse>(url, requestData);
   }
 }

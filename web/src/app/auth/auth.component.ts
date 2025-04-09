@@ -2,30 +2,10 @@ import { Component, Inject, InjectionToken, Injector, OnDestroy, OnInit } from '
 
 import { BehaviorSubject, Observable, Subject, combineLatest, filter, of, take, takeUntil } from 'rxjs';
 import { BusEvent, EVENT_BUS } from 'typlib';
-import { DisplayInvalidDataErrorAction } from './actions/auth/displayInvalidDataError.action';
-import { DisplayLoaderAction } from './actions/auth/displayLoader.action';
-import { DisplayLoginFormAction } from './actions/auth/displayLoginForm.action';
-import { DisplayUnknownErrorAction } from './actions/auth/displayUnknownError.action';
-import { GetProductAuthTokenAction } from './actions/auth/getLsToken.action';
-import { GrantAccessAction } from './actions/auth/grantAccess.action';
-import { ResetFormValidatorsAction } from './actions/auth/resetFormValidators.action';
-import { SaveTokenInLsAction } from './actions/auth/saveLsToken.action';
-import { SignInByDataAction } from './actions/auth/singInByData.action';
-import { AuthStrategyService } from './strategies/auth-strategy.service';
-import { BackendAuthStrategy } from './strategies/auth/backend-auth.strategy';
-import { DynamicComponent } from './components/dynamic/dynamic.component';
 import { ConfigService } from './services/config.service';
-import { UserActionService } from './services/user-action.service';
-import { ViewService } from './services/view.service';
-import { SignUpByDataAction } from './actions/auth/singUpByData.action';
-import { GoToLoginAction } from './actions/auth/goToLogin.action';
-import { RemoveProductAuthTokenAction } from './actions/auth/removeLsToken.action';
-import { TokenShareStrategyService } from './strategies/token-share-strategy.service';
-import { TokenShareService } from './services/token-share.service';
-import { InitTokenStrategyAction } from './actions/auth/initTokenShareStrategy.action';
-import { SaveTempDuplicateStrategy } from './strategies/token-share/save-temp-duplicate.strategy';
-import { AskProjectIdsAction } from './actions/token-share/askProjectsIds.action';
 import { CoreService } from './services/core.service';
+import { TokenShareService } from './services/token-share.service';
+import { AuthStrategyService } from './strategies/auth-strategy.service';
 
 export const EVENT_BUS_LISTENER = new InjectionToken<Observable<BusEvent>>('');
 export const EVENT_BUS_PUSHER = new InjectionToken<
@@ -37,29 +17,29 @@ export const EVENT_BUS_PUSHER = new InjectionToken<
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.scss',
   providers: [
-    GetProductAuthTokenAction,
-    DisplayLoginFormAction,
-    SignInByDataAction,
-    SaveTokenInLsAction,
-    DisplayInvalidDataErrorAction,
-    DisplayUnknownErrorAction,
-    DisplayLoaderAction,
-    GoToLoginAction,
-    ResetFormValidatorsAction,
-    DynamicComponent,
-    AuthStrategyService,
-    BackendAuthStrategy,
-    ViewService,
-    UserActionService,
-    RemoveProductAuthTokenAction,
-    SignInByDataAction,
-    SignUpByDataAction,
-    GrantAccessAction,
-    TokenShareStrategyService,
-    TokenShareService,
-    InitTokenStrategyAction,
-    SaveTempDuplicateStrategy,
-    AskProjectIdsAction,
+    // GetProductAuthTokenAction,
+    // DisplayLoginFormAction,
+    // SignInByDataAction,
+    // SaveTokenInLsAction,
+    // DisplayInvalidDataErrorAction,
+    // DisplayUnknownErrorAction,
+    // DisplayLoaderAction,
+    // GoToLoginAction,
+    // ResetFormValidatorsAction,
+    // DynamicComponent,
+    // AuthStrategyService,
+    // BackendAuthStrategy,
+    // ViewService,
+    // UserActionService,
+    // RemoveProductAuthTokenAction,
+    // SignInByDataAction,
+    // SignUpByDataAction,
+    // GrantAccessAction,
+    // TokenShareStrategyService,
+    // TokenShareService,
+    // InitTokenStrategyAction,
+    // SaveTempDuplicateStrategy,
+    // AskProjectIdsAction,
     {
       provide: EVENT_BUS_LISTENER,
       useFactory: (eventBus$: BehaviorSubject<BusEvent>) => {
@@ -90,7 +70,6 @@ export class AuthComponent implements OnInit, OnDestroy {
     @Inject(EVENT_BUS_PUSHER)
     private eventBusPusher: (busEvent: BusEvent) => void,
     @Inject(ConfigService) private ConfigServ: ConfigService,
-    @Inject('ROUTER_PATH') private routerPath: BehaviorSubject<string>,
     @Inject(AuthStrategyService) private AuthStrategyServ: AuthStrategyService, // do not remove: used to bootstrap it's constructor
     private _tokenShareService: TokenShareService
   ) {
@@ -217,15 +196,15 @@ export function authStrategyAdapter(busEvent: BusEvent): IAuthDto {
 }
 
 export interface IAuthDto {
-  productName: string;
+  productName?: string;
   authStrategy: string;
   tokenShareStrategy: string;
-  payload: {
+  payload?: {
     checkBackendUrl: string;
     signUpByDataUrl?: string
     signInByDataUrl: string;
     signInByTokenUrl: string;
   };
-  from: string;
-  status: string;
+  from?: string;
+  status?: string;
 }

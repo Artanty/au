@@ -9,17 +9,17 @@ export class TokenShareStrategyService {
   private strategy!: IAuthStrategy;
 
   constructor(
-      private injector: Injector,
+    private injector: Injector,
   ) {}
 
-  public select(tokenShareStrategy: string) {
+  public select(strategy: string) {
     try {
       this.strategy = this.injector.get<IAuthStrategy>(
-        TokenShareStrategyMap.get(tokenShareStrategy)
+        TokenShareStrategyMap.get(strategy)
       )
       if (!this.strategy)
         throw new Error(
-          `strategy '${tokenShareStrategy}' doesn't exist in StrategyMap`
+          `strategy '${strategy}' doesn't exist in StrategyMap`
         );
       this.strategy.runScenario('init');
     } catch (err) {

@@ -4,7 +4,7 @@
             "trigger": {
                 "event": "SET_REMOTES_CONFIGS_DONE"
             },
-            "action": "INIT_AUTH_STRATEGY",
+            "action": "INIT_AUTH_CONFIG",
             "lives": "once"
         },
         {

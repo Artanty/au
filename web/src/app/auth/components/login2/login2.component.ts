@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Inject, Injector } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, Injector, OnInit } from '@angular/core';
 import { IUserAction, UserActionService } from '../../services/user-action.service';
 import { IViewState, ViewService } from '../../services/view.service';
 import { BehaviorSubject, Observable, filter, map, startWith } from 'rxjs';
@@ -11,7 +11,7 @@ import { AuthActionMap } from '../../strategies/auth/backend-auth.strategy';
   templateUrl: './login2.component.html',
   styleUrl: './login2.component.scss'
 })
-export class Login2Component {
+export class Login2Component implements OnInit {
   username: string = '';
   password: string = '';
 
@@ -24,13 +24,9 @@ export class Login2Component {
   constructor(
     @Inject(UserActionService) private UserActionServ: UserActionService,
     @Inject(ViewService) private ViewServ: ViewService,
-    @Inject('ROUTER_PATH') private _routerPath$: BehaviorSubject<string>,
     @Inject(HttpClient) private readonly http: HttpClient,
     private injector: Injector
     ) {
-      this._routerPath$.asObservable().subscribe((res: string) => {
-        this.routerPath = `/${res}/signup`
-      })
     this.formMessage$ = this.ViewServ.listenViewState()
     .pipe(
       filter(Boolean),
@@ -46,12 +42,28 @@ export class Login2Component {
     )
   }
 
+  ngOnInit (): void {
+    this.mock()
+  }
+
+  private mock() {
+    this.username = 'john@example.com'
+    this.password = 'password123'
+  }
+
+  register() {
+    const user = { username: 'john', password: 'password123' };
+    const urlBase = `${process.env['AU_BACK_URL']}/auth-cookies`
+    this.http.post(`${urlBase}/register`, user).subscribe();
+  }
+
   onLogin() {
     const data: IUserAction = {
       action: 'SEND_LOGIN_REQUEST',
       payload: {
         username: this.username,
-        password: this.password
+        password: this.password,
+
       }
     }
     this.UserActionServ.setUserAction(data)
