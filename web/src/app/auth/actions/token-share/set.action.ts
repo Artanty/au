@@ -5,7 +5,7 @@ import { ConfigService } from '../../services/config.service';
 import { IAuthAction } from '../../models/action.model';
 
 @Injectable()
-export class AskProjectIdsAction implements IAuthAction {
+export class AskProjectIdsAction2 implements IAuthAction {
   constructor(
     @Inject(HOST_NAME) private readonly hostName: string,
     @Inject(ConfigService) private ConfigServ: ConfigService,

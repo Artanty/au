@@ -1,5 +1,4 @@
 import { Injectable, Injector } from '@angular/core';
-
 import { IAuthStrategy } from '../models/strategy.model';
 import { BackendAuthStrategy } from './auth/backend-auth.strategy';
 import { BackendTokenStrategy } from './auth/backend-token.strategy';
@@ -20,7 +19,7 @@ export class AuthStrategyService {
       );
       if (!this.strategy)
         throw new Error(
-          `strategy '${strategy}' doesn't exist in AuthStrategyMap`
+          `strategy '${strategy}' doesn't exist in StrategyMap`
         );
         this.strategy.runScenario('init');
     } catch (err) {

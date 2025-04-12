@@ -24,3 +24,32 @@ export const AuthActionMap = new Map<string, any>([
 ])
 
 экшен должен возвращать промис или поток для встраивания в хост приложение.
+
+
+```
+{
+  "on": {
+      "event": "SET_REMOTES_CONFIGS_DONE"
+  },
+  "push": {
+      "type": "TRIGGER_ACTION",
+      "event": "INIT_AUTH_CONFIG"
+  },
+  "lives": "once"
+}
+```
+// возможность ответить тому продукту, который задал вопрос.
+```
+{
+  "on": {
+      "event": "ASK_REMOTES_BACKEND_URLS"
+  },
+  "push": {
+      "type": "ANSWER",
+      "payload": {
+        "id": "faq"
+        "back_url": "http://localhost:3204"
+      }
+  },
+  "lives": "once"
+},

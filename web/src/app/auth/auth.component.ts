@@ -74,8 +74,8 @@ export class AuthComponent implements OnInit, OnDestroy {
     private _tokenShareService: TokenShareService
   ) {
     this.eventBusListener$.subscribe((busEvent: BusEvent) => {
-        console.log('AU:');
-        console.log(busEvent);
+        // console.log('AU:');
+        // console.log(busEvent);
       if (busEvent.event === 'authStrategy') {
         this.ConfigServ.setConfig(authStrategyAdapter(busEvent));
       }

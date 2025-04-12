@@ -3,7 +3,6 @@ import { SaveTempDuplicateStrategy } from "./token-share/save-temp-duplicate.str
 import { IAuthStrategy } from "../models/strategy.model";
 
 @Injectable()
-
 export class TokenShareStrategyService {
 
   private strategy!: IAuthStrategy;
@@ -31,5 +30,5 @@ export class TokenShareStrategyService {
 }
 
 export const TokenShareStrategyMap = new Map<string, any>([
-  ['saveTempDuplicate', SaveTempDuplicateStrategy],
+  ['SAVE_TEMP_DUPLICATE', SaveTempDuplicateStrategy],
 ]);

@@ -3,6 +3,9 @@ import { IAuthStrategy } from "../../models/strategy.model";
 import { AskProjectIdsAction } from "../../actions/token-share/askProjectsIds.action";
 import { IAuthAction } from "../../models/action.model";
 import { AskBackendRoutesAction } from "../../actions/token-share/askBackendRoutes.action";
+import { AskBackUrlsAction } from "../../actions/token-share/askBackUrls.action";
+import { Observable } from "rxjs";
+import { BusEvent } from "typlib";
 
 
 @Injectable()
@@ -35,21 +38,44 @@ export class SaveTempDuplicateStrategy implements IAuthStrategy {
    * 
    */
   handleInitScenario () {
-    console.log('handleInitScenario')
-    this.injector
+    /**
+     * todo: 
+     * check on host that all the remotes are loaded.
+     * if one is not - remove it from projectIds for @au
+     * try to reconnect it for 10 sec? )
+     */
+    const projectIds$ = this.injector
       .get<IAuthAction>(AuthActionMap.get('ASK_PROJECTS_IDS'))
-      .execute(true);
+      .execute()
 
-    // this.injector
-    //   .get<IAuthAction>(AuthActionMap.get('ASK_PROJECTS_IDS'))
-    //   .execute(true);
+    projectIds$.subscribe((res: string[]) => {
+      console.log(res)
+      const backUrls$ = this.injector
+        .get<IAuthAction>(AuthActionMap.get('ASK_BACK_URLS'))
+        .execute(res)
 
-          //ASK_BACKEND_ROUTES
+      backUrls$.subscribe((res: any) => { 
+        console.log(res)
+      })
+    })
+
+    // const backUrls$ = this.injector
+    //     .get<IAuthAction>(AuthActionMap.get('ASK_BACK_URLS'))
+    //     .execute(['au', 'faq'])
+
+    //   backUrls$.subscribe((res: any) => {
+    //     console.log(res)
+    //   })
+      
+
+    
+      
   }
 }
 
 export const AuthActionMap = new Map<string, any>([
   ['ASK_PROJECTS_IDS', AskProjectIdsAction],
-  ['ASK_BACKEND_ROUTES', AskBackendRoutesAction],
+  ['ASK_BACK_URLS', AskBackUrlsAction],
+  // ['ASK_BACKEND_ROUTES', AskBackendRoutesAction],
   
 ]);

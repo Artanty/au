@@ -35,6 +35,8 @@ import { TokenShareService } from './services/token-share.service';
 import { UserActionService } from './services/user-action.service';
 import { ViewService } from './services/view.service';
 import { TokenShareStrategyService } from './strategies/token-share-strategy.service';
+import { SelectTokenShareStrategyAction } from './actions/auth/selectTokenShareStrategy.action';
+import { AskBackUrlsAction } from './actions/token-share/askBackUrls.action';
 
 export const eventBusFilterByProject = (res: BusEvent) => {
   return res.to === `${process.env['PROJECT_ID']}@${process.env['NAMESPACE']}`
@@ -98,6 +100,8 @@ export const eventBusFilterByProject = (res: BusEvent) => {
     InitTokenStrategyAction,
     SaveTempDuplicateStrategy,
     AskProjectIdsAction,
+    AskBackUrlsAction,
+    SelectTokenShareStrategyAction,
     // {
     //   provide: 'ROUTER_PATH', useValue: new BehaviorSubject<string>('')
     // },
@@ -129,43 +133,25 @@ export const eventBusFilterByProject = (res: BusEvent) => {
 })
 export class AuthModule {
   ngDoBootstrap() {}
-  private eventBusListener$: Observable<BusEvent>
-  private eventBusPusher: (busEvent: BusEvent) => void
+  // private eventBusListener$: Observable<BusEvent>
+  // private eventBusPusher: (busEvent: BusEvent) => void
 
   constructor (
-    // @Inject(EVENT_BUS)
-    // private readonly eventBus$: BehaviorSubject<BusEvent>,
+    @Inject(EVENT_BUS)
+    private readonly eventBus$: BehaviorSubject<BusEvent>,
     private injector: Injector,
     
     // private goToLoginAction: GoToLoginAction
-    // @Inject(EVENT_BUS_LISTENER)
-    // private readonly eventBusListener$: Observable<BusEvent>,
-    // @Inject(EVENT_BUS_PUSHER)
-    // private readonly eventBusPusher: (busEvent: BusEvent) => void,
+    @Inject(EVENT_BUS_LISTENER)
+    private readonly eventBusListener$: Observable<BusEvent>,
+    @Inject(EVENT_BUS_PUSHER)
+    private readonly eventBusPusher: (busEvent: BusEvent) => void,
     private readonly _coreService: CoreService,
     private readonly _configService: ConfigService,
     private readonly _authStrategyService: AuthStrategyService
   ) {
     console.log('AuthModule CONSTRUCTOR')
-    // const injector = Injector.create({
-    //   providers: [
-    //     { provide: Router, useClass: Router },
-    //     { provide: Console, useClass: Console },
-    //     { provide: 'ROUTER_PATH', useValue: new BehaviorSubject<string>('default-path') },
-    //   ],
-    // });
     
-    const eventBus$ = this.injector.get(EVENT_BUS);
-    
-    this.eventBusListener$ = eventBus$
-    .asObservable()
-    .pipe(
-      filter((res: BusEvent) => {
-        return res.to === `${process.env['PROJECT_ID']}@${process.env['NAMESPACE']}`
-      }),
-    );
-    this.eventBusPusher = (busEvent) => eventBus$.next(busEvent)
-
     this.eventBusListener$
     .pipe(
       filter(eventBusFilterByProject)
@@ -223,7 +209,8 @@ export class AuthModule {
       filter((res: BusEvent) => res.event === 'AUTH_CONFIG'),
       take(1)
     ).subscribe(res => {
-      this._configService.setConfig(res.payload)
+      // console.log({ ...res.payload, from: res.from })
+      this._configService.setConfig({ ...res.payload, from: res.from })
       this._authStrategyService.select(res.payload.authStrategy)
     })
     

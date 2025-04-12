@@ -28,6 +28,8 @@ import { SignUpByDataAction } from '../../actions/auth/singUpByData.action';
 import { GoToLoginAction } from '../../actions/auth/goToLogin.action';
 import { RemoveProductAuthTokenAction } from '../../actions/auth/removeLsToken.action';
 import { InitTokenStrategyAction } from '../../actions/auth/initTokenShareStrategy.action';
+import { AskProjectIdsAction } from '../../actions/token-share/askProjectsIds.action';
+import { SelectTokenShareStrategyAction } from '../../actions/auth/selectTokenShareStrategy.action';
 
 @Injectable()
 export class BackendTokenStrategy implements IAuthStrategy {
@@ -64,15 +66,19 @@ export class BackendTokenStrategy implements IAuthStrategy {
   }
 
   handleInitScenario() {
-    console.log('strategy BackendTokenStrategy inited');
     const token = this.injector
       .get<IAuthAction>(AuthActionMap.get('GET_TOKEN'))
       .execute();
+
     if (token) {
       // this.injector
       //   .get<IAuthAction>(AuthActionMap.get('GRANT_ACCESS'))
       //   .execute();
     } else {
+      this.injector
+        .get<IAuthAction>(AuthActionMap.get('SELECT_TOKEN_SHARE_STRATEGY'))
+        .execute();
+
       this.injector
         .get<IAuthAction>(AuthActionMap.get('DISPLAY_LOGIN_FORM'))
         .execute();
@@ -183,5 +189,7 @@ export const AuthActionMap = new Map<string, any>([
   ['GRANT_ACCESS', GrantAccessAction],
   ['GO_TO_LOGIN', GoToLoginAction],
   ['REMOVE_TOKEN', RemoveProductAuthTokenAction],
-  ['INIT_TOKEN_SHARE', InitTokenStrategyAction]
+  ['INIT_TOKEN_SHARE', InitTokenStrategyAction],
+  ['ASK_PROJECTS_IDS', AskProjectIdsAction],
+  ['SELECT_TOKEN_SHARE_STRATEGY', SelectTokenShareStrategyAction]
 ]);

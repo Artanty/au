@@ -1,25 +1,27 @@
 {
     "event_bus_hooks": [
         {
-            "trigger": {
+            "on": {
                 "event": "SET_REMOTES_CONFIGS_DONE"
             },
-            "action": "INIT_AUTH_CONFIG",
+            "push": {
+                "type": "TRIGGER_ACTION",
+                "action": "INIT_AUTH_CONFIG"
+            },
             "lives": "once"
         },
         {
-            "trigger": {
-                "event": "MOCK1"
+            "on": {
+                "event": "ASK_BACK_URLS"
             },
-            "action": "TEST",
-            "lives": "once"
-        },
-        {
-            "trigger": {
-                "event": "MOCK2"
+            "push": {
+                "type": "ANSWER",
+                "payload": {
+                    "project_id": "au",
+                    "back_url": "http://localhost:3204"
+                }
             },
-            "action": "GO_TO_LOGIN",
-            "lives": "forever"
+            "lives": 1
         }
     ],
     "interceptors": [
