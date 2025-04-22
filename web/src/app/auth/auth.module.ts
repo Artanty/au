@@ -37,7 +37,9 @@ import { ViewService } from './services/view.service';
 import { TokenShareStrategyService } from './strategies/token-share-strategy.service';
 import { SelectTokenShareStrategyAction } from './actions/auth/selectTokenShareStrategy.action';
 import { AskBackUrlsAction } from './actions/token-share/askBackUrls.action';
-
+import { InitTokenShareStoreAction } from './actions/token-share/initTokenShareStore.action';
+import { GetRequiredProjectsIdsAction } from './actions/token-share/getRequiredProjectsIds.action';
+ 
 export const eventBusFilterByProject = (res: BusEvent) => {
   return res.to === `${process.env['PROJECT_ID']}@${process.env['NAMESPACE']}`
 }
@@ -102,6 +104,8 @@ export const eventBusFilterByProject = (res: BusEvent) => {
     AskProjectIdsAction,
     AskBackUrlsAction,
     SelectTokenShareStrategyAction,
+    InitTokenShareStoreAction,
+    GetRequiredProjectsIdsAction,
     // {
     //   provide: 'ROUTER_PATH', useValue: new BehaviorSubject<string>('')
     // },
@@ -136,7 +140,7 @@ export class AuthModule {
   // private eventBusListener$: Observable<BusEvent>
   // private eventBusPusher: (busEvent: BusEvent) => void
 
-  constructor (
+  constructor(
     @Inject(EVENT_BUS)
     private readonly eventBus$: BehaviorSubject<BusEvent>,
     private injector: Injector,
@@ -153,35 +157,35 @@ export class AuthModule {
     console.log('AuthModule CONSTRUCTOR')
     
     this.eventBusListener$
-    .pipe(
-      filter(eventBusFilterByProject)
-    ).subscribe((res: BusEvent) => {
-      console.log(res)
-      if (res.event === 'TRIGGER_ACTION') {
-        console.log('action: ' + res.payload.action)
-        if (res.payload.action === 'INIT_AUTH_CONFIG') {
-          this.initAuthConfig()
+      .pipe(
+        filter(eventBusFilterByProject)
+      ).subscribe((res: BusEvent) => {
+        console.log(res)
+        if (res.event === 'TRIGGER_ACTION') {
+          console.log('action: ' + res.payload.action)
+          if (res.payload.action === 'INIT_AUTH_CONFIG') {
+            this.initAuthConfig()
+          }
+          // const map = new Map([...AuthActionMap1, ...AuthActionMap2])
+          // const result = map.get(res.payload.action)
+          // console.log(result)
+          // result.execute()
+
+
+          // this.injector
+          //     .get<IAuthAction>(map.get('GO_TO_LOGIN'))
+          //     .execute();
+        
+          // const goToLoginAction = new GoToLoginAction(injector);    
+          // goToLoginAction.execute()
+        
+          // if ROUTER_PATH:
+          // this._coreService.setRouterPath((res.payload as any).routerPath).then(() => {
+          //     this.routerPath.next(res.payload.routerPath)
+          //     this._sendDoneEvent(res, 'self')
+          //   })
         }
-        // const map = new Map([...AuthActionMap1, ...AuthActionMap2])
-        // const result = map.get(res.payload.action)
-        // console.log(result)
-        // result.execute()
-
-
-        // this.injector
-        //     .get<IAuthAction>(map.get('GO_TO_LOGIN'))
-        //     .execute();
-        
-        // const goToLoginAction = new GoToLoginAction(injector);    
-        // goToLoginAction.execute()
-        
-        // if ROUTER_PATH:
-        // this._coreService.setRouterPath((res.payload as any).routerPath).then(() => {
-        //     this.routerPath.next(res.payload.routerPath)
-        //     this._sendDoneEvent(res, 'self')
-        //   })
-      }
-    })
+      })
     
   }
 
@@ -202,7 +206,7 @@ export class AuthModule {
    * для этого понять, ремоут мы или элоун.
    * для этого запросить ROUTE_PATH 
    */
-  private initAuthConfig () {
+  private initAuthConfig() {
     
     this.eventBusListener$.pipe(
       filter(eventBusFilterByProject),
@@ -224,14 +228,14 @@ export class AuthModule {
     ).subscribe(res => { 
       console.log(res)
       this._coreService.setRouterPath(res.payload.routerPath)
-      .then(() => {
-        /**
-         * Если мы ремоут - запрашиваем конфиг у хоста
-         */
-        if (this._coreService.isInsideHost()) {
-          this._sendEventToHost('ASK_AUTH_CONFIG')
-        }
-      })
+        .then(() => {
+          /**
+           * Если мы ремоут - запрашиваем конфиг у хоста
+           */
+          if (this._coreService.isInsideHost()) {
+            this._sendEventToHost('ASK_AUTH_CONFIG')
+          }
+        })
     })
 
     this.eventBusPusher({

@@ -24,26 +24,44 @@ export class TokenShareService {
 
   private store$ = new BehaviorSubject<ExternalUpdates>(this.initial)
 
-  public setStore (data: ExternalUpdates) {
+  public setStore(data: ExternalUpdates) {
     this.store$.next(data)
   }
 
-  public getStore (): ExternalUpdates {
+  public getStore(): ExternalUpdates {
     return this.store$.value
   }
 
-  public listenStore (): Observable<ExternalUpdates> {
+  public getRequiredProjectsIds(): string[] {
+    // const data = this.store$.value
+    // if (Object.keys(data).length > 0) throw new Error('wrong data in store')
+    
+    // return Object.entries(data).reduce((acc, [key, body]) => {
+    //   if (!body.ignore) {
+    //     acc.push(key)
+    //   }
+    //   return acc;
+    // }, [] as string[])
+    return []
+  }
+
+  public showStore(): void {
+    console.log('TOKEN_SHARE_STORE: ')
+    console.log(this.getStore())
+  }
+
+  public listenStore(): Observable<ExternalUpdates> {
     return this.store$.asObservable()
   }
 
-  public addProjects (projectIds: string | string[]) {
+  public addProjects(projectIds: string | string[]): void {
     if (!Array.isArray(projectIds)) {
       projectIds = [projectIds]
     }
-    const current = { ...this.getStore()}
+    const current = { ...this.getStore() }
     projectIds.forEach((projectId: string) => {
       if (!current[projectId]) {
-        current[projectId] = this.getProgectBodyTemplate()
+        current[projectId] = this.getProjectBodyTemplate()
       }
     })
     this.setStore(current)
@@ -53,8 +71,8 @@ export class TokenShareService {
    * Добавляет в стор адрес {url} бэка  
    * определенного mfe приложения {projectId}
    */
-  public addRouteToExternalUpdates (projectId: string, url: string) {
-    const current = { ...this.getStore()}
+  public addRouteToExternalUpdates(projectId: string, url: string) {
+    const current = { ...this.getStore() }
     if (!current[projectId]) {
       current[projectId] = {
         backendUrl: url,
@@ -69,9 +87,9 @@ export class TokenShareService {
 
   
 
-  constructor() { }
+  constructor() {}
 
-  private getProgectBodyTemplate (): ExternalUpdateBody {
+  private getProjectBodyTemplate(): ExternalUpdateBody {
     return {
       backendUrl: '',
       lastUpdated: '',
