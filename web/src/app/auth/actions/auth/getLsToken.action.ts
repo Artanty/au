@@ -6,8 +6,9 @@ import { IAuthAction } from '../../models/action.model';
 export class GetProductAuthTokenAction implements IAuthAction {
   constructor(@Inject(HOST_NAME) private readonly hostName: string) {}
 
-  public execute() {
-    const token = localStorage.getItem(`${this.hostName}__authToken`);
+  public execute(): string | null {
+    const token = localStorage.getItem(`${this.hostName}__accessToken`);
+
     return token === 'undefined'
       ? null
       : token

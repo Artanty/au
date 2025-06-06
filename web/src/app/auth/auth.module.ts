@@ -40,6 +40,7 @@ import { InitTokenShareStoreAction } from './actions/token-share/initTokenShareS
 import { GetRequiredProjectsIdsAction } from './actions/token-share/getRequiredProjectsIds.action';
 import { StoreBackUrlsAction } from './actions/token-share/storeBackUrls.action';
 import { ShareTokenAction } from './actions/token-share/shareToken.action';
+import { SendAuthDoneEventAction } from './actions/auth/sendAuthDoneEvent.action';
  
 export const eventBusFilterByProject = (res: BusEvent) => {
   return res.to === `${process.env['PROJECT_ID']}@${process.env['NAMESPACE']}`
@@ -108,6 +109,7 @@ export const eventBusFilterByProject = (res: BusEvent) => {
     GetRequiredProjectsIdsAction,
     StoreBackUrlsAction,
     ShareTokenAction,
+    SendAuthDoneEventAction,
     { 
       provide: EVENT_BUS_LISTENER, 
       useFactory: (eventBus$: BehaviorSubject<BusEvent>) => {
