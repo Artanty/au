@@ -2,12 +2,14 @@ import { Injectable, Injector } from "@angular/core";
 import { IAuthStrategy } from "../../models/strategy.model";
 import { AskProjectIdsAction } from "../../actions/token-share/askProjectsIds.action";
 import { IAuthAction } from "../../models/action.model";
-import { AskBackendRoutesAction } from "../../actions/token-share/askBackendRoutes.action";
+import { StoreBackUrlsAction } from "../../actions/token-share/storeBackUrls.action";
 import { AskBackUrlsAction } from "../../actions/token-share/askBackUrls.action";
-import { Observable } from "rxjs";
+import { forkJoin, Observable } from "rxjs";
 import { BusEvent } from "typlib";
 import { InitTokenShareStoreAction } from "../../actions/token-share/initTokenShareStore.action";
 import { GetRequiredProjectsIdsAction } from "../../actions/token-share/getRequiredProjectsIds.action";
+import { ShareTokenAction } from "../../actions/token-share/shareToken.action";
+import { SetTokenObtainedListenerAction } from "../../actions/token-share/setTokenObtainedListener.action";
 
 
 @Injectable()
@@ -15,7 +17,9 @@ export class SaveTempDuplicateStrategy implements IAuthStrategy {
 
   constructor(
     private injector: Injector
-  ) {}
+  ) {
+
+  }
   
   runScenario(scenario: string) {
     
@@ -34,7 +38,8 @@ export class SaveTempDuplicateStrategy implements IAuthStrategy {
    * 2 записать их в стор для заполнения INIT_TOKEN_SHARE_STORE
    * 3 спросить адреса бэков всех проектов ASK_BACK_URLS
    * 4 добавить полученные адреса в стор
-   * разослать запросы на бэки
+   * 5 оставить только нужные 
+   * 6 разослать запросы на бэки
    */
   handleInitScenario() {
     /**
@@ -53,38 +58,39 @@ export class SaveTempDuplicateStrategy implements IAuthStrategy {
         .get<IAuthAction>(AuthActionMap.get('INIT_TOKEN_SHARE_STORE'))
         .execute(res)
 
-      const requiredProjectsIds: any = []
-      // this.injector
-      //   .get('GET_REQUIRED_PROJECTS_IDS')
-      //   .execute()
+      const requiredProjectsIds: string[] = this.injector
+        .get<IAuthAction>(AuthActionMap.get('GET_REQUIRED_PROJECTS_IDS'))
+        .execute()
 
-      const backUrls$ = this.injector
+      // const backUrls$ = 
+      this.injector
         .get<IAuthAction>(AuthActionMap.get('ASK_BACK_URLS'))
         .execute(requiredProjectsIds)
+        
+        .subscribe((res: any) => { 
+          
+          const store = this.injector
+            .get<IAuthAction>(AuthActionMap.get('STORE_BACK_URLS'))
+            .execute(res)
 
-      backUrls$.subscribe((res: any) => { 
-        console.log(res)
-      })
+      
+
+          this.injector
+            .get<IAuthAction>(AuthActionMap.get('SHARE_TOKEN'))
+            .execute(store)
+        })
     })
-
-    // const backUrls$ = this.injector
-    //     .get<IAuthAction>(AuthActionMap.get('ASK_BACK_URLS'))
-    //     .execute(['au', 'faq'])
-
-    //   backUrls$.subscribe((res: any) => {
-    //     console.log(res)
-    //   })
-      
-
-    
-      
   }
 }
 
 export const AuthActionMap = new Map<string, any>([
   ['ASK_PROJECTS_IDS', AskProjectIdsAction],
-  ['ASK_BACK_URLS', AskBackUrlsAction],
-  // ['ASK_BACKEND_ROUTES', AskBackendRoutesAction],
   ['INIT_TOKEN_SHARE_STORE', InitTokenShareStoreAction],
   ['GET_REQUIRED_PROJECTS_IDS', GetRequiredProjectsIdsAction],
+  ['ASK_BACK_URLS', AskBackUrlsAction],
+  ['STORE_BACK_URLS', StoreBackUrlsAction],
+  ['SHARE_TOKEN', ShareTokenAction],
+  ['SET_TOKEN_LISTENER', SetTokenObtainedListenerAction],
 ]);
+
+

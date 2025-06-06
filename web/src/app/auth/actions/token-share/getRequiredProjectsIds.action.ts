@@ -8,13 +8,13 @@ import { ExternalUpdates, TokenShareService } from '../../services/token-share.s
 @Injectable()
 export class GetRequiredProjectsIdsAction implements IAuthAction {
   constructor(
-    // private _tokenShareService: TokenShareService
+    private _tokenShareService: TokenShareService
   ) {}
 
   public execute(): string[] {
 
-    // return this._tokenShareService.getRequiredProjectsIds()
-    return []
+    return this._tokenShareService.getRequiredProjectsIds()
+
   }
 }
 

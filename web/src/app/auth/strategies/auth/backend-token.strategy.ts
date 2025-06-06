@@ -29,7 +29,8 @@ import { GoToLoginAction } from '../../actions/auth/goToLogin.action';
 import { RemoveProductAuthTokenAction } from '../../actions/auth/removeLsToken.action';
 import { InitTokenStrategyAction } from '../../actions/auth/initTokenShareStrategy.action';
 import { AskProjectIdsAction } from '../../actions/token-share/askProjectsIds.action';
-import { SelectTokenShareStrategyAction } from '../../actions/auth/selectTokenShareStrategy.action';
+import { SendAuthDoneEventAction } from '../../actions/auth/sendAuthDoneEvent.action';
+import { dd } from '../../utilites/dd';
 
 @Injectable()
 export class BackendTokenStrategy implements IAuthStrategy {
@@ -49,7 +50,7 @@ export class BackendTokenStrategy implements IAuthStrategy {
   }
 
   runScenario(scenario: string, payload?: Record<string, string>) {
-    // console.log(scenario)
+    // dd(scenario)
     switch (scenario) {
       case 'init':
         this.handleInitScenario();
@@ -69,16 +70,10 @@ export class BackendTokenStrategy implements IAuthStrategy {
     const token = this.injector
       .get<IAuthAction>(AuthActionMap.get('GET_TOKEN'))
       .execute();
-
+    dd(token)
     if (token) {
-      // this.injector
-      //   .get<IAuthAction>(AuthActionMap.get('GRANT_ACCESS'))
-      //   .execute();
+      //
     } else {
-      this.injector
-        .get<IAuthAction>(AuthActionMap.get('SELECT_TOKEN_SHARE_STRATEGY'))
-        .execute();
-
       this.injector
         .get<IAuthAction>(AuthActionMap.get('DISPLAY_LOGIN_FORM'))
         .execute();
@@ -105,8 +100,12 @@ export class BackendTokenStrategy implements IAuthStrategy {
           //   .get<IAuthAction>(AuthActionMap.get('GRANT_ACCESS'))
           //   .execute();
           this.injector
-            .get<IAuthAction>(AuthActionMap.get('INIT_TOKEN_SHARE'))
+            .get<IAuthAction>(AuthActionMap.get('SEND_AUTH_DONE_EVENT'))
             .execute();
+          
+          // this.injector
+          //   .get<IAuthAction>(AuthActionMap.get('SHARE_TOKEN'))
+          //   .execute();
         }),
         catchError((err: HttpErrorResponse) => {
           this.catchResponseError(err);
@@ -189,7 +188,7 @@ export const AuthActionMap = new Map<string, any>([
   ['GRANT_ACCESS', GrantAccessAction],
   ['GO_TO_LOGIN', GoToLoginAction],
   ['REMOVE_TOKEN', RemoveProductAuthTokenAction],
-  ['INIT_TOKEN_SHARE', InitTokenStrategyAction],
   ['ASK_PROJECTS_IDS', AskProjectIdsAction],
-  ['SELECT_TOKEN_SHARE_STRATEGY', SelectTokenShareStrategyAction]
+  ['SEND_AUTH_DONE_EVENT', SendAuthDoneEventAction]
+  
 ]);

@@ -6,6 +6,8 @@ import { filter, map, Observable, of, ReplaySubject, scan, Subject, take, takeUn
 import { eventBusFilterByProject } from '../../auth.module';
 import { eventBusFilterByEvent } from './askProjectsIds.action';
 
+export interface BackUrl { project_id: string, back_url: string }
+
 export const filterIdByProjectId = (id: string, exclude?: boolean): boolean => {
     return exclude
         ? id !== process.env['PROJECT_ID']
@@ -23,14 +25,10 @@ export class AskBackUrlsAction implements IAuthAction {
         private readonly eventBusListener$: Observable<BusEvent>,
     ) {}
 
-    // 
-    public execute(projectIds: string[]): Observable<Array<{ project_id: string, back_url: string }>> {
-        // Filter out our own project ID if needed
-        const targetProjects = new Set(projectIds
-            // .filter(id => filterIdByProjectId(id, true))
-        );
+    public execute(projectIds: string[]): Observable<BackUrl[]> {
+        
+        const targetProjects = new Set(projectIds);
 
-        // Send the initial request
         const busEvent: BusEvent = {
             from: `${process.env['PROJECT_ID']}@${process.env['NAMESPACE']}`,
             to: `faq@web-host`,
@@ -40,7 +38,6 @@ export class AskBackUrlsAction implements IAuthAction {
         this.eventBusPusher(busEvent);
 
         return this.eventBusListener$.pipe(
-            // Filter relevant events
             filter(eventBusFilterByProject),
             filter(event => eventBusFilterByEvent(event, 'BACK_URLS')),
         
@@ -59,6 +56,7 @@ export class AskBackUrlsAction implements IAuthAction {
                     projectId in collectedUrls
                 );
             }),
+            // todo add timeout
             // Convert to array format when complete
             map(collectedUrls => {
                 return Array.from(targetProjects).map(projectId => ({

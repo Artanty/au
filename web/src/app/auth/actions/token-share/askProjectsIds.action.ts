@@ -17,11 +17,11 @@ export class AskProjectIdsAction implements IAuthAction {
     @Inject(EVENT_BUS_PUSHER)
     private eventBusPusher: (busEvent: BusEvent) => void,
     @Inject(EVENT_BUS_LISTENER)
-        private readonly eventBusListener$: Observable<BusEvent>,
+    private readonly eventBusListener$: Observable<BusEvent>,
   ) {}
 
   // todo this can be a race
-  public execute(): Observable<any> | any{
+  public execute(): Observable<any> | any {
     const busEvent: BusEvent = {
       from: `${process.env['PROJECT_ID']}@${process.env['NAMESPACE']}`,
       to: String(this._configService.getConfig()!.from),
@@ -34,13 +34,14 @@ export class AskProjectIdsAction implements IAuthAction {
     return this.waitForResponse()
   }
 
-  waitForResponse () {
+  // todo add timeout
+  waitForResponse() {
     return this.eventBusListener$
-    .pipe(
-      filter(eventBusFilterByProject),
-      filter(res => eventBusFilterByEvent(res, 'PROJECTS_IDS')),
-      map(res => res.payload.projectsIds),
-      take(1)
-    )
+      .pipe(
+        filter(eventBusFilterByProject),
+        filter(res => eventBusFilterByEvent(res, 'PROJECTS_IDS')),
+        map(res => res.payload.projectsIds),
+        take(1)
+      )
   }
 }

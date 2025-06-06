@@ -2,6 +2,8 @@ import { Injectable, Injector } from '@angular/core';
 import { IAuthStrategy } from '../models/strategy.model';
 import { BackendAuthStrategy } from './auth/backend-auth.strategy';
 import { BackendTokenStrategy } from './auth/backend-token.strategy';
+import { dd } from '../utilites/dd';
+
 
 @Injectable()
 export class AuthStrategyService {
@@ -13,18 +15,21 @@ export class AuthStrategyService {
   ) {}
 
   public select(strategy: string) {
+    // dd(strategy)
     try {
       this.strategy = this.injector.get<IAuthStrategy>(
         AuthStrategyMap.get(strategy)
       );
-      if (!this.strategy)
+      // dd(this.strategy)
+      if (!this.strategy) {
         throw new Error(
           `strategy '${strategy}' doesn't exist in StrategyMap`
         );
-        this.strategy.runScenario('init');
+      }
+      this.strategy.runScenario('init');
     } catch (err) {
       throw new Error(
-          (err instanceof Error ? err.message : String(err))
+        (err instanceof Error ? err.message : String(err))
       );
     }
   }

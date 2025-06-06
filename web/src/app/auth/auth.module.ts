@@ -35,10 +35,11 @@ import { TokenShareService } from './services/token-share.service';
 import { UserActionService } from './services/user-action.service';
 import { ViewService } from './services/view.service';
 import { TokenShareStrategyService } from './strategies/token-share-strategy.service';
-import { SelectTokenShareStrategyAction } from './actions/auth/selectTokenShareStrategy.action';
 import { AskBackUrlsAction } from './actions/token-share/askBackUrls.action';
 import { InitTokenShareStoreAction } from './actions/token-share/initTokenShareStore.action';
 import { GetRequiredProjectsIdsAction } from './actions/token-share/getRequiredProjectsIds.action';
+import { StoreBackUrlsAction } from './actions/token-share/storeBackUrls.action';
+import { ShareTokenAction } from './actions/token-share/shareToken.action';
  
 export const eventBusFilterByProject = (res: BusEvent) => {
   return res.to === `${process.env['PROJECT_ID']}@${process.env['NAMESPACE']}`
@@ -50,7 +51,6 @@ export const eventBusFilterByProject = (res: BusEvent) => {
     AuthComponent, 
     Login2Component,
     SignupComponent,
-    // TestApiComponent 
   ],
   imports: [
     CommonModule,
@@ -103,13 +103,11 @@ export const eventBusFilterByProject = (res: BusEvent) => {
     SaveTempDuplicateStrategy,
     AskProjectIdsAction,
     AskBackUrlsAction,
-    SelectTokenShareStrategyAction,
+    
     InitTokenShareStoreAction,
     GetRequiredProjectsIdsAction,
-    // {
-    //   provide: 'ROUTER_PATH', useValue: new BehaviorSubject<string>('')
-    // },
-    // { provide: EVENT_BUS, useValue: new BehaviorSubject('') },
+    StoreBackUrlsAction,
+    ShareTokenAction,
     { 
       provide: EVENT_BUS_LISTENER, 
       useFactory: (eventBus$: BehaviorSubject<BusEvent>) => {
@@ -137,22 +135,19 @@ export const eventBusFilterByProject = (res: BusEvent) => {
 })
 export class AuthModule {
   ngDoBootstrap() {}
-  // private eventBusListener$: Observable<BusEvent>
-  // private eventBusPusher: (busEvent: BusEvent) => void
-
+ 
   constructor(
     @Inject(EVENT_BUS)
     private readonly eventBus$: BehaviorSubject<BusEvent>,
     private injector: Injector,
-    
-    // private goToLoginAction: GoToLoginAction
     @Inject(EVENT_BUS_LISTENER)
     private readonly eventBusListener$: Observable<BusEvent>,
     @Inject(EVENT_BUS_PUSHER)
     private readonly eventBusPusher: (busEvent: BusEvent) => void,
     private readonly _coreService: CoreService,
     private readonly _configService: ConfigService,
-    private readonly _authStrategyService: AuthStrategyService
+    private readonly _authStrategyService: AuthStrategyService,
+    private readonly _tokenShareStrategyService: TokenShareStrategyService,
   ) {
     console.log('AuthModule CONSTRUCTOR')
     
@@ -160,33 +155,13 @@ export class AuthModule {
       .pipe(
         filter(eventBusFilterByProject)
       ).subscribe((res: BusEvent) => {
-        console.log(res)
         if (res.event === 'TRIGGER_ACTION') {
           console.log('action: ' + res.payload.action)
           if (res.payload.action === 'INIT_AUTH_CONFIG') {
             this.initAuthConfig()
           }
-          // const map = new Map([...AuthActionMap1, ...AuthActionMap2])
-          // const result = map.get(res.payload.action)
-          // console.log(result)
-          // result.execute()
-
-
-          // this.injector
-          //     .get<IAuthAction>(map.get('GO_TO_LOGIN'))
-          //     .execute();
-        
-          // const goToLoginAction = new GoToLoginAction(injector);    
-          // goToLoginAction.execute()
-        
-          // if ROUTER_PATH:
-          // this._coreService.setRouterPath((res.payload as any).routerPath).then(() => {
-          //     this.routerPath.next(res.payload.routerPath)
-          //     this._sendDoneEvent(res, 'self')
-          //   })
         }
       })
-    
   }
 
   private _sendDoneEvent(busEvent: BusEvent, to?: string): void {
@@ -204,7 +179,8 @@ export class AuthModule {
   /**
    * Понять, откуда брать конфиг
    * для этого понять, ремоут мы или элоун.
-   * для этого запросить ROUTE_PATH 
+   * для этого запросить ROUTE_PATH.
+   * Ремоут берет конфиг от хоста
    */
   private initAuthConfig() {
     
@@ -213,9 +189,9 @@ export class AuthModule {
       filter((res: BusEvent) => res.event === 'AUTH_CONFIG'),
       take(1)
     ).subscribe(res => {
-      // console.log({ ...res.payload, from: res.from })
       this._configService.setConfig({ ...res.payload, from: res.from })
       this._authStrategyService.select(res.payload.authStrategy)
+      this._tokenShareStrategyService.select(res.payload.tokenShareStrategy)
     })
     
     /**

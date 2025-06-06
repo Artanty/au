@@ -23,7 +23,7 @@ export class TokenShareStrategyService {
       this.strategy.runScenario('init');
     } catch (err) {
       throw new Error(
-          (err instanceof Error ? err.message : String(err))
+        (err instanceof Error ? err.message : String(err))
       );
     }
   }
@@ -31,4 +31,5 @@ export class TokenShareStrategyService {
 
 export const TokenShareStrategyMap = new Map<string, any>([
   ['SAVE_TEMP_DUPLICATE', SaveTempDuplicateStrategy],
+  //add no strategi
 ]);

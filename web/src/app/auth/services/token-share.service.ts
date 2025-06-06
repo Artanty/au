@@ -33,16 +33,14 @@ export class TokenShareService {
   }
 
   public getRequiredProjectsIds(): string[] {
-    // const data = this.store$.value
-    // if (Object.keys(data).length > 0) throw new Error('wrong data in store')
-    
-    // return Object.entries(data).reduce((acc, [key, body]) => {
-    //   if (!body.ignore) {
-    //     acc.push(key)
-    //   }
-    //   return acc;
-    // }, [] as string[])
-    return []
+    const data = this.store$.value
+    if (!Object.keys(data).length) throw new Error('store is empty')
+    return Object.entries(data).reduce((acc, [key, body]) => {
+      if (!body.ignore) {
+        acc.push(key)
+      }
+      return acc;
+    }, [] as string[])
   }
 
   public showStore(): void {
@@ -71,7 +69,7 @@ export class TokenShareService {
    * Добавляет в стор адрес {url} бэка  
    * определенного mfe приложения {projectId}
    */
-  public addRouteToExternalUpdates(projectId: string, url: string) {
+  public setBackUrl(projectId: string, url: string) {
     const current = { ...this.getStore() }
     if (!current[projectId]) {
       current[projectId] = {
@@ -81,7 +79,6 @@ export class TokenShareService {
     } else {
       current[projectId]['backendUrl'] = url
     }
-    console.log(current)
     this.setStore(current)
   }
 
@@ -96,7 +93,4 @@ export class TokenShareService {
       ignore: false
     }
   }
-
-  
-
 }

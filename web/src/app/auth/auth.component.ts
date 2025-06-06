@@ -17,29 +17,6 @@ export const EVENT_BUS_PUSHER = new InjectionToken<
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.scss',
   providers: [
-    // GetProductAuthTokenAction,
-    // DisplayLoginFormAction,
-    // SignInByDataAction,
-    // SaveTokenInLsAction,
-    // DisplayInvalidDataErrorAction,
-    // DisplayUnknownErrorAction,
-    // DisplayLoaderAction,
-    // GoToLoginAction,
-    // ResetFormValidatorsAction,
-    // DynamicComponent,
-    // AuthStrategyService,
-    // BackendAuthStrategy,
-    // ViewService,
-    // UserActionService,
-    // RemoveProductAuthTokenAction,
-    // SignInByDataAction,
-    // SignUpByDataAction,
-    // GrantAccessAction,
-    // TokenShareStrategyService,
-    // TokenShareService,
-    // InitTokenStrategyAction,
-    // SaveTempDuplicateStrategy,
-    // AskProjectIdsAction,
     {
       provide: EVENT_BUS_LISTENER,
       useFactory: (eventBus$: BehaviorSubject<BusEvent>) => {
@@ -74,32 +51,16 @@ export class AuthComponent implements OnInit, OnDestroy {
     private _tokenShareService: TokenShareService
   ) {
     this.eventBusListener$.subscribe((busEvent: BusEvent) => {
-        // console.log('AU:');
-        // console.log(busEvent);
       if (busEvent.event === 'authStrategy') {
         this.ConfigServ.setConfig(authStrategyAdapter(busEvent));
-      }
-      // if (busEvent.event === 'ROUTER_PATH') {
-      //   this.routerPath.next(busEvent.payload.routerPath)
-      // }
-      // if (busEvent.event === 'BACK_URL') {
-      //   this._tokenShareService.addRouteToExternalUpdates(busEvent.payload.projectId, busEvent.payload.backendUrl)
-      // }
-      if (busEvent.event === 'PROJECTS_IDS') {
-        // this._tokenShareService.addRouteToExternalUpdates(busEvent.payload.projectId, busEvent.payload.backendUrl)
-        this._tokenShareService.addProjects(busEvent.payload.projectsIds)
-        const ss = this._tokenShareService.getStore()
-        console.log(ss)
       }
     });
   }
 
-  ngOnInit (): void {
+  ngOnInit(): void {
+    
     combineLatest([
       this._routerPathSet$(),
-      // this._registerComponentsService.listenComponentsRegistered$().pipe(
-      //   filter((res: boolean) => res === true)
-      // )
     ]).pipe(
       takeUntil(this.destroyed)
     ).subscribe(() => {
@@ -107,13 +68,13 @@ export class AuthComponent implements OnInit, OnDestroy {
     })
   }
 
-  ngOnDestroy (): void {
+  ngOnDestroy(): void {
     console.log('au destroyed')
     this.destroyed.next();
     this.destroyed.complete();
   }
 
-  private _routerPathSet$ (): Observable<boolean> {
+  private _routerPathSet$(): Observable<boolean> {
     if (this._coreService.isRouterPathSet() === true) {
       return of(true)
     }
@@ -133,7 +94,7 @@ export class AuthComponent implements OnInit, OnDestroy {
     )
   }
 
-  private _renderComponents (): void {
+  private _renderComponents(): void {
     console.log('no navigation components to render in au@')
     /**
      * Навигационные кнопки уже сохранены в host'е при подгрузке модуля.
