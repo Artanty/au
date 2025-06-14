@@ -9,7 +9,8 @@ import { BusEvent } from "typlib";
 import { InitTokenShareStoreAction } from "../../actions/token-share/initTokenShareStore.action";
 import { GetRequiredProjectsIdsAction } from "../../actions/token-share/getRequiredProjectsIds.action";
 import { ShareTokenAction } from "../../actions/token-share/shareToken.action";
-import { SetTokenObtainedListenerAction } from "../../actions/token-share/setTokenObtainedListener.action";
+import { dd } from "../../utilites/dd";
+import { ValidateSharedTokenAction } from "../../actions/token-share/validateSharedToken.action";
 
 
 @Injectable()
@@ -61,25 +62,26 @@ export class SaveTempDuplicateStrategy implements IAuthStrategy {
       const requiredProjectsIds: string[] = this.injector
         .get<IAuthAction>(AuthActionMap.get('GET_REQUIRED_PROJECTS_IDS'))
         .execute()
-
-      // const backUrls$ = 
+      
       this.injector
         .get<IAuthAction>(AuthActionMap.get('ASK_BACK_URLS'))
         .execute(requiredProjectsIds)
         
         .subscribe((res: any) => { 
-          
           const store = this.injector
             .get<IAuthAction>(AuthActionMap.get('STORE_BACK_URLS'))
             .execute(res)
-
-      
-
+          
           this.injector
             .get<IAuthAction>(AuthActionMap.get('SHARE_TOKEN'))
             .execute(store)
         })
     })
+
+    this.injector
+      .get<IAuthAction>(AuthActionMap.get('VALIDATE_SHARED_TOKEN'))
+      .execute()
+    
   }
 }
 
@@ -90,7 +92,7 @@ export const AuthActionMap = new Map<string, any>([
   ['ASK_BACK_URLS', AskBackUrlsAction],
   ['STORE_BACK_URLS', StoreBackUrlsAction],
   ['SHARE_TOKEN', ShareTokenAction],
-  ['SET_TOKEN_LISTENER', SetTokenObtainedListenerAction],
+  ['VALIDATE_SHARED_TOKEN', ValidateSharedTokenAction]
 ]);
 
 

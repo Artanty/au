@@ -15,16 +15,15 @@ export class UserActionService {
 
   private userAction$ = new BehaviorSubject<Nullable<IUserAction>>(null)
 
-  constructor() { }
+  constructor() {}
 
-  public setUserAction (data: Nullable<IUserAction>) {
-    console.log(data)
+  public setUserAction(data: Nullable<IUserAction>) {
     this.userAction$.next(data)
   }
-  public getUserAction (): Nullable<IUserAction> {
+  public getUserAction(): Nullable<IUserAction> {
     return this.userAction$.value
   }
-  public listenUserAction (): Observable<Nullable<IUserAction>> {
+  public listenUserAction(): Observable<Nullable<IUserAction>> {
     return this.userAction$.asObservable()
   }
 }

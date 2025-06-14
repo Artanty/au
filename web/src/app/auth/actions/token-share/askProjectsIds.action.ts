@@ -4,11 +4,11 @@ import { BusEvent, EVENT_BUS_LISTENER, EVENT_BUS_PUSHER, HOST_NAME } from 'typli
 import { ConfigService } from '../../services/config.service';
 import { IAuthAction } from '../../models/action.model';
 import { filter, map, Observable, of, take } from 'rxjs';
-import { eventBusFilterByProject } from '../../auth.module';
 
-export const eventBusFilterByEvent = (res: BusEvent, event: string) => {
-  return res.event === `${event}`
-}
+import { eventBusFilterByEvent } from '../../utilites/eventBusFilterByEvent';
+import { eventBusFilterByProject } from '../../utilites/eventBusFilterByProject';
+
+
 
 @Injectable()
 export class AskProjectIdsAction implements IAuthAction {

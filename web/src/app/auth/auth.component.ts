@@ -95,7 +95,7 @@ export class AuthComponent implements OnInit, OnDestroy {
   }
 
   private _renderComponents(): void {
-    console.log('no navigation components to render in au@')
+    // console.log('no navigation components to render in au@')
     /**
      * Навигационные кнопки уже сохранены в host'е при подгрузке модуля.
      * Если этот рутовый продуктовый компонент инициализировался,

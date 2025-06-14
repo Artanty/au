@@ -3,9 +3,11 @@ import { BehaviorSubject, Observable } from 'rxjs';
 
 export interface ExternalUpdateBody {
   backendUrl: string,
-  // status: string,
+  isShared: boolean,
+  isValid: boolean,
   lastUpdated: string,
-  ignore?: boolean
+  ignore?: boolean,
+  projectId?: string
 }
 export interface ExternalUpdates {
   [key: string]: ExternalUpdateBody
@@ -18,7 +20,9 @@ export class TokenShareService {
     au: {
       backendUrl: `${process.env['AU_BACK_URL']}`,
       lastUpdated: '',
-      ignore: true
+      ignore: true,
+      isShared: false,
+      isValid: true
     }
   }
 
@@ -69,12 +73,14 @@ export class TokenShareService {
    * Добавляет в стор адрес {url} бэка  
    * определенного mfe приложения {projectId}
    */
-  public setBackUrl(projectId: string, url: string) {
+  public setBackUrl(projectId: string, url: string): void {
     const current = { ...this.getStore() }
     if (!current[projectId]) {
       current[projectId] = {
         backendUrl: url,
-        lastUpdated: ''
+        lastUpdated: '',
+        isShared: false, 
+        isValid: false
       }
     } else {
       current[projectId]['backendUrl'] = url
@@ -82,6 +88,15 @@ export class TokenShareService {
     this.setStore(current)
   }
 
+  public setSharedState(projectId: string, isShared: boolean): void {
+    const current = { ...this.getStore() }
+    if (!current[projectId]) {
+      throw new Error('project id ' + projectId + ' is not exist')
+    } else {
+      current[projectId]['isShared'] = isShared
+    }
+    this.setStore(current)
+  }
   
 
   constructor() {}
@@ -90,7 +105,9 @@ export class TokenShareService {
     return {
       backendUrl: '',
       lastUpdated: '',
-      ignore: false
+      ignore: false,
+      isShared: false,
+      isValid: false
     }
   }
 }

@@ -3,7 +3,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const authToken = require('./routes/authToken');
 const authCookies = require('./routes/authCookies');
-const authTokenShare = require('./routes/authTokenShare');
+const tokenShare = require('./routes/tokenShare');
 
 
 const cookieParser = require('cookie-parser');
@@ -34,8 +34,8 @@ const corsOptions = {
 
 // Routes
 app.use('/auth-token', cors(), authToken);
-app.use('/auth-token-share', cors(), authTokenShare);
 app.use('/auth-cookies', cors(corsOptions), authCookies);
+app.use('/token-share', cors(), tokenShare);
 
 
 // Start the server

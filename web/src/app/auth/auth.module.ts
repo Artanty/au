@@ -41,10 +41,10 @@ import { GetRequiredProjectsIdsAction } from './actions/token-share/getRequiredP
 import { StoreBackUrlsAction } from './actions/token-share/storeBackUrls.action';
 import { ShareTokenAction } from './actions/token-share/shareToken.action';
 import { SendAuthDoneEventAction } from './actions/auth/sendAuthDoneEvent.action';
+import { eventBusFilterByProject } from './utilites/eventBusFilterByProject';
+import { ValidateSharedTokenAction } from './actions/token-share/validateSharedToken.action';
  
-export const eventBusFilterByProject = (res: BusEvent) => {
-  return res.to === `${process.env['PROJECT_ID']}@${process.env['NAMESPACE']}`
-}
+
 
 @NgModule({
   declarations: [
@@ -110,6 +110,7 @@ export const eventBusFilterByProject = (res: BusEvent) => {
     StoreBackUrlsAction,
     ShareTokenAction,
     SendAuthDoneEventAction,
+    ValidateSharedTokenAction,
     { 
       provide: EVENT_BUS_LISTENER, 
       useFactory: (eventBus$: BehaviorSubject<BusEvent>) => {
@@ -151,14 +152,11 @@ export class AuthModule {
     private readonly _authStrategyService: AuthStrategyService,
     private readonly _tokenShareStrategyService: TokenShareStrategyService,
   ) {
-    console.log('AuthModule CONSTRUCTOR')
-    
     this.eventBusListener$
       .pipe(
         filter(eventBusFilterByProject)
       ).subscribe((res: BusEvent) => {
         if (res.event === 'TRIGGER_ACTION') {
-          console.log('action: ' + res.payload.action)
           if (res.payload.action === 'INIT_AUTH_CONFIG') {
             this.initAuthConfig()
           }
@@ -194,6 +192,8 @@ export class AuthModule {
       this._configService.setConfig({ ...res.payload, from: res.from })
       this._authStrategyService.select(res.payload.authStrategy)
       this._tokenShareStrategyService.select(res.payload.tokenShareStrategy)
+      // todo auth должен знать, нужно ли шарить токен после его получения
+      //  если нет - то завершать. как сделать это независимо?
     })
     
     /**
@@ -204,7 +204,7 @@ export class AuthModule {
       filter((res: BusEvent) => res.event === 'ROUTER_PATH'),
       take(1)
     ).subscribe(res => { 
-      console.log(res)
+      
       this._coreService.setRouterPath(res.payload.routerPath)
         .then(() => {
           /**

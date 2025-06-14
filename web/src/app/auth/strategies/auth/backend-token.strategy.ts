@@ -30,6 +30,7 @@ import { RemoveProductAuthTokenAction } from '../../actions/auth/removeLsToken.a
 import { InitTokenStrategyAction } from '../../actions/auth/initTokenShareStrategy.action';
 import { AskProjectIdsAction } from '../../actions/token-share/askProjectsIds.action';
 import { SendAuthDoneEventAction } from '../../actions/auth/sendAuthDoneEvent.action';
+import { dd } from '../../utilites/dd';
 
 @Injectable()
 export class BackendTokenStrategy implements IAuthStrategy {
@@ -40,7 +41,6 @@ export class BackendTokenStrategy implements IAuthStrategy {
     private readonly UserActionServ: UserActionService,
     private injector: Injector
   ) {
-    
     this.UserActionServ.listenUserAction()
       .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
       .subscribe((res: IUserAction) => {
@@ -65,16 +65,18 @@ export class BackendTokenStrategy implements IAuthStrategy {
   }
 
   handleInitScenario() {
-
+    
     const token = this.injector
       .get<IAuthAction>(AuthActionMap.get('GET_TOKEN'))
       .execute();
 
     if (token) {      
-      // todo check?
       this.injector
         .get<IAuthAction>(AuthActionMap.get('SEND_AUTH_DONE_EVENT'))
         .execute();
+
+      //todo check
+      // проверить, нужно ли шарить токен, если нет - завершить au@
     } else {
       this.injector
         .get<IAuthAction>(AuthActionMap.get('DISPLAY_LOGIN_FORM'))
@@ -98,9 +100,9 @@ export class BackendTokenStrategy implements IAuthStrategy {
           this.injector
             .get<IAuthAction>(AuthActionMap.get('SAVE_TOKEN_IN_LS'))
             .execute(res);
-          this.injector
-            .get<IAuthAction>(AuthActionMap.get('SEND_AUTH_DONE_EVENT'))
-            .execute();
+          // this.injector
+          //   .get<IAuthAction>(AuthActionMap.get('SEND_AUTH_DONE_EVENT'))
+          //   .execute();
         }),
         catchError((err: HttpErrorResponse) => {
           this.catchResponseError(err);

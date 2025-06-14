@@ -15,12 +15,10 @@ export class AuthStrategyService {
   ) {}
 
   public select(strategy: string) {
-    // dd(strategy)
     try {
       this.strategy = this.injector.get<IAuthStrategy>(
         AuthStrategyMap.get(strategy)
       );
-      // dd(this.strategy)
       if (!this.strategy) {
         throw new Error(
           `strategy '${strategy}' doesn't exist in StrategyMap`
