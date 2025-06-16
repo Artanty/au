@@ -31,6 +31,7 @@ import { InitTokenStrategyAction } from '../../actions/auth/initTokenShareStrate
 import { AskProjectIdsAction } from '../../actions/token-share/askProjectsIds.action';
 import { SendAuthDoneEventAction } from '../../actions/auth/sendAuthDoneEvent.action';
 import { dd } from '../../utilites/dd';
+import { GrantAuthAction } from '../../actions/auth/grandAuth.action';
 
 @Injectable()
 export class BackendTokenStrategy implements IAuthStrategy {
@@ -72,7 +73,10 @@ export class BackendTokenStrategy implements IAuthStrategy {
 
     if (token) {      
       this.injector
-        .get<IAuthAction>(AuthActionMap.get('SEND_AUTH_DONE_EVENT'))
+        .get<IAuthAction>(AuthActionMap.get(
+          // 'SEND_AUTH_DONE_EVENT'
+          'GRANT_AUTH'
+        ))
         .execute();
 
       //todo check
@@ -100,9 +104,7 @@ export class BackendTokenStrategy implements IAuthStrategy {
           this.injector
             .get<IAuthAction>(AuthActionMap.get('SAVE_TOKEN_IN_LS'))
             .execute(res);
-          // this.injector
-          //   .get<IAuthAction>(AuthActionMap.get('SEND_AUTH_DONE_EVENT'))
-          //   .execute();
+          this.handleInitScenario();
         }),
         catchError((err: HttpErrorResponse) => {
           this.catchResponseError(err);
@@ -186,6 +188,7 @@ export const AuthActionMap = new Map<string, any>([
   ['GO_TO_LOGIN', GoToLoginAction],
   ['REMOVE_TOKEN', RemoveProductAuthTokenAction],
   ['ASK_PROJECTS_IDS', AskProjectIdsAction],
-  ['SEND_AUTH_DONE_EVENT', SendAuthDoneEventAction]
+  ['SEND_AUTH_DONE_EVENT', SendAuthDoneEventAction],
+  ['GRANT_AUTH', GrantAuthAction]
   
 ]);

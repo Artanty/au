@@ -43,6 +43,7 @@ import { ShareTokenAction } from './actions/token-share/shareToken.action';
 import { SendAuthDoneEventAction } from './actions/auth/sendAuthDoneEvent.action';
 import { eventBusFilterByProject } from './utilites/eventBusFilterByProject';
 import { ValidateSharedTokenAction } from './actions/token-share/validateSharedToken.action';
+import { GrantAuthAction } from './actions/auth/grandAuth.action';
  
 
 
@@ -111,6 +112,7 @@ import { ValidateSharedTokenAction } from './actions/token-share/validateSharedT
     ShareTokenAction,
     SendAuthDoneEventAction,
     ValidateSharedTokenAction,
+    GrantAuthAction,
     { 
       provide: EVENT_BUS_LISTENER, 
       useFactory: (eventBus$: BehaviorSubject<BusEvent>) => {

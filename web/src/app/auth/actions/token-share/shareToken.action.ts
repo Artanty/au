@@ -43,7 +43,6 @@ export class ShareTokenAction implements IAuthAction {
     
     this._isAuthorized$().pipe(
       switchMap((res: boolean) => {
-        
         const token = this._tokenStoreService.getTokenStore()
 
         const back = this._tokenShareService.getStore()['faq']
