@@ -3,8 +3,8 @@ import { ConfigService } from '../../services/config.service';
 import { IAuthAction } from '../../models/action.model';
 
 import { BusEvent, EVENT_BUS_LISTENER, EVENT_BUS_PUSHER, HOST_NAME } from 'typlib';
-import { filter, map, Observable, switchMap, take } from 'rxjs';
-import { ExternalUpdates, TokenShareService } from '../../services/token-share.service';
+import { filter, map, Observable, of, share, switchMap, take, tap } from 'rxjs';
+import { ExternalUpdateBody, ExternalUpdates, TokenShareService } from '../../services/token-share.service';
 import { eventBusFilterByEvent } from '../../utilites/eventBusFilterByEvent';
 import { eventBusFilterByProject } from '../../utilites/eventBusFilterByProject';
 import { AuthStateService } from '../../services/auth-state.service';
@@ -39,13 +39,14 @@ export class ShareTokenAction implements IAuthAction {
     private _configService: ConfigService
   ) {}
 
-  public execute(): any {    
+  public execute(remote: ExternalUpdateBody): Observable<ExternalUpdateBody> {    
     
-    this._isAuthorized$().pipe(
+    return this._isAuthorized$().pipe(
       switchMap((res: boolean) => {
+
         const token = this._tokenStoreService.getTokenStore()
 
-        const back = this._tokenShareService.getStore()['faq']
+        const back = remote;
 
         const hostOrigin = (this._configService.getConfig() as any).hostOrigin
 
@@ -56,10 +57,13 @@ export class ShareTokenAction implements IAuthAction {
         }
         
         return this._makeRequest(payload)
-      })
-    ).subscribe((res: ShareTokenRes) => {
-      this._tokenShareService.setSharedState('faq', res.success)
-    })
+      }),
+      tap((res: ShareTokenRes) => {
+        this._tokenShareService.setSharedState(remote.projectId, res.success)
+      }),
+      map(() => remote),
+      share()
+    )
   }
 
   private _makeRequest(payload: ShareTokenReq): Observable<any> {

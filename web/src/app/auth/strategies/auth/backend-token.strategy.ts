@@ -74,7 +74,6 @@ export class BackendTokenStrategy implements IAuthStrategy {
     if (token) {      
       this.injector
         .get<IAuthAction>(AuthActionMap.get(
-          // 'SEND_AUTH_DONE_EVENT'
           'GRANT_AUTH'
         ))
         .execute();

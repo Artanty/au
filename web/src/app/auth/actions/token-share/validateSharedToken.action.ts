@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@angular/core';
 import { BusEvent, EVENT_BUS_LISTENER, EVENT_BUS_PUSHER, HOST_NAME } from 'typlib';
 import { ConfigService } from '../../services/config.service';
 import { IAuthAction } from '../../models/action.model';
-import { BehaviorSubject, filter, map, Observable, of, ReplaySubject, scan, Subject, take, takeUntil, timeout } from 'rxjs';
+import { BehaviorSubject, filter, map, Observable, of, ReplaySubject, scan, share, Subject, take, takeUntil, tap, timeout } from 'rxjs';
 import { eventBusFilterByEvent } from '../../utilites/eventBusFilterByEvent';
 import { eventBusFilterByProject } from '../../utilites/eventBusFilterByProject';
 import { ExternalUpdateBody, ExternalUpdates, TokenShareService } from '../../services/token-share.service';
@@ -26,19 +26,26 @@ export class ValidateSharedTokenAction implements IAuthAction {
         private _configService: ConfigService,
     ) {}
 
-    public execute(projectIds: string[]) {
+    public execute(remote: ExternalUpdateBody) {
         
-        this._tokenShareService.listenStore().pipe(
-            filter(res => (typeof res === 'object' && res !== null) && !!Object.values(res).find(body => body.isShared && !body.isValid)),
-            map(res => {
-                const found = Object.entries(res).find(([_, value]) => value.isShared && !value.isValid)
-                return found![1] // [string, ExternalUpdateBody]
-            })
-        )
-            .subscribe((remote: ExternalUpdateBody) => {
-                this._makeRequest(remote)
+        // this._tokenShareService.listenStore().pipe(
+        //     filter(res => (typeof res === 'object' && res !== null) && !!Object.values(res).find(body => body.isShared && !body.isValid)),
+        //     map(res => {
+        //         const found = Object.entries(res).find(([_, value]) => value.isShared && !value.isValid)
+        //         return found![1] // [string, ExternalUpdateBody]
+        //     })
+        // )
+        //     .subscribe((remote: ExternalUpdateBody) => {
+        //         this._makeRequest(remote)
 
-            })
+        //     })
+        return this._makeRequest(remote).pipe(
+            tap(() => {
+                this._tokenShareService.setValidState(remote.projectId, true)
+            }),
+            map(() => remote),
+            share()
+        )
     }
 
     private _makeRequest(remote: ExternalUpdateBody) {
@@ -57,17 +64,17 @@ export class ValidateSharedTokenAction implements IAuthAction {
 
         console.log(url, api)
         return this.http.post<any>(`${url}/${api}`, payload)
-            .subscribe(res => {
-                console.log('faq back res:')
-                console.log(res)
-                this._sendAuthDoneEvent()
-            })
+        // .subscribe(res => {
+        //     console.log('faq back res:')
+        //     console.log(res)
+        //     this._sendAuthDoneEvent()
+        // })
     }
 
-
+    // пеенести это. триггерить только когда все элементы закончили попытку проверить токен.
     private _sendAuthDoneEvent() {
         const busEvent: BusEvent = {
-            from: process.env['PROJECT_ID']!,
+            from: `${process.env['PROJECT_ID']}@${process.env['NAMESPACE']}`,
             to: this.hostName,
             event: 'AUTH_DONE',
             payload: {},

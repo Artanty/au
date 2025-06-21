@@ -7,7 +7,7 @@ export interface ExternalUpdateBody {
   isValid: boolean,
   lastUpdated: string,
   ignore?: boolean,
-  projectId?: string
+  projectId: string
 }
 export interface ExternalUpdates {
   [key: string]: ExternalUpdateBody
@@ -18,6 +18,7 @@ export class TokenShareService {
 
   private initial: ExternalUpdates = {
     au: {
+      projectId: 'au',
       backendUrl: `${process.env['AU_BACK_URL']}`,
       lastUpdated: '',
       ignore: true,
@@ -34,6 +35,17 @@ export class TokenShareService {
 
   public getStore(): ExternalUpdates {
     return this.store$.value
+  }
+
+  public getRequiredProjects(): ExternalUpdates {
+    const data = this.store$.value
+    if (!Object.keys(data).length) throw new Error('store is empty')
+    return Object.entries(data).reduce((acc, [key, body]) => {
+      if (!body.ignore) {
+        acc[key] = body
+      }
+      return acc;
+    }, {} as ExternalUpdates)
   }
 
   public getRequiredProjectsIds(): string[] {
@@ -63,7 +75,7 @@ export class TokenShareService {
     const current = { ...this.getStore() }
     projectIds.forEach((projectId: string) => {
       if (!current[projectId]) {
-        current[projectId] = this.getProjectBodyTemplate()
+        current[projectId] = this.getProjectBodyTemplate(projectId)
       }
     })
     this.setStore(current)
@@ -77,6 +89,7 @@ export class TokenShareService {
     const current = { ...this.getStore() }
     if (!current[projectId]) {
       current[projectId] = {
+        projectId: String(projectId),
         backendUrl: url,
         lastUpdated: '',
         isShared: false, 
@@ -97,12 +110,22 @@ export class TokenShareService {
     }
     this.setStore(current)
   }
-  
+
+  public setValidState(projectId: string, isValid: boolean): void {
+    const current = { ...this.getStore() }
+    if (!current[projectId]) {
+      throw new Error('project id ' + projectId + ' is not exist')
+    } else {
+      current[projectId]['isValid'] = isValid
+    }
+    this.setStore(current)
+  }  
 
   constructor() {}
 
-  private getProjectBodyTemplate(): ExternalUpdateBody {
+  private getProjectBodyTemplate(projectId: string): ExternalUpdateBody {
     return {
+      projectId: projectId,
       backendUrl: '',
       lastUpdated: '',
       ignore: false,
