@@ -14,6 +14,7 @@ import { ValidateSharedTokenAction } from "../../actions/token-share/validateSha
 import { ExternalUpdateBody, ExternalUpdates } from "../../services/token-share.service";
 import { SetProductBtnLoadingAction } from "../../actions/token-share/setProductBtnLoading.action";
 import { SetProductBtnReadyAction } from "../../actions/token-share/setProductBtnReady.action";
+import { SetProductBtnLockedAction } from "../../actions/token-share/setProductBtnLocked.action";
 
 
 @Injectable()
@@ -56,15 +57,22 @@ export class SaveTempDuplicateStrategy implements IAuthStrategy {
       .get<IAuthAction>(AuthActionMap.get('ASK_PROJECTS_IDS'))
       .execute()
 
-    projectIds$.subscribe((res: string[]) => {
+    projectIds$.subscribe((projectIds: string[]) => {
       
       const externals = this.injector
         .get<IAuthAction>(AuthActionMap.get('INIT_TOKEN_SHARE_STORE'))
-        .execute(res)
+        .execute(projectIds)
 
       const requiredProjectsIds: string[] = this.injector
         .get<IAuthAction>(AuthActionMap.get('GET_REQUIRED_PROJECTS_IDS'))
         .execute()
+      
+      of(requiredProjectsIds as string[]).pipe(
+        mergeMap(requiredProjectsIds => from(requiredProjectsIds))).subscribe(requiredProjectsId =>
+          this.injector
+            .get<IAuthAction>(AuthActionMap.get('SET_PRODUCT_BTN_LOCKED'))
+            .execute(requiredProjectsId))
+    
       
       this.injector
         .get<IAuthAction>(AuthActionMap.get('ASK_BACK_URLS'))
@@ -78,25 +86,25 @@ export class SaveTempDuplicateStrategy implements IAuthStrategy {
           of(store as ExternalUpdates).pipe(
             mergeMap(originalData => from(Object.values(originalData)))
           )
-            .pipe(
-              switchMap(remote => 
-                this.injector
-                  .get<IAuthAction>(AuthActionMap.get('SET_PRODUCT_BTN_LOADING'))
-                  .execute(remote) // of(remote)
-              )
-            )
+            
             .subscribe((remote: ExternalUpdateBody | any) => {
               const sharedToken = this.injector
                 .get<IAuthAction>(AuthActionMap.get('SHARE_TOKEN'))
                 .execute(remote) 
-              // console.log('res')
-              sharedToken.subscribe((remote: ExternalUpdateBody) => {
+              
+              sharedToken.pipe(
+                switchMap(remote => 
+                  this.injector
+                    .get<IAuthAction>(AuthActionMap.get('SET_PRODUCT_BTN_LOADING'))
+                    .execute(remote)
+                )
+              ).subscribe((remote: ExternalUpdateBody) => {
                 this.injector
                   .get<IAuthAction>(AuthActionMap.get('VALIDATE_SHARED_TOKEN'))
                   .execute(remote).subscribe((remote: ExternalUpdateBody) => {
                     this.injector
                       .get<IAuthAction>(AuthActionMap.get('SET_PRODUCT_BTN_READY'))
-                      .execute(remote) // of(remote)
+                      .execute(remote)
                   })
               })
             })
@@ -123,7 +131,7 @@ export const AuthActionMap = new Map<string, any>([
   ['VALIDATE_SHARED_TOKEN', ValidateSharedTokenAction],
   ['SET_PRODUCT_BTN_LOADING', SetProductBtnLoadingAction],
   ['SET_PRODUCT_BTN_READY', SetProductBtnReadyAction],
-  
+  ['SET_PRODUCT_BTN_LOCKED', SetProductBtnLockedAction]
 ]);
 
 

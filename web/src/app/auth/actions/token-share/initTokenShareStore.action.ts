@@ -13,8 +13,8 @@ export class InitTokenShareStoreAction implements IAuthAction {
 
   public execute(ids: string[]): ExternalUpdates {
     this._tokenShareService.addProjects(ids)
-  
-    return this._tokenShareService.getStore()
+ 
+    return this._tokenShareService.getRequiredProjects()
   }
 }
 

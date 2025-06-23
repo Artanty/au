@@ -46,6 +46,7 @@ import { ValidateSharedTokenAction } from './actions/token-share/validateSharedT
 import { GrantAuthAction } from './actions/auth/grandAuth.action';
 import { SetProductBtnLoadingAction } from './actions/token-share/setProductBtnLoading.action';
 import { SetProductBtnReadyAction } from './actions/token-share/setProductBtnReady.action';
+import { SetProductBtnLockedAction } from './actions/token-share/setProductBtnLocked.action';
  
 
 
@@ -116,8 +117,8 @@ import { SetProductBtnReadyAction } from './actions/token-share/setProductBtnRea
     ValidateSharedTokenAction,
     GrantAuthAction,
     SetProductBtnLoadingAction,
-
     SetProductBtnReadyAction,
+    SetProductBtnLockedAction,
     { 
       provide: EVENT_BUS_LISTENER, 
       useFactory: (eventBus$: BehaviorSubject<BusEvent>) => {
