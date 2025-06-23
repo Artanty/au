@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@angular/core';
 import { BusEvent, EVENT_BUS_LISTENER, EVENT_BUS_PUSHER, HOST_NAME } from 'typlib';
 import { ConfigService } from '../../services/config.service';
 import { IAuthAction } from '../../models/action.model';
-import { BehaviorSubject, filter, map, Observable, of, ReplaySubject, scan, share, Subject, take, takeUntil, tap, timeout } from 'rxjs';
+import { BehaviorSubject, catchError, delay, filter, map, Observable, of, ReplaySubject, retryWhen, scan, share, Subject, take, takeUntil, tap, throwError, timeout } from 'rxjs';
 import { eventBusFilterByEvent } from '../../utilites/eventBusFilterByEvent';
 import { eventBusFilterByProject } from '../../utilites/eventBusFilterByProject';
 import { ExternalUpdateBody, ExternalUpdates, TokenShareService } from '../../services/token-share.service';
@@ -62,8 +62,26 @@ export class ValidateSharedTokenAction implements IAuthAction {
             } 
         }
 
-        console.log(url, api)
-        return this.http.post<any>(`${url}/${api}`, payload)
+        // console.log(url, api)
+        const maxRetries = 3;
+        const initialDelay = 1000; // 1 second
+        return this.http.post<any>(`${url}/${api}`, payload).pipe(
+            retryWhen(errors =>
+                errors.pipe(
+                    scan((acc, error) => {
+                        if (acc >= maxRetries) {
+                            throw error; // Re-throw the error after max retries
+                        }
+                        return acc + 1;
+                    }, 0),
+                    tap(retryAttempt => console.log(`Retry attempt #${retryAttempt}`)),
+                    delay(initialDelay) // Delay before retrying
+                )
+            ),
+            catchError(error => {
+                console.error('Error fetching data after all retries:', error);
+                return throwError(() => new Error('Failed to fetch data after multiple attempts with delays.'));
+            }))
         // .subscribe(res => {
         //     console.log('faq back res:')
         //     console.log(res)
