@@ -29,7 +29,7 @@ import { GoToLoginAction } from '../../actions/auth/goToLogin.action';
 import { RemoveProductAuthTokenAction } from '../../actions/auth/removeLsToken.action';
 import { InitTokenStrategyAction } from '../../actions/auth/initTokenShareStrategy.action';
 import { AskProjectIdsAction } from '../../actions/token-share/askProjectsIds.action';
-import { SendAuthDoneEventAction } from '../../actions/auth/sendAuthDoneEvent.action';
+
 import { dd } from '../../utilites/dd';
 import { GrantAuthAction } from '../../actions/auth/grandAuth.action';
 
@@ -139,13 +139,6 @@ export class BackendTokenStrategy implements IAuthStrategy {
           this.injector
             .get<IAuthAction>(AuthActionMap.get('GO_TO_LOGIN'))
             .execute();
-          // для каких-то проектов возможно нужно оставить это поведение
-          // this.injector
-          //   .get<IAuthAction>(AuthActionMap.get('SAVE_TOKEN_IN_LS'))
-          //   .execute(response.token);
-          // this.injector
-          //   .get<IAuthAction>(AuthActionMap.get('GRANT_ACCESS'))
-          //   .execute();
         }),
         catchError((err: HttpErrorResponse) => {
           this.catchResponseError(err);
@@ -187,7 +180,6 @@ export const AuthActionMap = new Map<string, any>([
   ['GO_TO_LOGIN', GoToLoginAction],
   ['REMOVE_TOKEN', RemoveProductAuthTokenAction],
   ['ASK_PROJECTS_IDS', AskProjectIdsAction],
-  ['SEND_AUTH_DONE_EVENT', SendAuthDoneEventAction],
   ['GRANT_AUTH', GrantAuthAction]
   
 ]);

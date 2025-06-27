@@ -5,9 +5,10 @@ export interface ExternalUpdateBody {
   backendUrl: string,
   isShared: boolean,
   isValid: boolean,
+  isValidated: boolean,
   lastUpdated: string,
   ignore?: boolean,
-  projectId: string
+  projectId: string,
 }
 export interface ExternalUpdates {
   [key: string]: ExternalUpdateBody
@@ -23,7 +24,8 @@ export class TokenShareService {
       lastUpdated: '',
       ignore: true,
       isShared: false,
-      isValid: true
+      isValid: true,
+      isValidated: true,
     }
   }
 
@@ -88,13 +90,7 @@ export class TokenShareService {
   public setBackUrl(projectId: string, url: string): void {
     const current = { ...this.getStore() }
     if (!current[projectId]) {
-      current[projectId] = {
-        projectId: String(projectId),
-        backendUrl: url,
-        lastUpdated: '',
-        isShared: false, 
-        isValid: false
-      }
+      throw new Error('project id ' + projectId + ' not exist')
     } else {
       current[projectId]['backendUrl'] = url
     }
@@ -104,7 +100,7 @@ export class TokenShareService {
   public setSharedState(projectId: string, isShared: boolean): void {
     const current = { ...this.getStore() }
     if (!current[projectId]) {
-      throw new Error('project id ' + projectId + ' is not exist')
+      throw new Error('project id ' + projectId + ' not exist')
     } else {
       current[projectId]['isShared'] = isShared
     }
@@ -114,9 +110,11 @@ export class TokenShareService {
   public setValidState(projectId: string, isValid: boolean): void {
     const current = { ...this.getStore() }
     if (!current[projectId]) {
-      throw new Error('project id ' + projectId + ' is not exist')
+      throw new Error('project id ' + projectId + ' not exist')
     } else {
       current[projectId]['isValid'] = isValid
+      current[projectId]['isValidated'] = true
+
     }
     this.setStore(current)
   }  
@@ -130,7 +128,8 @@ export class TokenShareService {
       lastUpdated: '',
       ignore: false,
       isShared: false,
-      isValid: false
+      isValid: false,
+      isValidated: false,
     }
   }
 }

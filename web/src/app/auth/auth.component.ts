@@ -69,7 +69,6 @@ export class AuthComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    console.log('au destroyed')
     this.destroyed.next();
     this.destroyed.complete();
   }

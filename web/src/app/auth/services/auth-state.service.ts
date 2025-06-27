@@ -13,8 +13,6 @@ export class AuthStateService {
   constructor() {}
 
   public setAuthState(data: boolean) {
-    dd('setAuthState: ' + data)
-    
     this.authState$.next(data);
   }
   public getAuthState(): boolean {

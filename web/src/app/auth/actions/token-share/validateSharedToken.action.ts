@@ -28,17 +28,7 @@ export class ValidateSharedTokenAction implements IAuthAction {
 
     public execute(remote: ExternalUpdateBody) {
         
-        // this._tokenShareService.listenStore().pipe(
-        //     filter(res => (typeof res === 'object' && res !== null) && !!Object.values(res).find(body => body.isShared && !body.isValid)),
-        //     map(res => {
-        //         const found = Object.entries(res).find(([_, value]) => value.isShared && !value.isValid)
-        //         return found![1] // [string, ExternalUpdateBody]
-        //     })
-        // )
-        //     .subscribe((remote: ExternalUpdateBody) => {
-        //         this._makeRequest(remote)
-
-        //     })
+        
         return this._makeRequest(remote).pipe(
             tap(() => {
                 this._tokenShareService.setValidState(remote.projectId, true)
@@ -62,7 +52,6 @@ export class ValidateSharedTokenAction implements IAuthAction {
             } 
         }
 
-        // console.log(url, api)
         const maxRetries = 3;
         const initialDelay = 1000; // 1 second
         return this.http.post<any>(`${url}/${api}`, payload).pipe(
@@ -82,11 +71,6 @@ export class ValidateSharedTokenAction implements IAuthAction {
                 console.error('Error fetching data after all retries:', error);
                 return throwError(() => new Error('Failed to fetch data after multiple attempts with delays.'));
             }))
-        // .subscribe(res => {
-        //     console.log('faq back res:')
-        //     console.log(res)
-        //     this._sendAuthDoneEvent()
-        // })
     }
 
     // пеенести это. триггерить только когда все элементы закончили попытку проверить токен.

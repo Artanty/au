@@ -30,6 +30,5 @@ export class SaveTokenInLsAction implements IAuthAction {
     }
 
     this._tokenStoreService.setTokenStore(storeItem)
-    dd(this._tokenStoreService.getTokenStore())
   }
 }

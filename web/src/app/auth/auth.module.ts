@@ -16,8 +16,13 @@ import { GoToLoginAction } from './actions/auth/goToLogin.action';
 import { TestApiComponent } from '../test-api/components/test-api/test-api.component';
 import { TestApiModule } from '../test-api/test-api.module';
 import { ConfigService } from './services/config.service';
+
 import { AuthStrategyService } from './strategies/auth-strategy.service';
+import { TokenShareStrategyService } from './strategies/token-share-strategy.service';
+import { AuthDoneStrategyService } from './strategies/auth-done-strategy.service';
+
 import { BackendTokenStrategy } from './strategies/auth/backend-token.strategy';
+
 import { DisplayInvalidDataErrorAction } from './actions/auth/displayInvalidDataError.action';
 import { DisplayLoaderAction } from './actions/auth/displayLoader.action';
 import { DisplayLoginFormAction } from './actions/auth/displayLoginForm.action';
@@ -34,19 +39,25 @@ import { AskProjectIdsAction } from './actions/token-share/askProjectsIds.action
 import { TokenShareService } from './services/token-share.service';
 import { UserActionService } from './services/user-action.service';
 import { ViewService } from './services/view.service';
-import { TokenShareStrategyService } from './strategies/token-share-strategy.service';
+
 import { AskBackUrlsAction } from './actions/token-share/askBackUrls.action';
 import { InitTokenShareStoreAction } from './actions/token-share/initTokenShareStore.action';
 import { GetRequiredProjectsIdsAction } from './actions/token-share/getRequiredProjectsIds.action';
 import { StoreBackUrlsAction } from './actions/token-share/storeBackUrls.action';
 import { ShareTokenAction } from './actions/token-share/shareToken.action';
-import { SendAuthDoneEventAction } from './actions/auth/sendAuthDoneEvent.action';
+
 import { eventBusFilterByProject } from './utilites/eventBusFilterByProject';
 import { ValidateSharedTokenAction } from './actions/token-share/validateSharedToken.action';
 import { GrantAuthAction } from './actions/auth/grandAuth.action';
 import { SetProductBtnLoadingAction } from './actions/token-share/setProductBtnLoading.action';
 import { SetProductBtnReadyAction } from './actions/token-share/setProductBtnReady.action';
 import { SetProductBtnLockedAction } from './actions/token-share/setProductBtnLocked.action';
+import { ListenGrantAuthAction } from './actions/auth-done/listenGrantAuth.action';
+
+import { ListenValidateSharedTokenAction } from './actions/auth-done/listenValidateSharedToken.action';
+
+import { AuthAndShareStrategy } from './strategies/auth-done/auth-and-share.strategy';
+import { SendAuthDoneEventAction } from './actions/auth-done/sendAuthDoneEvent.action';
  
 
 
@@ -119,6 +130,10 @@ import { SetProductBtnLockedAction } from './actions/token-share/setProductBtnLo
     SetProductBtnLoadingAction,
     SetProductBtnReadyAction,
     SetProductBtnLockedAction,
+    ListenGrantAuthAction,
+    ListenValidateSharedTokenAction,
+    AuthAndShareStrategy,
+    AuthDoneStrategyService,
     { 
       provide: EVENT_BUS_LISTENER, 
       useFactory: (eventBus$: BehaviorSubject<BusEvent>) => {
@@ -159,6 +174,8 @@ export class AuthModule {
     private readonly _configService: ConfigService,
     private readonly _authStrategyService: AuthStrategyService,
     private readonly _tokenShareStrategyService: TokenShareStrategyService,
+    private readonly _authDoneStrategyService: AuthDoneStrategyService,
+
   ) {
     this.eventBusListener$
       .pipe(
@@ -198,14 +215,18 @@ export class AuthModule {
       take(1)
     ).subscribe(res => {
       this._configService.setConfig({ ...res.payload, from: res.from })
-      this._authStrategyService.select(res.payload.authStrategy)
-      this._tokenShareStrategyService.select(res.payload.tokenShareStrategy)
-      // todo auth должен знать, нужно ли шарить токен после его получения
-      //  если нет - то завершать. как сделать это независимо?
+      this._authStrategyService.select(res.payload.authStrategy);
+      this._tokenShareStrategyService.select(res.payload.tokenShareStrategy);
+      
+      if (res.payload.authStrategy && res.payload.tokenShareStrategy) {
+        this._authDoneStrategyService.select('AUTH_AND_SHARE');
+      }
+      
     })
-    
+
     /**
-     * Подписываемся, ждём прихода ROUTER_PATH и отписываемся
+     * Подписываемся, ждём прихода ROUTER_PATH и отписываемся.
+     * todo перенести это в INIT стратегию?
      */
     this.eventBusListener$.pipe(
       filter(eventBusFilterByProject),

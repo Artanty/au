@@ -6,39 +6,27 @@ import { AuthStateService } from '../../services/auth-state.service';
 import { Token, TokenStoreService } from '../../services/token-store.service';
 import { dd } from '../../utilites/dd';
 
+import { ExternalUpdateBody, ExternalUpdates, TokenShareService } from '../../services/token-share.service';
+import { filter, Observable, share, take } from 'rxjs';
+
 @Injectable()
-export class SendAuthDoneEventAction implements IAuthAction {
+export class ListenValidateSharedTokenAction implements IAuthAction {
   constructor(
     @Inject(HOST_NAME) private readonly hostName: string,
     @Inject(EVENT_BUS_PUSHER)
     private eventBusPusher: (busEvent: BusEvent) => void,
     private _authStateService: AuthStateService,
     private _tokenStoreService: TokenStoreService,
+    private _tokenShareService: TokenShareService
   ) {}
 
-  public execute() {
-    
-    this._storeTokenFromLocalStorage()
-
-    const busEvent: BusEvent = {
-      from: process.env['PROJECT_ID']!,
-      to: this.hostName,
-      event: 'AUTH_DONE',
-      payload: {},
-    };
-
-    this.eventBusPusher(busEvent);
-
-    this._authStateService.setAuthState(true)
-
-    
-  }
-
-  private _storeTokenFromLocalStorage() {
-    const storeItem: Token = {
-      access: localStorage.getItem(`accessToken`) as string,
-      refresh: localStorage.getItem(`refreshToken`) as string
-    }
-    this._tokenStoreService.setTokenStore(storeItem)
+  public execute(): Observable<any> {
+    return this._tokenShareService.listenStore()
+      .pipe(
+        filter((res: ExternalUpdates) => {
+          return Object.values(res).every((el: ExternalUpdateBody) => el.isValidated)
+        }),        
+        take(1),
+      )
   }
 }
