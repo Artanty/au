@@ -28,7 +28,7 @@ import { DisplayLoaderAction } from './actions/auth/displayLoader.action';
 import { DisplayLoginFormAction } from './actions/auth/displayLoginForm.action';
 import { DisplayUnknownErrorAction } from './actions/auth/displayUnknownError.action';
 import { GetProductAuthTokenAction } from './actions/auth/getLsToken.action';
-import { GrantAccessAction } from './actions/auth/grantAccess.action';
+
 import { InitTokenStrategyAction } from './actions/auth/initTokenShareStrategy.action';
 import { RemoveProductAuthTokenAction } from './actions/auth/removeLsToken.action';
 import { ResetFormValidatorsAction } from './actions/auth/resetFormValidators.action';
@@ -58,6 +58,7 @@ import { ListenValidateSharedTokenAction } from './actions/auth-done/listenValid
 
 import { AuthAndShareStrategy } from './strategies/auth-done/auth-and-share.strategy';
 import { SendAuthDoneEventAction } from './actions/auth-done/sendAuthDoneEvent.action';
+import { SetProductBtnCollapsedAction } from './actions/auth-done/setProductBtnCollapsed.action';
  
 
 
@@ -88,7 +89,8 @@ import { SendAuthDoneEventAction } from './actions/auth-done/sendAuthDoneEvent.a
         ]
       },
     ]),
-    TestApiModule
+    // Overrides router. Remove in prod
+    // TestApiModule
   ],
   exports: [AuthComponent],
   providers: [
@@ -106,7 +108,7 @@ import { SendAuthDoneEventAction } from './actions/auth-done/sendAuthDoneEvent.a
     GoToLoginAction,
     ResetFormValidatorsAction,
     DynamicComponent,
-    GrantAccessAction,
+    
     BackendAuthStrategy,
     ViewService,
     UserActionService,
@@ -134,6 +136,7 @@ import { SendAuthDoneEventAction } from './actions/auth-done/sendAuthDoneEvent.a
     ListenValidateSharedTokenAction,
     AuthAndShareStrategy,
     AuthDoneStrategyService,
+    SetProductBtnCollapsedAction,
     { 
       provide: EVENT_BUS_LISTENER, 
       useFactory: (eventBus$: BehaviorSubject<BusEvent>) => {

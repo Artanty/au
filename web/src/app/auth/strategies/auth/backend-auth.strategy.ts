@@ -14,7 +14,7 @@ import { DisplayLoaderAction } from '../../actions/auth/displayLoader.action';
 import { DisplayLoginFormAction } from '../../actions/auth/displayLoginForm.action';
 import { DisplayUnknownErrorAction } from '../../actions/auth/displayUnknownError.action';
 import { GetProductAuthTokenAction } from '../../actions/auth/getLsToken.action';
-import { GrantAccessAction } from '../../actions/auth/grantAccess.action';
+
 import { ResetFormValidatorsAction } from '../../actions/auth/resetFormValidators.action';
 import { SaveTokenInLsAction } from '../../actions/auth/saveLsToken.action';
 import { LoginResponse, SignInByDataAction } from '../../actions/auth/singInByData.action';
@@ -179,7 +179,7 @@ export const AuthActionMap = new Map<string, any>([
   ['SHOW_UNKNOWN_ERROR', DisplayUnknownErrorAction],
   ['DISPLAY_LOADER', DisplayLoaderAction],
   ['RESET_FORM_VALIDATORS', ResetFormValidatorsAction],
-  ['GRANT_ACCESS', GrantAccessAction],
+  
   ['GO_TO_LOGIN', GoToLoginAction],
   ['REMOVE_TOKEN', RemoveProductAuthTokenAction],
   ['INIT_TOKEN_SHARE', InitTokenStrategyAction]

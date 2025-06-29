@@ -9,11 +9,7 @@ import { dd } from '../../utilites/dd';
 @Injectable()
 export class GrantAuthAction implements IAuthAction {
   constructor(
-    @Inject(HOST_NAME) private readonly hostName: string,
-    @Inject(EVENT_BUS_PUSHER)
-    private eventBusPusher: (busEvent: BusEvent) => void,
     private _authStateService: AuthStateService,
-    private _tokenStoreService: TokenStoreService,
   ) {}
 
   public execute() {

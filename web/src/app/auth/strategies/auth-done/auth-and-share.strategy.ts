@@ -18,7 +18,7 @@ import { DisplayLoaderAction } from '../../actions/auth/displayLoader.action';
 import { DisplayLoginFormAction } from '../../actions/auth/displayLoginForm.action';
 import { DisplayUnknownErrorAction } from '../../actions/auth/displayUnknownError.action';
 import { GetProductAuthTokenAction } from '../../actions/auth/getLsToken.action';
-import { GrantAccessAction } from '../../actions/auth/grantAccess.action';
+
 import { ResetFormValidatorsAction } from '../../actions/auth/resetFormValidators.action';
 import { SaveTokenInLsAction } from '../../actions/auth/saveLsToken.action';
 import { LoginResponse, SignInByDataAction } from '../../actions/auth/singInByData.action';
@@ -38,6 +38,7 @@ import { dd } from '../../utilites/dd';
 import { GrantAuthAction } from '../../actions/auth/grandAuth.action';
 import { ListenGrantAuthAction } from '../../actions/auth-done/listenGrantAuth.action';
 import { ListenValidateSharedTokenAction } from '../../actions/auth-done/listenValidateSharedToken.action';
+import { SetProductBtnCollapsedAction } from '../../actions/auth-done/setProductBtnCollapsed.action';
 
 @Injectable()
 export class AuthAndShareStrategy implements IAuthStrategy {
@@ -72,6 +73,10 @@ export class AuthAndShareStrategy implements IAuthStrategy {
       this.injector
         .get<IAuthAction>(AuthActionMap.get('SEND_AUTH_DONE_EVENT'))
         .execute()
+      this.injector
+        .get<IAuthAction>(AuthActionMap.get('SET_PRODUCT_BTN_COLLAPSED'))
+        .execute()
+      console.log(9)
     })
   }
 }
@@ -79,5 +84,6 @@ export class AuthAndShareStrategy implements IAuthStrategy {
 export const AuthActionMap = new Map<string, any>([
   ['LISTEN_GRANT_AUTH', ListenGrantAuthAction],
   ['LISTEN_VALIDATE_SHARE_TOKEN', ListenValidateSharedTokenAction],
-  ['SEND_AUTH_DONE_EVENT', SendAuthDoneEventAction],  
+  ['SEND_AUTH_DONE_EVENT', SendAuthDoneEventAction],
+  ['SET_PRODUCT_BTN_COLLAPSED', SetProductBtnCollapsedAction]
 ]);
