@@ -9,6 +9,10 @@ class TokenShareController {
   //   hostOrigin: string - адрес хоста, который нужно переслать
   //   token?: string
   // }
+
+  /**
+   * todo: добавить для шаринга user-provider
+   * */
   static async share(req) {
     try {
       const encodedHostOrigin = encodeURIComponent(req.hostOrigin) // передлать на получение его из запроса?

@@ -5,9 +5,10 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 dotenv.config();
 
-router.post('/signup', async (req, res) => {
+router.post('/register', async (req, res) => {
+  console.log(999)
   try {
-    const result = await AuthController.signup(req.body);
+    const result = await AuthController.register(req.body);
     res.status(201).json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });

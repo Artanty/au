@@ -2,68 +2,55 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const createPool = require('../core/db_connection');
+const axios = require('axios');
 
 dotenv.config();
 
+/** 
+ * login, register move to user@ - done, checked.
+ * todo: move logout, refresh-token
+ * */
+
 class AuthController {
-  // Signup
-  static async signup({ username, email, password }) {
-    const pool = createPool();
-    const connection = await pool.getConnection();
+  static arr = [] // todo  mb add source if login?
 
+  static async register({ username, email, password }) {
+    const payload = { username, email, password };
     try {
-      // Hash the password
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      // Insert the user into the database
-      const [result] = await connection.query(
-        'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
-        [username, email, hashedPassword]
+      const response = await axios.post(
+        `${process.env.USER_BACK_URL}/api/users/register`,
+        payload,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          timeout: 5000
+        }
       );
+      return response.data;
 
-      connection.release();
-      return { message: 'User created successfully', userId: result.insertId };
     } catch (error) {
-      connection.release();
       throw new Error(error.message);
     }
   }
-  static arr = [] // todo  mb add source if login?
-  // Login
+  
   static async login({ email, password }) {
-    const pool = createPool();
-    const connection = await pool.getConnection();
+    const payload = { email, password }
 
     try {
-      // Find the user by email
-      const [users] = await connection.query('SELECT * FROM users WHERE email = ?', [email]);
-      if (users.length === 0) {
-        throw new Error('Invalid email or password');
-      }
-
-      const user = users[0];
-      AuthController.arr.push(user)
-      console.log(AuthController.arr)
-      // Compare passwords
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (!isPasswordValid) {
-        throw new Error('Invalid email or password');
-      }
-
-      // Generate tokens
-      const accessToken = this.generateToken(user.id);
-      const refreshToken = this.generateRefreshToken(user.id);
-
-      // Save the refresh token in the database
-      await connection.query(
-        'INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY))',
-        [user.id, refreshToken]
+      const response = await axios.post(
+        `${process.env.USER_BACK_URL}/api/users/login`,
+        payload,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          timeout: 5000
+        }
       );
-      
-      connection.release();
-      return { accessToken, refreshToken, user };
+      return response.data;
+
     } catch (error) {
-      connection.release();
       throw new Error(error.message);
     }
   }
