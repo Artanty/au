@@ -57,63 +57,63 @@ class AuthController {
 
   // Logout
   static async logout({ refreshToken }) {
-    const pool = createPool();
-    const connection = await pool.getConnection();
+    // const pool = createPool();
+    // const connection = await pool.getConnection();
   
-    try {
-      // Delete the refresh token from the database
-      await connection.query('DELETE FROM refresh_tokens WHERE token = ?', [refreshToken]);
+    // try {
+    //   // Delete the refresh token from the database
+    //   await connection.query('DELETE FROM refresh_tokens WHERE token = ?', [refreshToken]);
 
-      connection.release();
-      return { message: 'Logged out successfully' };
-    } catch (error) {
-      connection.release();
-      throw new Error(error.message);
-    } 
+    //   connection.release();
+    //   return { message: 'Logged out successfully' };
+    // } catch (error) {
+    //   connection.release();
+    //   throw new Error(error.message);
+    // } 
   }
 
   // Refresh Token
   static async refreshToken({ refreshToken }) {
-    const pool = createPool();
-    const connection = await pool.getConnection();
+    // const pool = createPool();
+    // const connection = await pool.getConnection();
 
-    try {
-      // Verify the refresh token
-      const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+    // try {
+    //   // Verify the refresh token
+    //   const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
 
-      // Check if the refresh token exists in the database
-      const [tokens] = await connection.query('SELECT * FROM refresh_tokens WHERE token = ?', [refreshToken]);
-      if (tokens.length === 0) {
-        throw new Error('Invalid refresh token');
-      }
+    //   // Check if the refresh token exists in the database
+    //   const [tokens] = await connection.query('SELECT * FROM refresh_tokens WHERE token = ?', [refreshToken]);
+    //   if (tokens.length === 0) {
+    //     throw new Error('Invalid refresh token');
+    //   }
 
-      // Generate a new access token
-      const accessToken = this.generateToken(decoded.id);
+    //   // Generate a new access token
+    //   const accessToken = this.generateToken(decoded.id);
 
-      connection.release();
-      return { accessToken };
-    } catch (error) {
-      connection.release();
-      throw new Error(error.message);
-    }
+    //   connection.release();
+    //   return { accessToken };
+    // } catch (error) {
+    //   connection.release();
+    //   throw new Error(error.message);
+    // }
   }
 
-  // Helper function to generate tokens
-  static generateToken(userId) {
-    return jwt.sign(
-      { id: userId }, 
-      process.env.JWT_SECRET, 
-      { expiresIn: process.env.JWT_EXPIRES_IN }
-    );
-  }
+  // // Helper function to generate tokens
+  // static generateToken(userId) {
+  //   return jwt.sign(
+  //     { id: userId }, 
+  //     process.env.JWT_SECRET, 
+  //     { expiresIn: process.env.JWT_EXPIRES_IN }
+  //   );
+  // }
 
-  static generateRefreshToken(userId) {
-    return jwt.sign(
-      { id: userId }, 
-      process.env.JWT_SECRET, 
-      { expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN }
-    );
-  }
+  // static generateRefreshToken(userId) {
+  //   return jwt.sign(
+  //     { id: userId }, 
+  //     process.env.JWT_SECRET, 
+  //     { expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN }
+  //   );
+  // }
 }
 
 module.exports = AuthController;

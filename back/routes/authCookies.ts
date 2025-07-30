@@ -1,12 +1,14 @@
-const express = require('express');
-const authenticate = require('../middlewares/auth.middleware')
-const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
+import express from 'express';
+import { authenticate } from '../middlewares/auth.middleware'
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 const router = express.Router();
 
-
-const users = [];
+const users: {
+  username: string,
+  password: string
+}[] = [];
 const JWT_SECRET = 'your-secret-key';
 
 router.post('/register', async (req, res) => {
@@ -66,8 +68,8 @@ router.post('/logout', (req, res) => {
 });
 
 // Protected route
-router.get('/profile', authenticate, (req, res) => {
-  res.json({ message: `Welcome, ${req.user.username}` });
-});
+// router.get('/profile', authenticate, (req, res) => {
+//   res.json({ message: `Welcome, ${req.body.user.username}` });
+// });
 
-module.exports = router;
+export default router;
