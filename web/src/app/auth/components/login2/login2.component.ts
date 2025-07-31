@@ -5,7 +5,7 @@ import { BehaviorSubject, Observable, filter, map, startWith, tap, pipe } from '
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { IAuthAction } from '../../models/action.model';
 import { AuthActionMap } from '../../strategies/auth/backend-auth.strategy';
-import { GetSourcesRes, GetSourcesResItem } from './models';
+import { GetProvidersRes, GetProvidersResItem } from './models';
 import { LoginService } from './login.service';
 
 
@@ -18,12 +18,12 @@ import { LoginService } from './login.service';
 export class Login2Component implements OnInit {
   username: string = '';
   password: string = '';
-  source: any = null
-  sourceType: boolean = false
+  provider: any = null
+  providerType: boolean = false
 
   formMessage$: Observable<IViewState>
   isLoaderVisible$: Observable<boolean>
-  sources$: Observable<GetSourcesResItem[]>
+  providers$: Observable<GetProvidersResItem[]>
 
   routerPath: string = ''
 
@@ -48,11 +48,10 @@ export class Login2Component implements OnInit {
         map((res: any) => res.payload.isVisible),
         startWith(false),
       )
-    this.sources$ = this._loginService.getSources().pipe(
+    this.providers$ = this._loginService.getProviders().pipe(
       tap(res => {
         if (res.length) {
-          this.source = res[0].id
-          // this._cdr.detectChanges()
+          this.provider = res[0].id
         }
       })
     )
@@ -62,9 +61,22 @@ export class Login2Component implements OnInit {
     this.mock()
   }
 
-  private mock() {
-    this.username = 'john@example.com2'
-    this.password = 'password123'
+  public providerOnChange(event: Event) {
+    const data = (event.target as HTMLInputElement).checked
+    this.providerType = data
+    setTimeout(() => {
+      this.mock(data)
+    }, 200)
+  }
+
+  private mock(isExternal?: boolean) {
+    if (isExternal) {
+      this.username = 'test.user@company.com'
+      this.password = 'testpassword123' 
+    } else {
+      this.username = 'john@example.com2'
+      this.password = 'password123'  
+    }
   }
 
   register() {
@@ -74,12 +86,13 @@ export class Login2Component implements OnInit {
   }
 
   onLogin() {
+
     const data: IUserAction = {
       action: 'SEND_LOGIN_REQUEST',
       payload: {
         username: this.username,
         password: this.password,
-        source: this.source.id ?? undefined
+        provider: this.providerType && this.provider ? this.provider : undefined
       }
     }
     this.UserActionServ.setUserAction(data)

@@ -31,10 +31,10 @@ export class SignInByDataAction implements IAuthAction {
     const formDataUserAction = this.UserActionServ.getUserAction()?.payload
 
     let requestData = {} as any
-
+    console.log(formDataUserAction)
     requestData.username = formDataUserAction?.['username']
     requestData.password = formDataUserAction?.['password']
-    requestData.source = formDataUserAction?.['source']
+    requestData.provider = formDataUserAction?.['provider']
 
     if (!formDataUserAction?.['email']) {
       requestData.email = formDataUserAction?.['username']

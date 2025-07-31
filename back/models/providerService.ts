@@ -18,16 +18,16 @@ export interface FieldMapping {
 }
 
 export class ProviderService {
-  
-  static async getProvider(name: string) {
+
+  static async getProvider(providerId: number) {
     const connection = await createPool().getConnection();
     try {
       // Get provider info
       const [providerRows] = await connection.query(
-        'SELECT id, name, provider_type FROM providers WHERE name = ?',
-        [name]
+        'SELECT id, name, provider_type FROM providers WHERE id = ?',
+        [providerId]
       );
-      if (providerRows.length === 0) throw new Error(`Provider ${name} not found`);
+      if (providerRows.length === 0) throw new Error(`Provider with id ${providerId} not found`);
       const provider = providerRows[0];
 
       // Get config
@@ -61,9 +61,9 @@ export class ProviderService {
     }
   }
 
-  static async createExternalModel(providerName: string) {
+  static async createExternalModel(providerId: number) {
     try {
-      const provider = await this.getProvider(providerName);
+      const provider = await this.getProvider(providerId);
     
       if (provider.provider_type !== 'external_db') {
         throw new Error('Provider is not an external database');

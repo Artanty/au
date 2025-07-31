@@ -37,10 +37,10 @@ export class UserController {
 
   public static async login(req: Request, res: Response) {
     try {
-      const { email, password, provider: providerName } = req.body;
+      const { email, password, provider: providerId } = req.body;
 
-      if (providerName) {
-        await UserController.handleExternalLogin(res, providerName, { email, password });
+      if (providerId) {
+        await UserController.handleExternalLogin(res, providerId, { email, password });
       } else {
         await UserController.handleInternalLogin(res, { email, password });
       }
@@ -140,12 +140,12 @@ export class UserController {
     }    
   }
 
-  private static async handleExternalLogin(res: Response, providerName: string, credentials: { email: string, password: string }) {
+  private static async handleExternalLogin(res: Response, providerId: number, credentials: { email: string, password: string }) {
     let externalModel;
     try {
 
-      const provider = await ProviderService.getProvider(providerName);
-      externalModel = await ProviderService.createExternalModel(providerName);
+      const provider = await ProviderService.getProvider(providerId);
+      externalModel = await ProviderService.createExternalModel(providerId);
 
       // Find field mappings
       const emailField = provider.mappings.find((m: any) => m.internal_claim === 'email');
