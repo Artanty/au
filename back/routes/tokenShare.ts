@@ -1,10 +1,12 @@
 import express from 'express';
 import { TokenShareController } from '../controllers/tokenShareController';
 import { ensureErr } from '../utils/throwError';
+import { dd } from '../utils/dd';
 
 const router = express.Router();
 
 router.post('/share', async (req, res) => {
+  dd('im here')
   try {
     const result = await TokenShareController.share(req.body);
     res.status(201).json(result);
@@ -14,3 +16,4 @@ router.post('/share', async (req, res) => {
 });
 
 export default router;
+

@@ -26,28 +26,28 @@ export class Login2Component implements OnInit {
     @Inject(ViewService) private ViewServ: ViewService,
     @Inject(HttpClient) private readonly http: HttpClient,
     private injector: Injector
-    ) {
+  ) {
     this.formMessage$ = this.ViewServ.listenViewState()
-    .pipe(
-      filter(Boolean),
-      filter((res: IViewState) => res.scope === 'FORM'),
-    )
+      .pipe(
+        filter(Boolean),
+        filter((res: IViewState) => res.scope === 'FORM'),
+      )
 
     this.isLoaderVisible$ = this.ViewServ.listenViewState()
-    .pipe(
-      filter(Boolean),
-      filter(res => res.scope === 'VIEW' && res.action === 'DISPLAY_LOADER'),
-      map((res: any) => res.payload.isVisible),
-      startWith(false),
-    )
+      .pipe(
+        filter(Boolean),
+        filter(res => res.scope === 'VIEW' && res.action === 'DISPLAY_LOADER'),
+        map((res: any) => res.payload.isVisible),
+        startWith(false),
+      )
   }
 
-  ngOnInit (): void {
+  ngOnInit(): void {
     this.mock()
   }
 
   private mock() {
-    this.username = 'john@example.com'
+    this.username = 'john@example.com2'
     this.password = 'password123'
   }
 
@@ -76,18 +76,18 @@ export class Login2Component implements OnInit {
       Authorization: `Bearer ${token}`,
     });
     this.http.post('http://localhost:3204/auth-token/profile', null, { headers })
-    .subscribe(res => {
+      .subscribe(res => {
         console.log(res)
       })
   }
 
-  logOut () {
+  logOut() {
     const refreshToken = localStorage.getItem(`faq@web-host__refreshToken`);
     console.log(refreshToken)
     this.http.post('http://localhost:3204/auth-token/logout', { refreshToken }).subscribe(res => {
       this.injector
-      .get<IAuthAction>(AuthActionMap.get('REMOVE_TOKEN'))
-      .execute();
+        .get<IAuthAction>(AuthActionMap.get('REMOVE_TOKEN'))
+        .execute();
     })
   }
 }

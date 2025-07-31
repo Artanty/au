@@ -6,7 +6,8 @@ import tokenShare from './routes/tokenShare';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import checkDBConnection from './core/db_check_connection';
-import userRoutes from './routes/userRoutes'; // Assuming you have this file
+import userRoutes from './routes/userRoutes';
+import providerRoutes from './routes/providerRoutes'
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ app.use('/auth-token', cors(), authToken);
 app.use('/auth-cookies', cors(corsOptions), authCookies);
 app.use('/token-share', cors(), tokenShare);
 app.use('/api/users', cors(), userRoutes);
+app.use('/provider', cors(), providerRoutes);
 
 // Start the server
 app.listen(PORT, () => {

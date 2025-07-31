@@ -87,4 +87,22 @@ export class ProviderService {
       err(error)
     }
   }
+
+  static async getProviders() {
+    const connection = await createPool().getConnection();
+    try {
+      // Get provider info
+      const [providerRows] = await connection.query(
+        'SELECT * FROM providers'
+      );
+      if (providerRows.length === 0) throw new Error(`Providers not found`);
+
+      return providerRows;
+    } catch (error: any) {
+      return err(error)
+    } 
+    finally {
+      connection.release();
+    }
+  }
 }

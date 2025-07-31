@@ -1,8 +1,11 @@
-const axios = require('axios');
-const dotenv = require('dotenv');
+import axios from 'axios';
+import dotenv from 'dotenv';
+
+import { dd } from '../utils/dd';
+
 dotenv.config();
 
-class TokenShareController {
+export class TokenShareController {
 
   // export interface ShareTokenReq {
   //   backendUrl: string - адрес, на который нужно сделать запрос
@@ -14,6 +17,7 @@ class TokenShareController {
    * todo: добавить для шаринга user-provider
    * */
   static async share(req) {
+    dd('im here 2')
     try {
       const encodedHostOrigin = encodeURIComponent(req.hostOrigin) // передлать на получение его из запроса?
       const backendUrlForRequest = req.backendUrl
@@ -47,7 +51,7 @@ class TokenShareController {
         // }
       };
 
-    } catch (error) {
+    } catch (error: any) {
       const errorDetails = {
         message: error.message,
         ...(error.response && {
@@ -65,4 +69,3 @@ class TokenShareController {
   }
 }
 
-module.exports = TokenShareController;
