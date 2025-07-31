@@ -1,31 +1,39 @@
 import { ChangeDetectorRef, Component, Inject, Injector, OnInit } from '@angular/core';
 import { IUserAction, UserActionService } from '../../services/user-action.service';
 import { IViewState, ViewService } from '../../services/view.service';
-import { BehaviorSubject, Observable, filter, map, startWith } from 'rxjs';
+import { BehaviorSubject, Observable, filter, map, startWith, tap, pipe } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { IAuthAction } from '../../models/action.model';
 import { AuthActionMap } from '../../strategies/auth/backend-auth.strategy';
+import { GetSourcesRes, GetSourcesResItem } from './models';
+import { LoginService } from './login.service';
+
 
 @Component({
   selector: 'app-login2',
   templateUrl: './login2.component.html',
-  styleUrl: './login2.component.scss'
+  styleUrl: './login2.component.scss',
+
 })
 export class Login2Component implements OnInit {
   username: string = '';
   password: string = '';
+  source: any = null
+  sourceType: boolean = false
 
   formMessage$: Observable<IViewState>
   isLoaderVisible$: Observable<boolean>
+  sources$: Observable<GetSourcesResItem[]>
 
   routerPath: string = ''
-
 
   constructor(
     @Inject(UserActionService) private UserActionServ: UserActionService,
     @Inject(ViewService) private ViewServ: ViewService,
     @Inject(HttpClient) private readonly http: HttpClient,
-    private injector: Injector
+    private injector: Injector,
+    private _loginService: LoginService,
+    private _cdr: ChangeDetectorRef
   ) {
     this.formMessage$ = this.ViewServ.listenViewState()
       .pipe(
@@ -40,6 +48,14 @@ export class Login2Component implements OnInit {
         map((res: any) => res.payload.isVisible),
         startWith(false),
       )
+    this.sources$ = this._loginService.getSources().pipe(
+      tap(res => {
+        if (res.length) {
+          this.source = res[0].id
+          // this._cdr.detectChanges()
+        }
+      })
+    )
   }
 
   ngOnInit(): void {
@@ -63,7 +79,7 @@ export class Login2Component implements OnInit {
       payload: {
         username: this.username,
         password: this.password,
-
+        source: this.source.id ?? undefined
       }
     }
     this.UserActionServ.setUserAction(data)

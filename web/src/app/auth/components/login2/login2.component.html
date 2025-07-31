@@ -8,6 +8,28 @@
 
     <form (ngSubmit)="onLogin()" class="form-login">
 
+      <ng-container *ngIf="(sources$ | async)?.length">
+        <label for="source" class="login__label">
+          Источник
+        </label>
+
+        <div class="switch_box box_1">
+          <div class="switch_box_value">
+            {{ sourceType ? 'Внешний' : 'Локальный'}}
+          </div>
+          <input type="checkbox" class="switch_1" [checked]="sourceType"
+          (change)="sourceType = !sourceType">
+        </div>
+        <ng-container *ngIf="sourceType">
+          <select id="source" class="login__input" [(ngModel)]="source" name="source">
+            <option *ngFor="let item of (sources$ | async)" [value]="item.id">
+              {{ item.name }}
+            </option>
+          </select>
+        </ng-container>
+        
+      </ng-container>
+
       <label for="login-input-user" class="login__label">
         Логин
       </label>

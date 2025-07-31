@@ -9,11 +9,11 @@ export interface LoginResponse {
   "accessToken": string
   "refreshToken": string
   "user": {
-      "id": number,
-      "username": string
-      "email": string
-      "password": string
-      "created_at": string
+    "id": number,
+    "username": string
+    "email": string
+    "password": string
+    "created_at": string
   }
 }
 
@@ -34,6 +34,7 @@ export class SignInByDataAction implements IAuthAction {
 
     requestData.username = formDataUserAction?.['username']
     requestData.password = formDataUserAction?.['password']
+    requestData.source = formDataUserAction?.['source']
 
     if (!formDataUserAction?.['email']) {
       requestData.email = formDataUserAction?.['username']
