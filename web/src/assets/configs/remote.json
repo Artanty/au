@@ -24,6 +24,14 @@
             "lives": 1
         }
     ],
+    "interceptors": [
+        {
+            "on": "ERROR",
+            "trigger": 403,
+            "action": "GO_TO_REMOTE_PATH",
+            "project_id": "au"
+        }
+    ],
     "interceptors2": [
         {
             "trigger": "401",
