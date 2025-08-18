@@ -41,14 +41,13 @@ export class ValidateSharedTokenAction implements IAuthAction {
     private _makeRequest(remote: ExternalUpdateBody) {
         const url = remote.backendUrl
         const api = TOKEN_VALIDATE_API
-        const token = this._tokenStoreService.getTokenStore()?.access
+        const accessToken = this._tokenStoreService.getTokenStore()?.access
         const hostOrigin = (this._configService.getConfig() as any).hostOrigin
         
         const payload = {
             hostOrigin: hostOrigin,
             data: { 
-                token: token, 
-                hostOrigin: hostOrigin
+                accessToken
             } 
         }
 

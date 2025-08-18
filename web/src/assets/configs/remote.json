@@ -24,7 +24,7 @@
             "lives": 1
         }
     ],
-    "interceptors": [
+    "interceptors2": [
         {
             "trigger": "401",
             "action": "GO_TO_LOGIN"

@@ -6,9 +6,8 @@ import { dd } from '../utils/dd';
 const router = express.Router();
 
 router.post('/share', async (req, res) => {
-  dd('im here')
   try {
-    const result = await TokenShareController.share(req.body);
+    const result = await TokenShareController.share(req);
     res.status(201).json(result);
   } catch (error) {
     res.status(500).json({ error: ensureErr(error) });

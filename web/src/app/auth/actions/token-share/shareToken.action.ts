@@ -13,6 +13,7 @@ import { HttpClient } from '@angular/common/http';
 import { TokenStoreService } from '../../services/token-store.service';
 
 export interface ShareTokenReq {
+  projectId: string
   backendUrl: string
   hostOrigin: string
   token?: string
@@ -51,6 +52,7 @@ export class ShareTokenAction implements IAuthAction {
         const hostOrigin = (this._configService.getConfig() as any).hostOrigin
 
         const payload: ShareTokenReq = {
+          projectId: back.projectId + '@back',
           backendUrl: back.backendUrl,
           hostOrigin: hostOrigin,
           token: String(token?.access)

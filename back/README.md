@@ -1,11 +1,51 @@
+зачем нужен
+
 при сохранении записи (как запись привязывается к пользователю):
-1. к моменту сохранения имеем на бэке note@ токен юзера
+1. к моменту сохранения ентити имеем на бэке note@ токен юзера.
+этот токен состоит из:
+- ид юзера
+- ид провайдера (если есть)
+
 2. при сохранении записи идет сохранение самой записи - таблица note@notes
 3. при сохранении записи идет сохранение связки запись-юзер - таблица note@note2user
 в качестве юзера должно быть что-то больше, чем id
 потому что при подключении другой дб юзеров - id может совпасть.
 а note@ об этом ничего не знает.
 нужно ли прокидывать в note@note2user также userListSource? получается, что да.
+
+
+### при запросе в другой микроервис
+берем ключ из key@back
+1. делаем запрос с:
+```
+headers: {
+        'X-Project-Id': process.env.PROJECT_ID, // e.g. 'au@back'
+        'X-Project-Domain-Name': requesterUrl,
+        'X-Api-Key': process.env.BASE_KEY
+      }
+```
+2. получаем ответ:
+```
+{ 
+    apiKey: string, // backendServiceToken
+    expiresAt: string
+}
+```
+
+### при запросе для записи (saveTemp)
+добавляем headers:
+```
+headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${backendServiceToken.token}`,
+          'X-Requester-Project': process.env.PROJECT_ID,
+          'X-Requester-Url': `${req.protocol}://${req.get('host')}`
+        },
+```
+
+
+
+
 
 ### что должно быть в конфиге?
 ```
@@ -38,6 +78,11 @@ const busEvent: BusEvent = {
 самый дешевый способ получить обновление для хоста - перебилдить его. 
 поэтому нет смысла запрашивать конфиг в рантайме.
 к моменту рантайма конфиг будет захардкожен в него.
+
+### todo next
+1. прочекать login+tokenShare
+раздаем token+userHandler
+hostOrigin только для пути файла.
 
 
 CREATE TABLE `users` (

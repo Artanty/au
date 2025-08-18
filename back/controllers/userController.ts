@@ -5,6 +5,8 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { ensureErr, err } from '../utils/throwError';
+import { createHash } from '../utils/createHash';
+import { sanitizePath, saveTemp } from './saveTempController';
 
 dotenv.config();
 
@@ -40,9 +42,9 @@ export class UserController {
       const { email, password, provider: providerId } = req.body;
 
       if (providerId) {
-        await UserController.handleExternalLogin(res, providerId, { email, password });
+        await UserController.handleExternalLogin(req, res, providerId, { email, password });
       } else {
-        await UserController.handleInternalLogin(res, { email, password });
+        await UserController.handleInternalLogin(req, res, { email, password });
       }
       
     } catch (error) {
@@ -128,19 +130,20 @@ export class UserController {
     }
   }
 
-  private static async handleInternalLogin(res: Response, credentials: { email: string, password: string }) {
+  private static async handleInternalLogin(req: Request, res: Response, credentials: { email: string, password: string }) {
     const user = await UserModel.getByEmail(credentials.email);
     if (!user || !(await bcrypt.compare(credentials.password, user.password_hash))) {
       res.status(401).json({ error: 'Invalid credentials' });
     } else {
-      const tokens = UserController.generateTokens(user.id!);
+      const hostOrigin = encodeURIComponent(`${req.protocol}://${req.get('host')}`)
+      const tokens = UserController.generateTokens(user.id!, hostOrigin);
       const userData = UserController.sanitizeUser(user);
     
       res.json({ ...tokens, user: userData });
     }    
   }
 
-  private static async handleExternalLogin(res: Response, providerId: number, credentials: { email: string, password: string }) {
+  private static async handleExternalLogin(req: Request, res: Response, providerId: number, credentials: { email: string, password: string }) {
     let externalModel;
     try {
 
@@ -165,12 +168,27 @@ export class UserController {
       } else {
         // Map fields according to provider configuration
         const mappedUser = UserController.mapUserData(externalUser, provider.mappings);
-        const tokens = UserController.generateTokens(mappedUser.id);
 
+        const hostOrigin = encodeURIComponent(`${req.protocol}://${req.get('host')}`)
+
+        const tokens = UserController.generateTokens(mappedUser.id, hostOrigin);
+
+        const userHandler = await createHash(provider.id, mappedUser.id);
+        
+        await saveTemp({
+          path: sanitizePath(hostOrigin),
+          fileName: `userHandler.json`,
+          data: { 
+            userHandler,
+            ...tokens
+          }
+        })
+        
         res.json({ 
-          ...tokens, 
-          user: UserController.sanitizeUser(mappedUser as IUser), //todo type
-          provider: provider.name 
+          ...tokens,
+          user: UserController.sanitizeUser(mappedUser as IUser),
+          provider: provider.name,
+          
         });
       }
 
@@ -204,10 +222,10 @@ export class UserController {
     }
   }
 
-  private static generateTokens(userId: string | number) {
+  private static generateTokens(userId: string | number, hostOrigin: string) {
     return {
-      accessToken: (jwt as any).sign({ id: userId }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN }),
-      refreshToken: jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: '30d' })
+      accessToken: (jwt as any).sign({ id: userId, hostOrigin }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN }),
+      refreshToken: jwt.sign({ id: userId, hostOrigin }, JWT_SECRET, { expiresIn: '30d' })
     };
   }
 
@@ -220,13 +238,6 @@ export class UserController {
     };
   }
 }
-
-
-  
-
-
-
-
 
 
 //   // Refresh Token
