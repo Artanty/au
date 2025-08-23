@@ -148,7 +148,7 @@ export class UserController {
     try {
 
       const provider = await ProviderService.getProvider(providerId);
-      externalModel = await ProviderService.createExternalModel(providerId);
+      externalModel = await ProviderService.createExternalModel(provider);
 
       // Find field mappings
       const emailField = provider.mappings.find((m: any) => m.internal_claim === 'email');

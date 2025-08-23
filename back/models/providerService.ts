@@ -19,7 +19,7 @@ export interface FieldMapping {
 
 export class ProviderService {
 
-  static async getProvider(providerId: number) {
+  static async getProvider(providerId: number): Promise<Provider> {
     const connection = await createPool().getConnection();
     try {
       // Get provider info
@@ -61,10 +61,15 @@ export class ProviderService {
     }
   }
 
-  static async createExternalModel(providerId: number) {
+  static async createExternalModel(providerOrId: number | Provider) {
     try {
-      const provider = await this.getProvider(providerId);
-    
+      let provider: Provider;
+      if (typeof providerOrId === 'number') {
+        provider = await this.getProvider(providerOrId);
+      } else {
+        provider = providerOrId  
+      }
+      
       if (provider.provider_type !== 'external_db') {
         throw new Error('Provider is not an external database');
       }
@@ -81,7 +86,8 @@ export class ProviderService {
         db_name: provider.config.db_name,
         db_user: provider.config.db_user,
         db_password: provider.config.db_password,
-        user_table: provider.config.user_table
+        user_table: provider.config.user_table,
+        mappings: provider.mappings
       });
     } catch (error: any) {
       err(error)
@@ -103,6 +109,32 @@ export class ProviderService {
     } 
     finally {
       connection.release();
+    }
+  }
+
+  /**
+   * взять данные для подключения к внешней ДБ и мэппинги
+   * подключиться к внешней ДБ путём создания инстанса ExternalUserModel
+   * получить всех юзеров через ExternalUserModel.getUsers()
+   * размэпить полученные столбцы под нужные 
+   * вернуть 
+   * */
+  static async getProviderUsers(providerId: number) {
+    try {
+      const provider = await this.getProvider(providerId)
+      const externalUserModel = new ExternalUserModel({
+        db_host: provider.config.db_host,
+        db_port: provider.config.db_port,
+        db_name: provider.config.db_name,
+        db_user: provider.config.db_user,
+        db_password: provider.config.db_password,
+        user_table: provider.config.user_table,
+        mappings: provider.mappings
+      })
+      return await externalUserModel.getUsers()
+
+    } catch (error: any) {
+      return err(error)
     }
   }
 }

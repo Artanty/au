@@ -1,6 +1,7 @@
 import createPool from "../core/db_connection";
 import mysql from 'mysql2/promise';
 import crypto from 'crypto';
+import { FieldMapping } from "./providerService";
 
 
 interface ExternalUserConfig {
@@ -10,10 +11,12 @@ interface ExternalUserConfig {
   db_user: string;
   db_password: string;
   user_table: string;
+  mappings: FieldMapping[]
 }
-
+ 
 export class ExternalUserModel {
   private pool: mysql.Pool;
+
 
   constructor(private providerConfig: ExternalUserConfig) {
     console.log(providerConfig)
@@ -27,7 +30,7 @@ export class ExternalUserModel {
       connectionLimit: 10
     });
   }
-
+  
   async getUserById(externalId: string, idColumn: string): Promise<any> {
     const connection = await this.pool.getConnection();
     try {
@@ -41,10 +44,24 @@ export class ExternalUserModel {
     }
   }
 
+  async getUsers(): Promise<any> {
+    const connection = await this.pool.getConnection();
+    try {
+      const filteredMappings = this.filterMappingsByInternal(this.providerConfig.mappings, ['id', 'name'])
+      const fields = this.buildRemappedQueryFields(filteredMappings)
+      const [rows] = await connection.query(
+        `SELECT ${fields} FROM ${this.providerConfig.user_table}`
+      );
+      return (rows as any[]) || null;
+    } finally {
+      connection.release();
+    }
+  }
+
   private hashPassword(password: string): string {
     return crypto.createHash('sha256').update(password).digest('hex');
   }
-
+  // todo get mappings from constructor
   async getUserByCredential(
     fieldMapping: { emailField: string, passwordField: string },
     credentials: { email: string, password: string }
@@ -74,6 +91,25 @@ export class ExternalUserModel {
     } finally {
       connection.release();
     }
+  }
+
+  filterMappingsByInternal(mappings: FieldMapping[], internalClaimFields: string[]): FieldMapping[] {
+    return mappings.filter(el => internalClaimFields.includes(el.internal_claim))
+  }
+
+  private buildRemappedQueryFields(mappings: FieldMapping[]): string {
+    const fields = mappings
+      .map(mapping => 
+        `${this.quoteIdentifier(mapping.external_field)} AS ${this.quoteIdentifier(mapping.internal_claim)}`
+      )
+      .join(', ');
+
+    return fields;
+  }
+
+  // MySQL uses backticks for identifiers
+  private quoteIdentifier(name: string): string {
+    return `\`${name}\``;
   }
 
   async closePool() {

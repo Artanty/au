@@ -32,12 +32,6 @@
             "project_id": "au"
         }
     ],
-    "interceptors2": [
-        {
-            "trigger": "401",
-            "action": "GO_TO_LOGIN"
-        }
-    ],
     "todo": "Перенести все из remotes сюда",
     "todo1": "добавить порядок для отображения кнопок приложений",
     "todo2": "event_hooks trigger can be with conditions",

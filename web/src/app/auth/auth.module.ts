@@ -59,6 +59,9 @@ import { ListenValidateSharedTokenAction } from './actions/auth-done/listenValid
 import { AuthAndShareStrategy } from './strategies/auth-done/auth-and-share.strategy';
 import { SendAuthDoneEventAction } from './actions/auth-done/sendAuthDoneEvent.action';
 import { SetProductBtnCollapsedAction } from './actions/auth-done/setProductBtnCollapsed.action';
+import { createCustomElement } from '@angular/elements';
+import { UserSelectorComponent } from './components/_remotes/user-selector/user-selector.component';
+import { WrapperComponent } from './components/_remotes/wrapper';
  
 
 
@@ -180,6 +183,7 @@ export class AuthModule {
     private readonly _authDoneStrategyService: AuthDoneStrategyService,
 
   ) {
+    console.log('au module constructor')
     this.eventBusListener$
       .pipe(
         filter(eventBusFilterByProject)
@@ -190,6 +194,26 @@ export class AuthModule {
           }
         }
       })
+    this.register()
+  }
+
+  private register() {
+    
+    const injectorWithComponentName = Injector.create({
+      providers: [
+        { provide: 'componentName', useValue: 'UserSelectorComponent' },
+      ],
+      parent: this.injector,
+    });
+
+    // defineAngularElement('user-providers-select', WrapperComponent, { injector: injectorWithComponentName });
+    // // Convert Angular component to web component
+    const userSelectorElement = createCustomElement(UserSelectorComponent, {
+      injector: injectorWithComponentName
+    });
+
+    // Register as custom element
+    customElements.define('user-selector', userSelectorElement);
   }
 
   private _sendDoneEvent(busEvent: BusEvent, to?: string): void {
@@ -268,3 +292,5 @@ export class AuthModule {
     this.eventBusPusher(busEvent)
   }
 }
+
+

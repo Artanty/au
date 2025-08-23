@@ -31,3 +31,4 @@ AuthStrategyService и TokenShareStrategyService
 ++
 никакие данные не хранятся в сторе после ивента AUTH_DONE
 приложение @au существует только в ходе функций аутентификации
+

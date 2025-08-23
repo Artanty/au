@@ -4,8 +4,8 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-	
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-ke∑y';
+	∑
 
 // declare module 'express' {
 // 	interface Request {

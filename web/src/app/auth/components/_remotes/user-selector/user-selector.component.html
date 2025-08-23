@@ -1,0 +1,16 @@
+<div class="user-selector">
+  <input 
+    type="text" 
+    placeholder="Search users..." 
+    (input)="searchUsers($event)"
+  >
+  <div class="user-list">
+    <div 
+      *ngFor="let user of filteredUsers" 
+      class="user-item"
+      (click)="selectUser(user)"
+    >
+      {{ user.name }} ({{ user.email }})
+    </div>
+  </div>
+</div> 
