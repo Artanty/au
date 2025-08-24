@@ -1,11 +1,17 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { GetProvidersResItem, User, UserRes } from '../../login2/models';
+import { map, merge, Observable, Subject, switchMap, tap, withLatestFrom } from 'rxjs';
+import { LoginService } from '../../login2/login.service';
+import { FormsModule } from '@angular/forms';
   
+
+
 @Component({
   selector: 'app-user-selector',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './user-selector.component.html',
   styleUrl: './user-selector.component.scss'
 })
@@ -14,33 +20,49 @@ export class UserSelectorComponent {
   @Input() selectedUsers: any[] = [];
   @Output() usersSelected = new EventEmitter<any[]>();
   
-  allUsers: any[] = [];
-  filteredUsers: any[] = [];
+  // allUsers: any[] = [];
+  // filteredUsers: any[] = [];
 
-  constructor(private http: HttpClient) {}
+  provider: any = null
+  providers$: Observable<GetProvidersResItem[]>
+  providerType: boolean = false;
+  users$: Observable<User[]>
+  user: any = null
+  isProviderChanged$: Subject<number> = new Subject()
+
+  constructor(
+    private http: HttpClient,
+    private _loginService: LoginService,
+  ) {
+    this.providers$ = this._loginService.getProviders().pipe(
+      tap(res => {
+        if (this.providerType && res.length) {
+          this.provider = res[0].id
+          this.providerOnChange()
+        }
+      })
+    )
+
+    this.users$ = this.isProviderChanged$
+      .pipe(
+        tap(res => console.log(res)),
+        switchMap(providerId => {
+          return this._loginService.getProviderUsers(providerId)
+        })
+      )
+  }
+
+  public providerTypeOnChange(event: Event) {
+    const data = (event.target as HTMLInputElement).checked
+    this.providerType = data
+    
+  }
+  
+  public providerOnChange() {
+    this.isProviderChanged$.next(this.provider)
+  }
 
   ngOnInit() {
-    this.loadUsers();
-  }
-
-  async loadUsers() {
-    const data = { "id": 1 }
-    await this.http.post<any[]>(`${process.env['AU_BACK_URL']}/provider/getProviderUsers`, data).toPromise()
-      .then(res => {
-        this.allUsers = res || [];
-      });
-    this.filteredUsers = this.allUsers;
-  }
-
-  searchUsers(event: any) {
-    const query = event.target.value.toLowerCase();
-    this.filteredUsers = this.allUsers.filter(user =>
-      user.name.toLowerCase().includes(query) ||
-      user.email.toLowerCase().includes(query)
-    );
-  }
-
-  selectUser(user: any) {
-    this.usersSelected.emit([...this.selectedUsers, user]);
+   
   }
 }

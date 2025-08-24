@@ -7,3 +7,8 @@ export interface GetProvidersResItem {
 export interface GetProvidersRes {
   data: GetProvidersResItem[]
 };
+
+export interface User { name: string, id: string }
+export interface UserRes {
+  data: User[];
+}

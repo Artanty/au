@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post('/getProviders', ProviderController.getProviders);
 
-router.post('/getProvider', ProviderController.getProvider);
+router.post('/getProvider', ProviderController.getProviders);
 
 router.post('/getProviderUsers', ProviderController.getProviderUsers);
 

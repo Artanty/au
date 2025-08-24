@@ -233,6 +233,10 @@ input[type="checkbox"].switch_1:checked:after {
 	left: calc(100% - 1.4em);
 }
 
+.switch_box.box_1 {
+	position: relative;
+}
+
 /* Switch 1 Specific Style End */
 .switch_box_value {
 	font-family: 'Montserrat', sans-serif;
@@ -242,8 +246,8 @@ input[type="checkbox"].switch_1:checked:after {
 
 	position: absolute;
 	z-index: 999;
-	top: 49px;
-	left: 113px;
+	top: 13px;
+	left: 73px;
 
 	/* Make text unselectable */
 	user-select: none;

@@ -3,7 +3,7 @@ import { inject, Inject, Injector, NgModule, ɵConsole as Console } from '@angul
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthComponent } from './auth.component';
-import { DynamicComponent } from './components/dynamic/dynamic.component';
+
 import { Login2Component } from './components/login2/login2.component';
 import { SignupComponent } from './components/signup/signup.component';
 import { BehaviorSubject, filter, Observable, take } from 'rxjs'; 
@@ -67,7 +67,7 @@ import { WrapperComponent } from './components/_remotes/wrapper';
 
 @NgModule({
   declarations: [
-    DynamicComponent, 
+    
     AuthComponent, 
     Login2Component,
     SignupComponent,
@@ -110,7 +110,7 @@ import { WrapperComponent } from './components/_remotes/wrapper';
     DisplayLoaderAction,
     GoToLoginAction,
     ResetFormValidatorsAction,
-    DynamicComponent,
+    
     
     BackendAuthStrategy,
     ViewService,
@@ -205,9 +205,7 @@ export class AuthModule {
       ],
       parent: this.injector,
     });
-
-    // defineAngularElement('user-providers-select', WrapperComponent, { injector: injectorWithComponentName });
-    // // Convert Angular component to web component
+    // Convert Angular component to web component
     const userSelectorElement = createCustomElement(UserSelectorComponent, {
       injector: injectorWithComponentName
     });
