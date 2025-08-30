@@ -19,7 +19,10 @@ export class UserSelectorComponent {
 
   @Input() selectedUsers: any[] = [];
   @Output() usersSelected = new EventEmitter<any[]>();
-  
+
+  public userSelectorInputs = {}
+  public userSelectorOutputs = {}
+
   // allUsers: any[] = [];
   // filteredUsers: any[] = [];
 

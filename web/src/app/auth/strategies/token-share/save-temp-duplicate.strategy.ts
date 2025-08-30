@@ -82,7 +82,7 @@ export class SaveTempDuplicateStrategy implements IAuthStrategy {
           const store = this.injector
             .get<IAuthAction>(AuthActionMap.get('STORE_BACK_URLS'))
             .execute(res)
-
+          console.log(store)
           of(store as ExternalUpdates).pipe(
             mergeMap(originalData => from(Object.values(originalData)))
           )

@@ -25,7 +25,33 @@ export class Login2Component implements OnInit {
   isLoaderVisible$: Observable<boolean>
   providers$: Observable<GetProvidersResItem[]>
 
-  routerPath: string = ''
+  routerPath: string = '/au/signup'
+
+  public providerTypeOnChange(data: any) {
+    console.log(data)
+    this.providerType = data
+    setTimeout(() => {
+      this.mock(data)
+    }, 200)
+  }
+
+  public providerOnChange(data: any) {
+    console.log(data)
+  }
+
+  public loginOnChange(data: any) {
+    console.log(data)
+  }
+
+  public passwordOnChange(data: any) {
+    console.log(data)
+  }
+
+  
+
+  private _valueChange(data: any) {
+    console.log(data)
+  }
 
   constructor(
     @Inject(UserActionService) private UserActionServ: UserActionService,
@@ -61,14 +87,6 @@ export class Login2Component implements OnInit {
     this.mock()
   }
 
-  public providerOnChange(event: Event) {
-    const data = (event.target as HTMLInputElement).checked
-    this.providerType = data
-    setTimeout(() => {
-      this.mock(data)
-    }, 200)
-  }
-
   private mock(isExternal?: boolean) {
     if (isExternal) {
       this.username = 'test.user@company.com'
@@ -86,7 +104,6 @@ export class Login2Component implements OnInit {
   }
 
   onLogin() {
-
     const data: IUserAction = {
       action: 'SEND_LOGIN_REQUEST',
       payload: {

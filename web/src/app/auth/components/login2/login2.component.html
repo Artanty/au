@@ -5,40 +5,77 @@
       </div>
     </ng-container>
 
-    <form (ngSubmit)="onLogin()" class="form-login">
+    <form class="form-login">
 
       <ng-container *ngIf="(providers$ | async)?.length">
-        <label for="provider" class="login__label">
-          Источник
-        </label>
 
-        <div class="switch_box box_1">
-          <div class="switch_box_value">
-            {{ providerType ? 'Внешний' : 'Локальный'}}
-          </div>
-          <input type="checkbox" class="switch_1" [checked]="providerType"
-          (change)="providerOnChange($event)">
-        </div>
-        <ng-container *ngIf="providerType">
-          <select id="provider" class="login__input" [(ngModel)]="provider" name="provider">
+        <!-- <app-web-component-wrapper
+          [componentName]="'gui-toggle'"
+          [inputs]="{
+            label: 'Источник',
+            options: ['Локальный', 'Внешний']
+          }"
+          [outputs]="{valueChange: providerTypeOnChange.bind(this)}"
+        ></app-web-component-wrapper> -->
+
+        <ng-container *ngIf="!providerType">
+          <select
+          gui
+          [inputs]="{
+            label: 'Источник',
+            options$: providers$,
+              value: provider 
+          }"
+          [outputs]="{valueChange: providerTypeOnChange.bind(this)}"
+        ></select>
+          <!-- <select gui name="ee" id="ee" label='Источник' [value]="provider">
             <option *ngFor="let item of (providers$ | async)" [value]="item.id">
               {{ item.name }}
             </option>
-          </select>
+          </select> -->
+
+          <!-- <app-web-component-wrapper
+            [componentName]="'gui-select'"
+            [inputs]="{
+              label: 'Источник',
+              options$: providers$,
+              value: provider
+            }"
+            [outputs]="{valueChange: providerOnChange.bind(this)}"
+          ></app-web-component-wrapper> -->
+
         </ng-container>
         
       </ng-container>
 
-      <label for="login-input-user" class="login__label">
-        Логин
-      </label>
-      <input id="login-input-user" class="login__input"  [(ngModel)]="username" name="username" type="text" />
-      <label for="login-input-password" class="login__label">
-        Пароль
-      </label>
-      <input id="login-input-password" class="login__input"  [(ngModel)]="password" name="password" type="password" />
+      <!-- <app-web-component-wrapper
+        [componentName]="'gui-input'"
+        [inputs]="{
+          label: 'Логин',
+          value: username
+        }"
+        [outputs]="{valueChange: loginOnChange.bind(this)}"
+      ></app-web-component-wrapper>
 
-      <button class="login__submit" type="submit">Войти</button>
+      <app-web-component-wrapper
+        [componentName]="'gui-input'"
+        [inputs]="{
+          label: 'Пароль',
+          type: 'password',
+          value: password
+        }"
+        [outputs]="{valueChange: passwordOnChange.bind(this)}"
+      ></app-web-component-wrapper>
+
+      
+      <app-web-component-wrapper
+        [componentName]="'gui-button'"
+        [inputs]="{
+          label: 'Войти',
+          type: 'submit'
+        }"
+        [outputs]="{valueChange: onLogin.bind(this)}"
+      ></app-web-component-wrapper>
 
       <div class="messageWrapper">
         <ng-container *ngIf="(formMessage$ | async) as message">
@@ -47,7 +84,14 @@
           >{{ message.payload?.['message'] }}</div>
         </ng-container>
       </div> 
-      <button class="login__default-btn" type="button" [routerLink]="routerPath">Регистрация</button>
+      
+      <app-web-component-wrapper
+        [componentName]="'gui-button'"
+        [inputs]="{
+          label: 'Регистрация',
+          routerLink: routerPath
+        }"
+      ></app-web-component-wrapper> -->
     </form>
 
     
@@ -55,3 +99,9 @@
   <button class="over" (click)="profile()">profile</button>
   <button class="over" (click)="logOut()">log out</button>
   <button class="over" (click)="register()">register</button>
+
+
+  <!-- ok its good (if its working, i did not check)
+add in  directive:
+if someCondition (calculated in provided GuiService) is true- use custom select, if not - use native
+make similar directives for input, checkbox, radiobutton, textarea and button -->

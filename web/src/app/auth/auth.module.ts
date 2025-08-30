@@ -62,8 +62,8 @@ import { SetProductBtnCollapsedAction } from './actions/auth-done/setProductBtnC
 import { createCustomElement } from '@angular/elements';
 import { UserSelectorComponent } from './components/_remotes/user-selector/user-selector.component';
 import { WrapperComponent } from './components/_remotes/wrapper';
- 
-
+import { WebComponentWrapperComponent } from './components/_remotes/web-component-wrapper/web-component-wrapper';
+import { GuiDirective } from './components/_remotes/web-component-wrapper/gui.directive';
 
 @NgModule({
   declarations: [
@@ -71,6 +71,7 @@ import { WrapperComponent } from './components/_remotes/wrapper';
     AuthComponent, 
     Login2Component,
     SignupComponent,
+    GuiDirective
   ],
   imports: [
     CommonModule,
@@ -94,6 +95,7 @@ import { WrapperComponent } from './components/_remotes/wrapper';
     ]),
     // Overrides router. Remove in prod
     // TestApiModule
+    WebComponentWrapperComponent
   ],
   exports: [AuthComponent],
   providers: [
@@ -110,8 +112,6 @@ import { WrapperComponent } from './components/_remotes/wrapper';
     DisplayLoaderAction,
     GoToLoginAction,
     ResetFormValidatorsAction,
-    
-    
     BackendAuthStrategy,
     ViewService,
     UserActionService,
@@ -124,7 +124,6 @@ import { WrapperComponent } from './components/_remotes/wrapper';
     SaveTempDuplicateStrategy,
     AskProjectIdsAction,
     AskBackUrlsAction,
-    
     InitTokenShareStoreAction,
     GetRequiredProjectsIdsAction,
     StoreBackUrlsAction,

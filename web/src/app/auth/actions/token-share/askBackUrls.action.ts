@@ -41,7 +41,7 @@ export class AskBackUrlsAction implements IAuthAction {
                 return acc;
             }, {} as Record<string, string>),
         
-            // Check if we have all required projects
+            // Check if we have all required projects // todo wait or tries to throw error?
             filter(collectedUrls => {
                 return Array.from(targetProjects).every(projectId => 
                     projectId in collectedUrls

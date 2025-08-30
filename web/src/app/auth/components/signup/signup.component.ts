@@ -10,7 +10,7 @@ import { IViewState, ViewService } from '../../services/view.service';
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.scss'
 })
-export class SignupComponent implements OnInit{
+export class SignupComponent implements OnInit {
   username: string = '';
   password: string = '';
   repeatPassword: string = '';
@@ -30,23 +30,23 @@ export class SignupComponent implements OnInit{
       this.routerPath = `/${res}/login`
     })
     this.formMessage$ = this.ViewServ.listenViewState()
-    .pipe(
-      filter(Boolean),
-      filter((res: IViewState) => res.scope === 'FORM'),
-    )
+      .pipe(
+        filter(Boolean),
+        filter((res: IViewState) => res.scope === 'FORM'),
+      )
     this.isLoaderVisible$ = this.ViewServ.listenViewState()
-    .pipe(
-      filter(Boolean),
-      filter(res => res.scope === 'VIEW' && res.action === 'DISPLAY_LOADER'),
-      map((res: any) => res.payload.isVisible),
-      startWith(false),
-    )
+      .pipe(
+        filter(Boolean),
+        filter(res => res.scope === 'VIEW' && res.action === 'DISPLAY_LOADER'),
+        map((res: any) => res.payload.isVisible),
+        startWith(false),
+      )
   }
 
-  ngOnInit (): void {
-    this.username = 'one' + new Date().toUTCString().slice(-10,-3)
-    this.password = 'one' + new Date().toUTCString().slice(-10,-3)
-    this.repeatPassword = 'one' + new Date().toUTCString().slice(-10,-3)
+  ngOnInit(): void {
+    this.username = 'one' + new Date().toUTCString().slice(-10, -3)
+    this.password = 'one' + new Date().toUTCString().slice(-10, -3)
+    this.repeatPassword = 'one' + new Date().toUTCString().slice(-10, -3)
   }
 
   onSubmit() {
