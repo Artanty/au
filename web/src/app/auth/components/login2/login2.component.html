@@ -8,74 +8,47 @@
     <form class="form-login">
 
       <ng-container *ngIf="(providers$ | async)?.length">
-
-        <!-- <app-web-component-wrapper
-          [componentName]="'gui-toggle'"
+        <input gui type="radio"
           [inputs]="{
             label: 'Источник',
-            options: ['Локальный', 'Внешний']
+            options: ['Локальный', 'Внешний'],
+            value: true
           }"
           [outputs]="{valueChange: providerTypeOnChange.bind(this)}"
-        ></app-web-component-wrapper> -->
+        >
 
-        <ng-container *ngIf="!providerType">
-          <select
-          gui
-          [inputs]="{
-            label: 'Источник',
-            options$: providers$,
-              value: provider 
-          }"
-          [outputs]="{valueChange: providerTypeOnChange.bind(this)}"
-        ></select>
-          <!-- <select gui name="ee" id="ee" label='Источник' [value]="provider">
-            <option *ngFor="let item of (providers$ | async)" [value]="item.id">
-              {{ item.name }}
-            </option>
-          </select> -->
-
-          <!-- <app-web-component-wrapper
-            [componentName]="'gui-select'"
+        <ng-container *ngIf="providerType">
+          <select gui
             [inputs]="{
-              label: 'Источник',
               options$: providers$,
-              value: provider
+                value: provider 
             }"
-            [outputs]="{valueChange: providerOnChange.bind(this)}"
-          ></app-web-component-wrapper> -->
-
+            [outputs]="{valueChange: providerTypeOnChange.bind(this)}"
+          ></select>
         </ng-container>
         
       </ng-container>
 
-      <!-- <app-web-component-wrapper
-        [componentName]="'gui-input'"
+      <input gui type="text"
         [inputs]="{
           label: 'Логин',
           value: username
         }"
         [outputs]="{valueChange: loginOnChange.bind(this)}"
-      ></app-web-component-wrapper>
-
-      <app-web-component-wrapper
-        [componentName]="'gui-input'"
+      >
+      <input gui type="password"
         [inputs]="{
           label: 'Пароль',
-          type: 'password',
           value: password
         }"
         [outputs]="{valueChange: passwordOnChange.bind(this)}"
-      ></app-web-component-wrapper>
-
-      
-      <app-web-component-wrapper
-        [componentName]="'gui-button'"
+      >
+      <button gui type="submit"
         [inputs]="{
-          label: 'Войти',
-          type: 'submit'
+          label: 'Войти'
         }"
-        [outputs]="{valueChange: onLogin.bind(this)}"
-      ></app-web-component-wrapper>
+        [outputs]="{click: onLogin.bind(this)}"
+      ></button>
 
       <div class="messageWrapper">
         <ng-container *ngIf="(formMessage$ | async) as message">
@@ -85,23 +58,14 @@
         </ng-container>
       </div> 
       
-      <app-web-component-wrapper
-        [componentName]="'gui-button'"
+      <button gui type="button"
         [inputs]="{
           label: 'Регистрация',
           routerLink: routerPath
         }"
-      ></app-web-component-wrapper> -->
+      ></button>
     </form>
-
-    
   </div>
   <button class="over" (click)="profile()">profile</button>
   <button class="over" (click)="logOut()">log out</button>
   <button class="over" (click)="register()">register</button>
-
-
-  <!-- ok its good (if its working, i did not check)
-add in  directive:
-if someCondition (calculated in provided GuiService) is true- use custom select, if not - use native
-make similar directives for input, checkbox, radiobutton, textarea and button -->

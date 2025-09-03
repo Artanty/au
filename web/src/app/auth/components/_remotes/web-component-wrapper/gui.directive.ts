@@ -1,21 +1,32 @@
 import {
   Directive, ElementRef, Renderer2, ComponentFactoryResolver, 
-  ViewContainerRef, Input, OnInit, OnDestroy, Injector
+  ViewContainerRef, Input, OnInit, OnDestroy, Injector, TemplateRef,
+  ComponentRef, Optional,
+  InjectionToken,
+  Inject
 } from '@angular/core';
-import { GuiService, NATIVE_ELEMENT } from './gui.service';
+import { ElementsMap, GuiService } from './gui.service';
 import { WebComponentWrapperComponent } from './web-component-wrapper';
+import { Router } from '@angular/router';
 
+export const GUI_PLACEHOLDER_TEMPLATE = new InjectionToken<TemplateRef<any>>('GUI_PLACEHOLDER_TEMPLATE');
 
 @Directive({
-  selector: '[gui]'
+  selector: '[gui]',
+  providers: [
+    {
+      provide: GUI_PLACEHOLDER_TEMPLATE,
+      useValue: null
+    }
+  ]
 })
 export class GuiDirective implements OnInit, OnDestroy {
   @Input() inputs: any = {};
   @Input() outputs: any = {};
   
-  private nativeSelect: HTMLSelectElement;
-  private customComponentRef: any;
-  private isUsingCustomComponent = false;
+  private element: HTMLElement & { type: string };
+  private customComponentRef: ComponentRef<any> | null = null;
+  private placeholderViewRef: any = null;
 
   constructor(
     private el: ElementRef,
@@ -23,165 +34,102 @@ export class GuiDirective implements OnInit, OnDestroy {
     private componentFactoryResolver: ComponentFactoryResolver,
     private viewContainerRef: ViewContainerRef,
     private guiService: GuiService,
-    private injector: Injector
+    private injector: Injector,
+    private router: Router,
+    @Optional() @Inject(GUI_PLACEHOLDER_TEMPLATE) 
+    private injectedPlaceholderTemplate: TemplateRef<any> | null
   ) {
-    this.nativeSelect = this.el.nativeElement;
+    this.element = this.el.nativeElement;
   }
 
   async ngOnInit() {
-    console.log(this.inputs)
+    await this._findCustomElement()
+  }
+
+  private async _findCustomElement() {
     try {
-      const tagName = this.el.nativeElement.tagName;
-      const customElementName = await this.guiService.getCustomElement(tagName)
-      if (customElementName === NATIVE_ELEMENT) {
-        // this.enhanceNativeSelect();
-      } else {
-        await this.replaceWithCustomComponent(customElementName)
-      }
-    } catch (error) {
-      console.warn('Failed to initialize custom select, falling back to native', error);
-      // this.enhanceNativeSelect();
+      const elementKey = `${this.element.tagName}__${this.element.type?.toUpperCase().replace('-', '_')}`;
+      const customElementName = await this.guiService.getCustomElement(elementKey);
+      await this.replaceWithCustomComponent(customElementName);
+    } catch (e: unknown) {
+      const text = (e instanceof Error) ? e.message : e;
+      this.showPlaceholder('Failed to load custom element. ' + text);
     }
   }
 
   private async replaceWithCustomComponent(customElementName: string): Promise<void> {
     try {
-      // Hide the native select element
-      this.renderer.setStyle(this.nativeSelect, 'display', 'none');
-      this.renderer.setAttribute(this.nativeSelect, 'aria-hidden', 'true');
-      
-      // Create the web component wrapper
+      this.hideElement();
       const factory = this.componentFactoryResolver.resolveComponentFactory(WebComponentWrapperComponent);
       this.customComponentRef = this.viewContainerRef.createComponent(factory, undefined, this.injector);
       
-      // Set up the web component with inputs and outputs from the directive
-      this.setupWebComponent(customElementName);
+      const instance = this.customComponentRef.instance;
+      instance.componentName = customElementName;
+      instance.inputs = { ...this.inputs, type: this.inputs.type ?? this.element.type };
+      instance.outputs = this.outputs;
       
-      this.isUsingCustomComponent = true;
-      
-      console.log('Successfully replaced native select with custom component');
-      
-    } catch (error) {
-      console.error('Error creating custom component', error);
-      this.fallbackToNative();
+    } catch {
+      this.showPlaceholder('Failed to load custom component');
     }
   }
 
-  private setupWebComponent(customElementName: string) {
-    const instance = this.customComponentRef.instance as WebComponentWrapperComponent;
-    
-    // Prepare the inputs for the web component
-    const webComponentInputs = {
-      ...this.inputs, // Spread all inputs from the directive
-      // Ensure we have required properties
-      // label: this.inputs?.label || this.getLabelFromNative(),
-      // value: this.inputs?.value !== undefined ? this.inputs.value : this.nativeSelect.value,
-      // disabled: this.inputs?.disabled !== undefined ? this.inputs.disabled : this.nativeSelect.disabled,
-      // required: this.inputs?.required !== undefined ? this.inputs.required : this.nativeSelect.required,
-      // name: this.inputs?.name || this.nativeSelect.name,
-      // id: this.inputs?.id || this.nativeSelect.id
-    };
-    
-    // Prepare outputs - wrap valueChange to also update native select
-    const webComponentOutputs = {
-      ...this.outputs,
-      // valueChange: (value: any) => {
-      //   // Update native select value for form submission
-      //   this.nativeSelect.value = value;
-        
-      //   // Trigger change event on native select for Angular forms
-      //   this.triggerChangeEvent();
-        
-      //   // Call the original valueChange handler if provided
-      //   if (this.outputs?.valueChange) {
-      //     this.outputs.valueChange(value);
-      //   }
-      // },
-      // error: (error: any) => {
-      //   console.error('Custom component error:', error);
-      //   if (this.outputs?.error) {
-      //     this.outputs.error(error);
-      //   }
-      // }
-    };
-    
-    // Configure the web component wrapper
-    instance.componentName = customElementName;
-    instance.inputs = webComponentInputs;
-    instance.outputs = webComponentOutputs;
+  private showPlaceholder(message: string) {
+    this.hideElement();
+    this.clearPlaceholder();
+
+    // Use injected template if available
+    const template = this.injectedPlaceholderTemplate;
+    if (template) {
+      this.placeholderViewRef = this.viewContainerRef.createEmbeddedView(template, {
+        $implicit: message,
+        retry: () => this.retryLoading(),
+        element: this.element
+      });
+      return;
+    }
+
+    // Fallback: throw error or create minimal placeholder
+    this.createMinimalPlaceholder(message);
   }
 
-  // private getLabelFromNative(): string {
-  //   return this.nativeSelect.getAttribute('aria-label') || 
-  //          this.nativeSelect.getAttribute('title') || 
-  //          this.nativeSelect.getAttribute('name') || 
-  //          '';
-  // }
-
-  // private triggerChangeEvent() {
-  //   // Create and dispatch change event on native select
-  //   const event = new Event('change', { bubbles: true });
-  //   this.nativeSelect.dispatchEvent(event);
+  private createMinimalPlaceholder(message: string) {
+    const placeholderElement = this.renderer.createElement('div');
+    this.renderer.setProperty(placeholderElement, 'textContent', `${message}`);
+    this.renderer.setStyle(placeholderElement, 'color', 'red');
+    this.renderer.setStyle(placeholderElement, 'border', '1px solid red');
+    this.renderer.setStyle(placeholderElement, 'padding', '5px');
+    this.renderer.insertBefore(this.element.parentNode, placeholderElement, this.element.nextSibling);
     
-  //   // Also dispatch input event for reactive forms
-  //   const inputEvent = new Event('input', { bubbles: true });
-  //   this.nativeSelect.dispatchEvent(inputEvent);
-  // }
+    this.placeholderViewRef = { element: placeholderElement };
+  }
 
-  private fallbackToNative() {
-    if (this.isUsingCustomComponent) {
-      // Clean up custom component
-      if (this.customComponentRef) {
-        this.customComponentRef.destroy();
-        this.customComponentRef = null;
+  private clearPlaceholder() {
+    if (this.placeholderViewRef) {
+      if (this.placeholderViewRef.destroy) {
+        this.placeholderViewRef.destroy();
+      } else if (this.placeholderViewRef.element && this.placeholderViewRef.element.parentNode) {
+        this.renderer.removeChild(this.placeholderViewRef.element.parentNode, this.placeholderViewRef.element);
       }
-      
-      // Show native select
-      this.renderer.setStyle(this.nativeSelect, 'display', '');
-      this.renderer.removeAttribute(this.nativeSelect, 'aria-hidden');
-      
-      this.isUsingCustomComponent = false;
-      
-      console.log('Fell back to native select');
+      this.placeholderViewRef = null;
     }
   }
 
-  // private enhanceNativeSelect() {
-  //   // Add some basic enhancements to native select when custom component is not used
-  //   this.renderer.addClass(this.nativeSelect, 'enhanced-native-select');
+  private async retryLoading() {
+    this.clearPlaceholder();
     
-  //   // Add custom styling
-  //   this.renderer.setStyle(this.nativeSelect, 'padding', '10px 12px');
-  //   this.renderer.setStyle(this.nativeSelect, 'border-radius', '6px');
-  //   this.renderer.setStyle(this.nativeSelect, 'border', '2px solid #e2e8f0');
-  //   this.renderer.setStyle(this.nativeSelect, 'font-size', '14px');
-  //   this.renderer.setStyle(this.nativeSelect, 'min-width', '200px');
-    
-  //   // Add hover and focus styles
-  //   this.nativeSelect.addEventListener('mouseenter', () => {
-  //     this.renderer.setStyle(this.nativeSelect, 'border-color', '#cbd5e0');
-  //   });
-    
-  //   this.nativeSelect.addEventListener('mouseleave', () => {
-  //     this.renderer.setStyle(this.nativeSelect, 'border-color', '#e2e8f0');
-  //   });
-    
-  //   this.nativeSelect.addEventListener('focus', () => {
-  //     this.renderer.setStyle(this.nativeSelect, 'border-color', '#3b82f6');
-  //     this.renderer.setStyle(this.nativeSelect, 'box-shadow', '0 0 0 3px rgba(59, 130, 246, 0.1)');
-  //     this.renderer.setStyle(this.nativeSelect, 'outline', 'none');
-  //   });
-    
-  //   this.nativeSelect.addEventListener('blur', () => {
-  //     this.renderer.setStyle(this.nativeSelect, 'border-color', '#e2e8f0');
-  //     this.renderer.setStyle(this.nativeSelect, 'box-shadow', 'none');
-  //   });
-  // }
+    await this._findCustomElement()
+  }
+
+  private hideElement() {
+    this.renderer.setStyle(this.element, 'display', 'none');
+    this.renderer.setAttribute(this.element, 'aria-hidden', 'true');
+  }
 
   ngOnDestroy() {
-    // Clean up
     if (this.customComponentRef) {
       this.customComponentRef.destroy();
     }
+    
+    this.clearPlaceholder();
   }
 }

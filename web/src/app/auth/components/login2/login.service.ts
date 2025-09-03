@@ -1,5 +1,3 @@
-//login.service.ts
-
 import { Inject, Injectable } from "@angular/core"
 import { GetProvidersRes, GetProvidersResItem, User, UserRes } from "./models"
 import { HttpClient } from "@angular/common/http"
