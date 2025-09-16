@@ -51,6 +51,6 @@ export async function attachToken(
     };
   } catch (error: any) {
     console.error('Token acquisition failed:', error.message);
-    throw new Error('Failed to acquire API token' + error.message);
+    throw new Error('Failed to acquire API token: ' + error.message);
   }
 }

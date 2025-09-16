@@ -13,6 +13,7 @@ export class GrantAuthAction implements IAuthAction {
   ) {}
 
   public execute() {
+    console.log(' GrantAuthAction')
     this._authStateService.setAuthState(true)  
   }
 }

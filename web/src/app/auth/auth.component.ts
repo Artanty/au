@@ -6,6 +6,7 @@ import { ConfigService } from './services/config.service';
 import { CoreService } from './services/core.service';
 import { TokenShareService } from './services/token-share.service';
 import { AuthStrategyService } from './strategies/auth-strategy.service';
+import { UserProfileService } from './services/user-profile.service';
 
 export const EVENT_BUS_LISTENER = new InjectionToken<Observable<BusEvent>>('');
 export const EVENT_BUS_PUSHER = new InjectionToken<
@@ -48,7 +49,8 @@ export class AuthComponent implements OnInit, OnDestroy {
     private eventBusPusher: (busEvent: BusEvent) => void,
     @Inject(ConfigService) private ConfigServ: ConfigService,
     @Inject(AuthStrategyService) private AuthStrategyServ: AuthStrategyService, // do not remove: used to bootstrap it's constructor
-    private _tokenShareService: TokenShareService
+    private _tokenShareService: TokenShareService,
+    private _userProfileService: UserProfileService
   ) {
     this.eventBusListener$.subscribe((busEvent: BusEvent) => {
       if (busEvent.event === 'authStrategy') {
@@ -66,6 +68,14 @@ export class AuthComponent implements OnInit, OnDestroy {
     ).subscribe(() => {
       this._renderComponents()
     })
+    this._listenUserData()
+  }
+  private _listenUserData() {
+    this._userProfileService.listenUserData()
+      // .pipe(
+      //   filter(res => res !== null),
+      // )
+      .subscribe(res => console.log(res))
   }
 
   ngOnDestroy(): void {

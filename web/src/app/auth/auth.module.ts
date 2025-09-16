@@ -64,6 +64,10 @@ import { UserSelectorComponent } from './components/_remotes/user-selector/user-
 import { WrapperComponent } from './components/_remotes/wrapper';
 import { WebComponentWrapperComponent } from './components/_remotes/web-component-wrapper/web-component-wrapper';
 import { GuiDirective } from './components/_remotes/web-component-wrapper/gui.directive';
+import { UserAvatarComponent } from './components/_remotes/user-avatar/user-avatar.component';
+import { CheckTokenAction } from './actions/auth/checkToken.action';
+import { UserProfileService } from './services/user-profile.service';
+import { SetUserDataAction } from './actions/auth/setUserData.action';
 
 @NgModule({
   declarations: [
@@ -71,7 +75,7 @@ import { GuiDirective } from './components/_remotes/web-component-wrapper/gui.di
     AuthComponent, 
     Login2Component,
     SignupComponent,
-    GuiDirective
+    
   ],
   imports: [
     CommonModule,
@@ -95,12 +99,15 @@ import { GuiDirective } from './components/_remotes/web-component-wrapper/gui.di
     ]),
     // Overrides router. Remove in prod
     // TestApiModule
-    WebComponentWrapperComponent
+    WebComponentWrapperComponent,
+    GuiDirective,
+    UserAvatarComponent
   ],
   exports: [AuthComponent],
   providers: [
     CoreService,
     ConfigService,
+    // UserProfileService,
     AuthStrategyService,
     BackendTokenStrategy,
     GetProductAuthTokenAction,
@@ -139,6 +146,8 @@ import { GuiDirective } from './components/_remotes/web-component-wrapper/gui.di
     AuthAndShareStrategy,
     AuthDoneStrategyService,
     SetProductBtnCollapsedAction,
+    CheckTokenAction,
+    SetUserDataAction,
     { 
       provide: EVENT_BUS_LISTENER, 
       useFactory: (eventBus$: BehaviorSubject<BusEvent>) => {
@@ -193,24 +202,29 @@ export class AuthModule {
           }
         }
       })
-    this.register()
+    this.register('UserSelectorComponent', UserSelectorComponent, 'user-selector')
+    // this.register('UserAvatarComponent', UserAvatarComponent, 'user-avatar')
   }
 
-  private register() {
+  /**
+   * 'UserSelectorComponent', UserSelectorComponent, 'user-selector'
+   * 
+   * */
+  private register(componentName: string, component: any, customElementName: string) {
     
     const injectorWithComponentName = Injector.create({
       providers: [
-        { provide: 'componentName', useValue: 'UserSelectorComponent' },
+        { provide: 'componentName', useValue: componentName },
       ],
       parent: this.injector,
     });
     // Convert Angular component to web component
-    const userSelectorElement = createCustomElement(UserSelectorComponent, {
+    const customElement = createCustomElement(component, {
       injector: injectorWithComponentName
     });
 
     // Register as custom element
-    customElements.define('user-selector', userSelectorElement);
+    customElements.define(customElementName, customElement);
   }
 
   private _sendDoneEvent(busEvent: BusEvent, to?: string): void {

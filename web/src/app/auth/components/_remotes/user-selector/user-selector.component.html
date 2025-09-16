@@ -1,39 +1,34 @@
-<!-- <app-web-component-wrapper
-  [componentName]="'gui-select'"
-  [inputs]="userSelectorInputs"
-  [outputs]="userSelectorOutputs"
-></app-web-component-wrapper> -->
-
 <ng-container *ngIf="(providers$ | async)?.length">
-  <label for="providerType" class="login__label">
-    Источник
-  </label>
-
-  <div class="switch_box box_1">
-    <div class="switch_box_value">
-      {{ providerType ? 'Внешний' : 'Локальный'}}
-    </div>
-    <input type="checkbox" class="switch_1" [checked]="providerType" id="providerType"
-    (change)="providerTypeOnChange($event)">
-  </div>
+  <input gui type="radio"
+    [inputs]="{
+      label: 'Источник',
+      options: ['Локальный', 'Внешний'],
+      value: true
+    }"
+    [outputs]="{valueChange: providerTypeOnChange.bind(this)}"
+  >
 
   <ng-container *ngIf="providerType">
-    <select id="provider" class="login__input" [(ngModel)]="provider" name="provider" (change)="providerOnChange()">
-      <option *ngFor="let item of (providers$ | async)" [value]="item.id">
-        {{ item.name }}
-      </option>
-    </select>
+    <select gui
+      [inputs]="{
+        options$: providers$,
+        value: provider$
+      }"
+      [outputs]="{valueChange: providerOnChange.bind(this)}"
+    ></select>
+
+    <div class="space"></div>
+
+    <select gui
+      [inputs]="{
+        options$: users$,
+      }"
+      [outputs]="{valueChange: userOnChange.bind(this)}"
+    ></select>
   </ng-container>
 
-  <ng-container *ngIf="providerType">
-    <label for="user" class="login__label">
-      Пользователь
-    </label>
+  
 
-    <select class="login__input" [(ngModel)]="user" name="provider" id="user">
-      <option *ngFor="let item of (users$ | async)" [value]="item.id">
-        {{ item.name }}
-      </option>
-    </select>
-  </ng-container>
+  <div class="space"></div>
+
 </ng-container>

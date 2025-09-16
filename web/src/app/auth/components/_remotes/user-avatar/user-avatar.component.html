@@ -1,0 +1,49 @@
+
+
+<div class="menu">
+   <input [(ngModel)]="isOpened" 
+     type="checkbox" 
+     href="#" 
+     class="menu-open" 
+     name="menu-open" 
+     id="menu-open" 
+     (click)="handleCheckboxClick()"
+   />
+   <label class="menu-open-button" for="menu-open">
+
+    <div 
+      class="avatar" 
+      [class]="sizeClass"
+      [style.background]="backgroundColor"
+      [style.width.px]="customSize"
+      [style.height.px]="customSize"
+      [style.fontSize.px]="fontSize"
+      [attr.aria-label]="name || 'User avatar'"
+      role="img"
+    >
+      @if (displayImage && isLoggedIn) {
+        <img 
+          [src]="avatarUrl" 
+          [alt]="name" 
+          class="avatar-image" 
+          (error)="onImageError()" 
+          loading="lazy"
+        />
+      }
+      
+      @if (displayInitials && isLoggedIn) {
+        <span class="avatar-initials">{{ initials }}</span>
+      }
+      @if (!isLoggedIn) {
+        <i class="loginBtn mu mu-user"></i>
+      }
+    </div>
+  </label>
+  @if (isLoggedIn) {
+    <a href="#" class="menu-item blue"> <i class="fa fa-anchor"></i> </a>
+     <a (click)="onLogoutHandler()" class="menu-item green"> 
+         <i class="logoutBtn mu mu-power" ></i>
+     </a> 
+  }
+   
+</div>

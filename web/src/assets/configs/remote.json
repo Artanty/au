@@ -6,7 +6,10 @@
             },
             "push": {
                 "type": "TRIGGER_ACTION",
-                "action": "INIT_AUTH_CONFIG"
+                "action": "INIT_AUTH_CONFIG",
+                "payload": {
+                    "routerPath": "au"
+                }
             },
             "lives": "once"
         },

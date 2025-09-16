@@ -6,7 +6,8 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { ensureErr, err } from '../utils/throwError';
 import { createHash } from '../utils/createHash';
-import { sanitizePath, saveTemp } from './saveTempController';
+import { deleteFile, getUserHandlerAndTokens, sanitizePath, saveTemp } from './saveTempController';
+import { getEncodedClientOrigin } from '../utils/getEncodedClientOrigin';
 
 dotenv.config();
 
@@ -53,15 +54,30 @@ export class UserController {
     }
   }
 
-
+  /**
+   * back: удаляем файл из storage
+   * web: следующий запрос с фронта вернет 401 и очистит токен
+   * */
   public static async logout(req: Request, res: Response) {
-  
-    // try {
-    //   await UserModel.logout(req.body.refreshToken)
-    // } catch (error: any) {
-    //   console.error('Logout error:', error);
-    //   res.status(500).json({ error: 'Logout failed' });
-    // } 
+    try {
+      const path = getEncodedClientOrigin(req);
+      const fileName = `userHandler.json`;
+
+      const success = await deleteFile(path, fileName);
+      if (success) {
+        console.log('File deleted successfully');
+        return res.status(200).json({
+          success: true,
+          message: 'Successfully logged out'
+        });
+      } else {
+        throw new Error('smth wrong');
+      }
+    } catch (error: any) {
+      console.error('Logout error:', error);
+      res.status(500).json({ error: 'Logout failed: ' + error });
+    }
+    
   }
 
   public static async getProfile(req: Request, res: Response) {
@@ -169,25 +185,29 @@ export class UserController {
         // Map fields according to provider configuration
         const mappedUser = UserController.mapUserData(externalUser, provider.mappings);
 
-        const hostOrigin = encodeURIComponent(`${req.protocol}://${req.get('host')}`)
+        const clientOrigin = getEncodedClientOrigin(req);
 
-        const tokens = UserController.generateTokens(mappedUser.id, hostOrigin);
+        const tokens = UserController.generateTokens(mappedUser.id, clientOrigin);
 
         const userHandler = await createHash(provider.id, mappedUser.id);
+
+        const userName = mappedUser.name; // add profile table: proflie.userName ?? mappedUser.name
         
         await saveTemp({
-          path: sanitizePath(hostOrigin),
+          path: clientOrigin,
           fileName: `userHandler.json`,
           data: { 
             userHandler,
-            ...tokens
+            ...tokens,
+            userName: userName
           }
         })
         
         res.json({ 
           ...tokens,
-          user: UserController.sanitizeUser(mappedUser as IUser),
-          provider: provider.name,
+          // user: UserController.sanitizeUser(mappedUser as IUser),
+          userName: userName,
+          // provider: provider.name,
           
         });
       }
@@ -236,6 +256,30 @@ export class UserController {
       email: user.email,
       created_at: user.created_at
     };
+  }
+
+  public static async checkToken(req: Request, res: Response) {
+    try {
+      const accessToken = req.body.accessToken
+      if (!accessToken) {
+        throw new Error('No access token provided.')
+      }
+      const clientOrigin = getEncodedClientOrigin(req);
+      const savedTempData = await getUserHandlerAndTokens(clientOrigin, 'userHandler.json');
+      if (!savedTempData) {
+        throw new Error('File problem.')
+      }
+      return res.json({
+        // data: {
+        //   userName: savedTempData.userName,
+        // }
+
+        userName: savedTempData.userName,
+        
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: 'Check token failed: ' + String(error) });
+    }
   }
 }
 

@@ -12,11 +12,13 @@ sharedMappings.register(
 module.exports = {
   output: {
     uniqueName: "au",
-    publicPath: "auto",
+    publicPath: "http://localhost:4204/", // Use explicit URL instead of 'auto'
+    chunkLoadingGlobal: 'webpackJsonp_au', // Add unique chunk loading global
     scriptType: 'text/javascript'
   },
   optimization: {
-    runtimeChunk: false
+    runtimeChunk: false,
+    chunkIds: 'named' // Better for debugging
   },
   resolve: {
     alias: {
@@ -24,7 +26,17 @@ module.exports = {
     }
   },
   experiments: {
-    outputModule: true
+    outputModule: false, // Change to false - outputModule can cause issues with Angular
+  },
+  devServer: {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+      'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization',
+      'Access-Control-Allow-Credentials': 'true'
+    },
+    allowedHosts: 'all',
+    hot: true
   },
   plugins: [
     new ModuleFederationPlugin({
@@ -33,21 +45,66 @@ module.exports = {
       exposes: {
         './AuthModule': './src/app/auth/auth.module.ts',
         './Component': './src/app/auth/auth.component.ts',
-        // './UserSelectorComponent': './src/app/auth/components/_remotes/user-selector/user-selector.component.ts',
-
+        './UserSelectorComponent': './src/app/auth/components/_remotes/user-selector/user-selector.component.ts',
+        './Exposed': './src/app/auth/_exposed.ts',
       },
       shared: share({
-        "@angular/core": { singleton: true, strictVersion: true, requiredVersion: '17.0.5', eager: true },
-        "@angular/common": { singleton: true, strictVersion: true, requiredVersion: '17.0.5', eager: true },
-        // "@angular/common/http": { singleton: true, strictVersion: true, requiredVersion: 'auto', eager: true  },
-        "@angular/router": { singleton: true, strictVersion: true, requiredVersion: '17.0.5', eager: true },
-        "typlib": { singleton: true, strictVersion: true, requiredVersion: 'auto', eager: true },
+        "@angular/core": { 
+          singleton: true, 
+          strictVersion: true, 
+          requiredVersion: '17.0.5', 
+          eager: true 
+        },
+        "@angular/common": { 
+          singleton: true, 
+          strictVersion: true, 
+          requiredVersion: '17.0.5', 
+          eager: true 
+        },
+        "@angular/common/http": { 
+          singleton: true, 
+          strictVersion: true, 
+          requiredVersion: '17.0.5', 
+          eager: true 
+        },
+        "@angular/router": { 
+          singleton: true, 
+          strictVersion: true, 
+          requiredVersion: '17.0.5', 
+          eager: true 
+        },
+        "@angular/compiler": {
+          singleton: true,
+          strictVersion: true,
+          requiredVersion: '17.0.5',
+          eager: true
+        },
+        "@angular/platform-browser": {
+          singleton: true,
+          strictVersion: true,
+          requiredVersion: '17.0.5',
+          eager: true
+        },
+        "rxjs": {
+          singleton: true,
+          strictVersion: true,
+          requiredVersion: '~7.8.0',
+          eager: true
+        },
+        "typlib": { 
+          singleton: true, 
+          strictVersion: false, // Change to false if version mismatches occur
+          requiredVersion: 'auto', 
+          eager: true 
+        },
         ...sharedMappings.getDescriptors(),
       })
     }),
     sharedMappings.getPlugin(),
     new Dotenv({
-      path: './.env', // Path to .env file (this is the default)
+      path: './.env',
+      systemvars: true, // Include system environment variables
+      safe: true // Load .env.example to verify all variables are set
     })
   ],
 };

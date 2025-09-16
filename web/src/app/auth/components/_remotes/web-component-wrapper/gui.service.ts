@@ -1,13 +1,16 @@
 import { Injectable } from "@angular/core";
 import { waitForWebComponent } from "./gui.utils";
+import { dd } from "../../../utilites/dd";
 
 export const ElementsMap = {
   SELECT__SELECT_ONE: 'gui-select',
   INPUT__RADIO: 'gui-toggle',
   INPUT__TEXT: 'gui-input',
   INPUT__PASSWORD: 'gui-input',
+  INPUT__COLOR: 'gui-input-color',
   BUTTON__SUBMIT: 'gui-button',
-  BUTTON__BUTTON: 'gui-button'
+  BUTTON__BUTTON: 'gui-button',
+  DIV__USER_AVATAR: 'au-user-avatar',
 }
 @Injectable({
   providedIn: 'root',
@@ -19,10 +22,15 @@ export class GuiService {
       
       try {
         if (ElementsMap[elementName as keyof typeof ElementsMap]) {
-          const elName = ElementsMap[elementName as keyof typeof ElementsMap]
-          const isRegistered = customElements.get(elName)
-          if (!isRegistered) throw new Error(`${elName} is not registered`);
-          resolve(elName)
+          const customElementName = ElementsMap[elementName as keyof typeof ElementsMap]
+          
+          const remoteName = getRemoteNameFromCustomElementName(customElementName)
+          if (!isRemoteLoaded(remoteName)) throw new Error('remote ' + remoteName + ' is not loaded');
+
+          const isRegistered = customElements.get(customElementName)
+          if (!isRegistered) throw new Error(`${customElementName} is not registered`);
+
+          resolve(customElementName)
         } else {
           throw new Error(`unknown element: ${elementName}`);
         }
@@ -31,4 +39,15 @@ export class GuiService {
       }
     })
   }
+}
+
+
+export const isRemoteLoaded = (remoteName: string) => {
+  // console.log(window)
+  const container = (window as any)[remoteName];
+  return !!container;
+}
+
+export const getRemoteNameFromCustomElementName = (customElementName: string): string => {
+  return customElementName.split('-')[0]
 }

@@ -34,7 +34,7 @@ export class WebComponentWrapperComponent implements AfterViewInit, OnChanges {
   ) {}
 
   ngAfterViewInit() {
-    console.log('componentName: ' + this.componentName)
+    // console.log('componentName: ' + this.componentName)
     this.renderComponent();
   }
 

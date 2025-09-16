@@ -6,6 +6,7 @@
     </ng-container>
 
     <form class="form-login">
+    
 
       <ng-container *ngIf="(providers$ | async)?.length">
         <input gui type="radio"
@@ -17,13 +18,13 @@
           [outputs]="{valueChange: providerTypeOnChange.bind(this)}"
         >
 
-        <ng-container *ngIf="providerType">
+        <ng-container *ngIf="isExternalProviderType">
           <select gui
             [inputs]="{
               options$: providers$,
                 value: provider 
             }"
-            [outputs]="{valueChange: providerTypeOnChange.bind(this)}"
+            [outputs]="{valueChange: providerOnChange.bind(this)}"
           ></select>
         </ng-container>
         
@@ -32,7 +33,7 @@
       <input gui type="text"
         [inputs]="{
           label: 'Логин',
-          value: username
+          value: username$
         }"
         [outputs]="{valueChange: loginOnChange.bind(this)}"
       >

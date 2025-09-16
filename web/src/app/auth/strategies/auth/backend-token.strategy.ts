@@ -29,9 +29,11 @@ import { GoToLoginAction } from '../../actions/auth/goToLogin.action';
 import { RemoveProductAuthTokenAction } from '../../actions/auth/removeLsToken.action';
 import { InitTokenStrategyAction } from '../../actions/auth/initTokenShareStrategy.action';
 import { AskProjectIdsAction } from '../../actions/token-share/askProjectsIds.action';
+import { CheckTokenAction } from '../../actions/auth/checkToken.action'
 
 import { dd } from '../../utilites/dd';
 import { GrantAuthAction } from '../../actions/auth/grandAuth.action';
+import { SetUserDataAction } from '../../actions/auth/setUserData.action';
 
 @Injectable()
 export class BackendTokenStrategy implements IAuthStrategy {
@@ -71,15 +73,31 @@ export class BackendTokenStrategy implements IAuthStrategy {
       .get<IAuthAction>(AuthActionMap.get('GET_TOKEN'))
       .execute();
 
-    if (token) {      
+    if (token) {   
       this.injector
         .get<IAuthAction>(AuthActionMap.get(
-          'GRANT_AUTH'
+          'CHECK_TOKEN__GET_USER_DATA'
         ))
-        .execute();
+        .execute()
+        .subscribe((res: any) => {
+          this.injector
+            .get<IAuthAction>(AuthActionMap.get(
+              'SET_USER_DATA'
+            ))
+            .execute(res)
+          
+          this.injector
+            .get<IAuthAction>(AuthActionMap.get(
+              'GRANT_AUTH'
+            ))
+            .execute();
+        })
+      // + logout on 4xx error
+      
 
-      //todo check
+      
       // проверить, нужно ли шарить токен, если нет - завершить au@
+      // obtain userName
     } else {
       this.injector
         .get<IAuthAction>(AuthActionMap.get('DISPLAY_LOGIN_FORM'))
@@ -180,6 +198,9 @@ export const AuthActionMap = new Map<string, any>([
   ['GO_TO_LOGIN', GoToLoginAction],
   ['REMOVE_TOKEN', RemoveProductAuthTokenAction],
   ['ASK_PROJECTS_IDS', AskProjectIdsAction],
-  ['GRANT_AUTH', GrantAuthAction]
+  ['GRANT_AUTH', GrantAuthAction],
+
+  ['CHECK_TOKEN__GET_USER_DATA', CheckTokenAction],
+  ['SET_USER_DATA', SetUserDataAction]
   
 ]);

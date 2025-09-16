@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { dd } from '../utils/dd';
 import { attachToken } from '../middlewares/attachToken';
 import { getUserHandlerAndTokens } from './saveTempController';
+import { getEncodedClientOrigin } from '../utils/getEncodedClientOrigin';
 
 dotenv.config();
 
@@ -25,31 +26,28 @@ export class TokenShareController {
   //   hostOrigin: string - адрес хоста, который нужно переслать
   //   token?: string
   // }
-// headers.origin !!!
+  // headers.origin !!!
   static async share(req) {
     const body = req.body
-    dd(body)
     try {
-      const backOrigin = `${req.protocol}://${req.get('host')}` // todo rename
+      const thisBackOrigin = `${req.protocol}://${req.get('host')}` 
+      const clientOrigin = getEncodedClientOrigin(req);
       
-      console.log('backOrigin: ' + backOrigin)
-      const encodedBackOrigin = encodeURIComponent(backOrigin)
-      const backendUrlForRequest = body.backendUrl // mb get it secure? no not show in frontend?
+      const backendUrlForRequest = body.backendUrl; // mb get it secure? no not show in frontend?
       
       // Get backend service token before making the request
       const backendServiceToken = await attachToken(
         body.projectId, // target project
         backendUrlForRequest, // target URL
-        backOrigin
+        thisBackOrigin // requester url (this back url)
       )
 
       // get saved locally token & user hash
-      const savedTempData = await getUserHandlerAndTokens(encodedBackOrigin, 'userHandler.json')
+      const savedTempData = await getUserHandlerAndTokens(clientOrigin, 'userHandler.json')
 
       const hostOrigin = req.body.hostOrigin; // todo rename +web
       const encodedHostOrigin = encodeURIComponent(hostOrigin);
-      console.log('hostOrigin: ' + hostOrigin)
-
+      
       const payload = {
         path: encodedHostOrigin, // needed for file path to save creds
         fileName: `token.json`,
@@ -68,7 +66,7 @@ export class TokenShareController {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${backendServiceToken.token}`,
             'X-Requester-Project': process.env.PROJECT_ID,
-            'X-Requester-Url': backOrigin
+            'X-Requester-Url': thisBackOrigin
           },
           timeout: 5000
         }

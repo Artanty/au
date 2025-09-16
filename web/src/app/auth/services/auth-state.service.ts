@@ -13,6 +13,7 @@ export class AuthStateService {
   constructor() {}
 
   public setAuthState(data: boolean) {
+    console.log('AuthStateService: ' + data)
     this.authState$.next(data);
   }
   public getAuthState(): boolean {

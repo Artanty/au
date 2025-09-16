@@ -8,8 +8,12 @@ import {
 import { ElementsMap, GuiService } from './gui.service';
 import { WebComponentWrapperComponent } from './web-component-wrapper';
 import { Router } from '@angular/router';
+import { buildCustomElName } from './gui.utils';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 export const GUI_PLACEHOLDER_TEMPLATE = new InjectionToken<TemplateRef<any>>('GUI_PLACEHOLDER_TEMPLATE');
+export type FormHTMLElement = HTMLElement & { type: string }
 
 @Directive({
   selector: '[gui]',
@@ -18,13 +22,15 @@ export const GUI_PLACEHOLDER_TEMPLATE = new InjectionToken<TemplateRef<any>>('GU
       provide: GUI_PLACEHOLDER_TEMPLATE,
       useValue: null
     }
-  ]
+  ],
+  standalone: true,
+  
 })
 export class GuiDirective implements OnInit, OnDestroy {
   @Input() inputs: any = {};
   @Input() outputs: any = {};
   
-  private element: HTMLElement & { type: string };
+  private element: FormHTMLElement;
   private customComponentRef: ComponentRef<any> | null = null;
   private placeholderViewRef: any = null;
 
@@ -48,8 +54,11 @@ export class GuiDirective implements OnInit, OnDestroy {
 
   private async _findCustomElement() {
     try {
-      const elementKey = `${this.element.tagName}__${this.element.type?.toUpperCase().replace('-', '_')}`;
+      const elementKey = buildCustomElName(this.element);
+      // console.log(this.element.type)
+      // console.log(elementKey)
       const customElementName = await this.guiService.getCustomElement(elementKey);
+      // console.log(customElementName)
       await this.replaceWithCustomComponent(customElementName);
     } catch (e: unknown) {
       const text = (e instanceof Error) ? e.message : e;

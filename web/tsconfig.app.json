@@ -5,7 +5,9 @@
     "types": ["node"]
   },
   "files": [
-    "src/main.ts"
+    "src/main.ts",
+    "src/app/auth/_exposed.ts",
+
   ],
   "include": [
     "src/**/*.d.ts",

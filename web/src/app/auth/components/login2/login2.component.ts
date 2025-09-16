@@ -1,12 +1,13 @@
 import { ChangeDetectorRef, Component, Inject, Injector, OnInit } from '@angular/core';
 import { IUserAction, UserActionService } from '../../services/user-action.service';
 import { IViewState, ViewService } from '../../services/view.service';
-import { BehaviorSubject, Observable, filter, map, startWith, tap, pipe } from 'rxjs';
+import { BehaviorSubject, Observable, filter, map, startWith, tap, pipe, Subject } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { IAuthAction } from '../../models/action.model';
 import { AuthActionMap } from '../../strategies/auth/backend-auth.strategy';
 import { GetProvidersRes, GetProvidersResItem } from './models';
 import { LoginService } from './login.service';
+import { dd } from '../../utilites/dd';
 
 
 @Component({
@@ -16,10 +17,14 @@ import { LoginService } from './login.service';
 
 })
 export class Login2Component implements OnInit {
-  username: string = '';
+  // username: string = '';
+  _username$: BehaviorSubject<string> = new BehaviorSubject('цвц');
+  get username$() {
+    return this._username$.getValue()
+  }
   password: string = '';
   provider: any = null
-  providerType: boolean = false
+  isExternalProviderType: boolean = false
 
   formMessage$: Observable<IViewState>
   isLoaderVisible$: Observable<boolean>
@@ -28,15 +33,15 @@ export class Login2Component implements OnInit {
   routerPath: string = '/au/signup'
 
   public providerTypeOnChange(data: any) {
-    console.log(data)
-    this.providerType = data
+    this.isExternalProviderType = data
     setTimeout(() => {
       this.mock(data)
     }, 200)
   }
 
   public providerOnChange(data: any) {
-    console.log(data)
+    this.provider = data
+    this.mock()
   }
 
   public loginOnChange(data: any) {
@@ -46,8 +51,6 @@ export class Login2Component implements OnInit {
   public passwordOnChange(data: any) {
     console.log(data)
   }
-
-  
 
   private _valueChange(data: any) {
     console.log(data)
@@ -84,17 +87,23 @@ export class Login2Component implements OnInit {
   }
 
   ngOnInit(): void {
-    this.mock()
+    this.mock(true)
   }
 
   private mock(isExternal?: boolean) {
+    console.log(isExternal)
     if (isExternal) {
-      this.username = 'test.user@company.com'
+      this._username$.next('test.user@company.com')
+      
+      // this._username$.next('michael.scott@dundermifflin.com')
+      // this.username = 'michael.scott@dundermifflin.com'
       this.password = 'testpassword123' 
     } else {
-      this.username = 'john@example.com2'
+      this._username$.next('john@example.com2')
+      // this.username = 'john@example.com2' 
       this.password = 'password123'  
     }
+    this._cdr.detectChanges()
   }
 
   register() {
@@ -104,14 +113,17 @@ export class Login2Component implements OnInit {
   }
 
   onLogin() {
+    
+    console.log('onLogin')
     const data: IUserAction = {
       action: 'SEND_LOGIN_REQUEST',
       payload: {
-        username: this.username,
+        username: this._username$.getValue(),
         password: this.password,
-        provider: this.providerType && this.provider ? this.provider : undefined
+        provider: this.isExternalProviderType && this.provider ? this.provider : undefined
       }
     }
+    dd(data)
     this.UserActionServ.setUserAction(data)
   }
   

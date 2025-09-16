@@ -31,4 +31,6 @@ router.post('/refresh-token', async (req, res) => {
   }
 });
 
+router.post('/check-token', UserController.checkToken);
+
 export default router;

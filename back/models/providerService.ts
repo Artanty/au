@@ -99,7 +99,7 @@ export class ProviderService {
     try {
       // Get provider info
       const [providerRows] = await connection.query(
-        'SELECT * FROM providers'
+        'SELECT id, name FROM providers'
       );
       if (providerRows.length === 0) throw new Error(`Providers not found`);
 

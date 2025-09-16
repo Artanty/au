@@ -1,44 +1,12 @@
-import { HttpErrorResponse } from '@angular/common/http';
-import { Inject, Injectable, Injector } from '@angular/core';
-import {
-  EMPTY,
-  Subject,
-  catchError,
-  filter,
-  finalize,
-  forkJoin,
-  share,
-  shareReplay,
-  take,
-  takeUntil,
-  tap,
-} from 'rxjs';
-import { DisplayInvalidDataErrorAction } from '../../actions/auth/displayInvalidDataError.action';
-import { DisplayLoaderAction } from '../../actions/auth/displayLoader.action';
-import { DisplayLoginFormAction } from '../../actions/auth/displayLoginForm.action';
-import { DisplayUnknownErrorAction } from '../../actions/auth/displayUnknownError.action';
-import { GetProductAuthTokenAction } from '../../actions/auth/getLsToken.action';
-
-import { ResetFormValidatorsAction } from '../../actions/auth/resetFormValidators.action';
-import { SaveTokenInLsAction } from '../../actions/auth/saveLsToken.action';
-import { LoginResponse, SignInByDataAction } from '../../actions/auth/singInByData.action';
-import { IAuthAction } from '../../models/action.model';
-import {
-  IUserAction,
-  UserActionService,
-} from '../../services/user-action.service';
-import { IAuthStrategy } from '../../models/strategy.model';
-import { SignUpByDataAction } from '../../actions/auth/singUpByData.action';
-import { GoToLoginAction } from '../../actions/auth/goToLogin.action';
-import { RemoveProductAuthTokenAction } from '../../actions/auth/removeLsToken.action';
-import { InitTokenStrategyAction } from '../../actions/auth/initTokenShareStrategy.action';
-import { AskProjectIdsAction } from '../../actions/token-share/askProjectsIds.action';
-import { SendAuthDoneEventAction } from '../../actions/auth-done/sendAuthDoneEvent.action';
-import { dd } from '../../utilites/dd';
-import { GrantAuthAction } from '../../actions/auth/grandAuth.action';
-import { ListenGrantAuthAction } from '../../actions/auth-done/listenGrantAuth.action';
-import { ListenValidateSharedTokenAction } from '../../actions/auth-done/listenValidateSharedToken.action';
-import { SetProductBtnCollapsedAction } from '../../actions/auth-done/setProductBtnCollapsed.action';
+import { Inject, Injectable, Injector } from "@angular/core";
+import { ListenGrantAuthAction } from "../../actions/auth-done/listenGrantAuth.action";
+import { ListenValidateSharedTokenAction } from "../../actions/auth-done/listenValidateSharedToken.action";
+import { SendAuthDoneEventAction } from "../../actions/auth-done/sendAuthDoneEvent.action";
+import { SetProductBtnCollapsedAction } from "../../actions/auth-done/setProductBtnCollapsed.action";
+import { IAuthAction } from "../../models/action.model";
+import { UserActionService } from "../../services/user-action.service";
+import { IAuthStrategy } from "../../models/strategy.model";
+import { forkJoin, Subject } from "rxjs";
 
 @Injectable()
 export class AuthAndShareStrategy implements IAuthStrategy {
