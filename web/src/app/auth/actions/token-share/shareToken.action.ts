@@ -1,16 +1,12 @@
 import { Inject, Injectable } from '@angular/core';
 import { ConfigService } from '../../services/config.service';
 import { IAuthAction } from '../../models/action.model';
-
 import { BusEvent, EVENT_BUS_LISTENER, EVENT_BUS_PUSHER, HOST_NAME } from 'typlib';
 import { filter, map, Observable, of, share, switchMap, take, tap } from 'rxjs';
 import { ExternalUpdateBody, ExternalUpdates, TokenShareService } from '../../services/token-share.service';
-import { eventBusFilterByEvent } from '../../utilites/eventBusFilterByEvent';
-import { eventBusFilterByProject } from '../../utilites/eventBusFilterByProject';
-import { AuthStateService } from '../../services/auth-state.service';
-import { dd } from '../../utilites/dd';
 import { HttpClient } from '@angular/common/http';
 import { TokenStoreService } from '../../services/token-store.service';
+import { AppStateService } from '../../services/app-state.service';
 
 export interface ShareTokenReq {
   projectId: string
@@ -34,7 +30,7 @@ export class ShareTokenAction implements IAuthAction {
     private _tokenShareService: TokenShareService,
     @Inject(EVENT_BUS_LISTENER)
     private readonly eventBusListener$: Observable<BusEvent>,
-    private _authStateService: AuthStateService,
+    private _appStateService: AppStateService,
     private http: HttpClient,
     private _tokenStoreService: TokenStoreService,
     private _configService: ConfigService
@@ -73,7 +69,7 @@ export class ShareTokenAction implements IAuthAction {
   }
 
   private _isAuthorized$(): Observable<boolean> {
-    return this._authStateService.listenAuthState()
+    return this._appStateService.isLoggedIn.listen
       .pipe(
         filter(el => el === true),
         take(1)

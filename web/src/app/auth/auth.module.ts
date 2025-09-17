@@ -37,25 +37,20 @@ import { SignInByDataAction } from './actions/auth/singInByData.action';
 import { SignUpByDataAction } from './actions/auth/singUpByData.action';
 import { AskProjectIdsAction } from './actions/token-share/askProjectsIds.action';
 import { TokenShareService } from './services/token-share.service';
-
 import { ViewService } from './services/view.service';
-
 import { AskBackUrlsAction } from './actions/token-share/askBackUrls.action';
 import { InitTokenShareStoreAction } from './actions/token-share/initTokenShareStore.action';
 import { GetRequiredProjectsIdsAction } from './actions/token-share/getRequiredProjectsIds.action';
 import { StoreBackUrlsAction } from './actions/token-share/storeBackUrls.action';
 import { ShareTokenAction } from './actions/token-share/shareToken.action';
-
 import { eventBusFilterByProject } from './utilites/eventBusFilterByProject';
 import { ValidateSharedTokenAction } from './actions/token-share/validateSharedToken.action';
-import { GrantAuthAction } from './actions/auth/grandAuth.action';
+import { GrantAuthAction } from './actions/auth/grantAuth.action';
 import { SetProductBtnLoadingAction } from './actions/token-share/setProductBtnLoading.action';
 import { SetProductBtnReadyAction } from './actions/token-share/setProductBtnReady.action';
 import { SetProductBtnLockedAction } from './actions/token-share/setProductBtnLocked.action';
 import { ListenGrantAuthAction } from './actions/auth-done/listenGrantAuth.action';
-
 import { ListenValidateSharedTokenAction } from './actions/auth-done/listenValidateSharedToken.action';
-
 import { AuthAndShareStrategy } from './strategies/auth-done/auth-and-share.strategy';
 import { SendAuthDoneEventAction } from './actions/auth-done/sendAuthDoneEvent.action';
 import { SetProductBtnCollapsedAction } from './actions/auth-done/setProductBtnCollapsed.action';
@@ -259,7 +254,6 @@ export class AuthModule {
       if (res.payload.authStrategy && res.payload.tokenShareStrategy) {
         this._authDoneStrategyService.select('AUTH_AND_SHARE');
       }
-      
     })
 
     /**

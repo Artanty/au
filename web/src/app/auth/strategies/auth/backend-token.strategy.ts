@@ -27,11 +27,9 @@ import { RemoveProductAuthTokenAction } from '../../actions/auth/removeLsToken.a
 import { InitTokenStrategyAction } from '../../actions/auth/initTokenShareStrategy.action';
 import { AskProjectIdsAction } from '../../actions/token-share/askProjectsIds.action';
 import { CheckTokenAction } from '../../actions/auth/checkToken.action'
-
-import { dd } from '../../utilites/dd';
-import { GrantAuthAction } from '../../actions/auth/grandAuth.action';
 import { SetUserDataAction } from '../../actions/auth/setUserData.action';
 import { AppStateService, UserAction } from '../../services/app-state.service';
+import { GrantAuthAction } from '../../actions/auth/grantAuth.action';
 
 @Injectable()
 export class BackendTokenStrategy implements IAuthStrategy {

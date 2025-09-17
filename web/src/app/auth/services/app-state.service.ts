@@ -16,6 +16,8 @@ export type UserAction = BusEvent<UserActionPayload>
 export class AppStateService {
 
   public userAction = obs$<Nullable<UserAction>>(null)
+  public isLoggedIn = obs$<boolean>(false)
+  
   // private userAction$ = new BehaviorSubject<Nullable<IUserAction>>(null)
 
   // user = new ObservableVariable<User | null>(null);

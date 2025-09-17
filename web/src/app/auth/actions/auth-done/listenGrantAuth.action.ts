@@ -1,11 +1,9 @@
 import { Inject, Injectable } from '@angular/core';
 import { BusEvent, EVENT_BUS_PUSHER, HOST_NAME } from 'typlib';
-import { ConfigService } from '../../services/config.service';
 import { IAuthAction } from '../../models/action.model';
-import { AuthStateService } from '../../services/auth-state.service';
-import { Token, TokenStoreService } from '../../services/token-store.service';
-import { dd } from '../../utilites/dd';
-import { filter, Observable, share, take } from 'rxjs';
+import { TokenStoreService } from '../../services/token-store.service';
+import { filter, Observable, take } from 'rxjs';
+import { AppStateService } from '../../services/app-state.service';
 
 @Injectable()
 export class ListenGrantAuthAction implements IAuthAction {
@@ -13,12 +11,12 @@ export class ListenGrantAuthAction implements IAuthAction {
     @Inject(HOST_NAME) private readonly hostName: string,
     @Inject(EVENT_BUS_PUSHER)
     private eventBusPusher: (busEvent: BusEvent) => void,
-    private _authStateService: AuthStateService,
+    private _appStateService: AppStateService,
     private _tokenStoreService: TokenStoreService,
   ) {}
 
   public execute(): Observable<boolean> {
-    return this._authStateService.listenAuthState()
+    return this._appStateService.isLoggedIn.listen
       .pipe(
         filter(res => res === true),
         take(1),
