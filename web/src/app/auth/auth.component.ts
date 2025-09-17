@@ -1,12 +1,10 @@
 import { Component, Inject, InjectionToken, Injector, OnDestroy, OnInit } from '@angular/core';
-
 import { BehaviorSubject, Observable, Subject, combineLatest, filter, of, take, takeUntil } from 'rxjs';
 import { BusEvent, EVENT_BUS } from 'typlib';
-import { ConfigService } from './services/config.service';
 import { CoreService } from './services/core.service';
 import { TokenShareService } from './services/token-share.service';
 import { AuthStrategyService } from './strategies/auth-strategy.service';
-import { AppStateService } from './services/app-state.service';
+import { AppStateService, IAuthDto } from './services/app-state.service';
 
 
 export const EVENT_BUS_LISTENER = new InjectionToken<Observable<BusEvent>>('');
@@ -48,14 +46,13 @@ export class AuthComponent implements OnInit, OnDestroy {
     private readonly eventBusListener$: Observable<BusEvent>,
     @Inject(EVENT_BUS_PUSHER)
     private eventBusPusher: (busEvent: BusEvent) => void,
-    @Inject(ConfigService) private ConfigServ: ConfigService,
     @Inject(AuthStrategyService) private AuthStrategyServ: AuthStrategyService, // do not remove: used to bootstrap it's constructor
     private _tokenShareService: TokenShareService,
     private _appStateService: AppStateService
   ) {
     this.eventBusListener$.subscribe((busEvent: BusEvent) => {
       if (busEvent.event === 'authStrategy') {
-        this.ConfigServ.setConfig(authStrategyAdapter(busEvent));
+        this._appStateService.authConfig.next(authStrategyAdapter(busEvent));
       }
     });
   }
@@ -151,6 +148,7 @@ export class AuthComponent implements OnInit, OnDestroy {
 // }
 export function authStrategyAdapter(busEvent: BusEvent): IAuthDto {
   const result: IAuthDto = {
+    hostOrigin: String(busEvent.payload?.['hostOrigin']),
     productName: busEvent.from,
     authStrategy: String(busEvent.payload?.['authStrategy']),
     tokenShareStrategy: String(busEvent.payload?.['tokenShareStrategy']),
@@ -166,16 +164,4 @@ export function authStrategyAdapter(busEvent: BusEvent): IAuthDto {
   return result;
 }
 
-export interface IAuthDto {
-  productName?: string;
-  authStrategy: string;
-  tokenShareStrategy: string;
-  payload?: {
-    checkBackendUrl: string;
-    signUpByDataUrl?: string
-    signInByDataUrl: string;
-    signInByTokenUrl: string;
-  };
-  from?: string;
-  status?: string;
-}
+

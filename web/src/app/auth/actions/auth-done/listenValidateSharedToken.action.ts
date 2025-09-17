@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@angular/core';
 import { BusEvent, EVENT_BUS_PUSHER, HOST_NAME } from 'typlib';
-import { ConfigService } from '../../services/config.service';
 import { IAuthAction } from '../../models/action.model';
 import { dd } from '../../utilites/dd';
 

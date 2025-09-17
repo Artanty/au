@@ -1,7 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { ConfigService } from '../../services/config.service';
-
 import { IAuthAction } from '../../models/action.model';
 import { Observable } from 'rxjs';
 
@@ -10,12 +8,10 @@ export interface CheckTokenResponse {
 	code: string
 }
 
-
 @Injectable()
 export class CheckTokenAction implements IAuthAction {
 	constructor(
 		@Inject(HttpClient) private readonly http: HttpClient,
-		@Inject(ConfigService) private ConfigServ: ConfigService
 	) {}
 
 	public execute(): Observable<CheckTokenResponse> {

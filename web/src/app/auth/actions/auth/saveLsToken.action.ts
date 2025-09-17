@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@angular/core';
 import { HOST_NAME } from 'typlib';
 import { IAuthAction } from '../../models/action.model';
-import { ConfigService } from '../../services/config.service';
 import { LoginResponse } from './singInByData.action';
 
 import { dd } from '../../utilites/dd';

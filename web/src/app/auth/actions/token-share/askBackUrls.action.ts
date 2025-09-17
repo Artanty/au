@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@angular/core';
 import { BusEvent, EVENT_BUS_LISTENER, EVENT_BUS_PUSHER, HOST_NAME } from 'typlib';
-import { ConfigService } from '../../services/config.service';
 import { IAuthAction } from '../../models/action.model';
 import { BehaviorSubject, filter, map, Observable, of, ReplaySubject, scan, Subject, take, takeUntil, timeout } from 'rxjs';
 import { eventBusFilterByEvent } from '../../utilites/eventBusFilterByEvent';

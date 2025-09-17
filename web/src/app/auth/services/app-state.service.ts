@@ -25,6 +25,35 @@ export interface Tokens {
   refresh: string
 }
 
+export interface IAuthDto {
+  productName?: string;
+  authStrategy: string;
+  tokenShareStrategy: string;
+  hostOrigin: string;
+  payload?: {
+    checkBackendUrl: string;
+    signUpByDataUrl?: string
+    signInByDataUrl: string;
+    signInByTokenUrl: string;
+  };
+  from?: string;
+  status?: string;
+}
+
+// const defaultConfig: IAuthDto = {
+//   productName: "AU",
+//   authStrategy: "backend",
+//   tokenShareStrategy: 'saveTempDuplicate',
+//   payload: {
+//     checkBackendUrl: `${process.env['AU_BACK_URL']}/getUpdates`,
+//     signUpByDataUrl: `${process.env['AU_BACK_URL']}/auth-token/signup`,
+//     signInByDataUrl: `${process.env['AU_BACK_URL']}/auth-token/login`,
+//     signInByTokenUrl: "",
+//   },
+//   from: "AU",
+//   status: "init",
+// }
+
 
 @Injectable({
   providedIn: 'root'
@@ -35,6 +64,7 @@ export class AppStateService {
   public isLoggedIn = obs$<boolean>(false)
   public userProfile = obs$<Nullable<UserData>>(null)
   public view = obs$<Nullable<ViewState>>(null)
+  public authConfig = obs$<Nullable<IAuthDto>>(null)
 
   // private userAction$ = new BehaviorSubject<Nullable<IUserAction>>(null)
 

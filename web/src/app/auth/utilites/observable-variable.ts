@@ -19,6 +19,16 @@ export class ObservableVariable<T> {
   get value(): T {
     return this.subject.getValue();
   }
+
+  get req(): NonNullable<T> {
+    const value = this.subject.getValue();
+    
+    if (value === null || value === undefined) {
+      throw new Error(`Expected non-null value but got ${value}`);
+    }
+    
+    return value as NonNullable<T>;
+  }
   
   setValue(newValue: T) {
     if (this.validator && !this.validator(newValue)) {

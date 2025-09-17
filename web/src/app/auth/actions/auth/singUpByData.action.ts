@@ -1,7 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { ConfigService } from '../../services/config.service';
-
 import { IAuthAction } from '../../models/action.model';
 import { AppStateService } from '../../services/app-state.service';
 
@@ -10,13 +8,12 @@ export class SignUpByDataAction implements IAuthAction {
   constructor(
    
     @Inject(HttpClient) private readonly http: HttpClient,
-    @Inject(ConfigService) private ConfigServ: ConfigService,
     private _appStateService: AppStateService
   ) {}
 
   public execute() {
     const formDataUserAction = this._appStateService.userAction.value?.payload
-    const config = this.ConfigServ.getConfig()
+    const config = this._appStateService.authConfig.value
     let requestData = {} as any
     if (config?.from === 'AU') {
       requestData.username = formDataUserAction?.['username']

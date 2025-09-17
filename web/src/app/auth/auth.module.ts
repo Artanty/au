@@ -15,8 +15,6 @@ import { IAuthAction } from './models/action.model';
 import { GoToLoginAction } from './actions/auth/goToLogin.action';
 import { TestApiComponent } from '../test-api/components/test-api/test-api.component';
 import { TestApiModule } from '../test-api/test-api.module';
-import { ConfigService } from './services/config.service';
-
 import { AuthStrategyService } from './strategies/auth-strategy.service';
 import { TokenShareStrategyService } from './strategies/token-share-strategy.service';
 import { AuthDoneStrategyService } from './strategies/auth-done-strategy.service';
@@ -62,6 +60,7 @@ import { UserAvatarComponent } from './components/_remotes/user-avatar/user-avat
 import { CheckTokenAction } from './actions/auth/checkToken.action';
 
 import { SetUserDataAction } from './actions/auth/setUserData.action';
+import { AppStateService } from './services/app-state.service';
 
 @NgModule({
   declarations: [
@@ -100,8 +99,6 @@ import { SetUserDataAction } from './actions/auth/setUserData.action';
   exports: [AuthComponent],
   providers: [
     CoreService,
-    ConfigService,
-    // UserProfileService,
     AuthStrategyService,
     BackendTokenStrategy,
     GetProductAuthTokenAction,
@@ -177,11 +174,10 @@ export class AuthModule {
     @Inject(EVENT_BUS_PUSHER)
     private readonly eventBusPusher: (busEvent: BusEvent) => void,
     private readonly _coreService: CoreService,
-    private readonly _configService: ConfigService,
     private readonly _authStrategyService: AuthStrategyService,
     private readonly _tokenShareStrategyService: TokenShareStrategyService,
     private readonly _authDoneStrategyService: AuthDoneStrategyService,
-
+    private _appStateService: AppStateService
   ) {
     console.log('au module constructor')
     this.eventBusListener$
@@ -244,7 +240,7 @@ export class AuthModule {
       filter((res: BusEvent) => res.event === 'AUTH_CONFIG'),
       take(1)
     ).subscribe(res => {
-      this._configService.setConfig({ ...res.payload, from: res.from })
+      this._appStateService.authConfig.next({ ...res.payload, from: res.from })
       this._authStrategyService.select(res.payload.authStrategy);
       this._tokenShareStrategyService.select(res.payload.tokenShareStrategy);
       

@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@angular/core';
 import { BusEvent, EVENT_BUS_LISTENER, EVENT_BUS_PUSHER, HOST_NAME } from 'typlib';
-import { ConfigService } from '../../services/config.service';
 import { IAuthAction } from '../../models/action.model';
 import { BehaviorSubject, catchError, delay, filter, map, Observable, of, ReplaySubject, retryWhen, scan, share, Subject, take, takeUntil, tap, throwError, timeout } from 'rxjs';
 import { eventBusFilterByEvent } from '../../utilites/eventBusFilterByEvent';
@@ -8,7 +7,7 @@ import { eventBusFilterByProject } from '../../utilites/eventBusFilterByProject'
 import { ExternalUpdateBody, ExternalUpdates, TokenShareService } from '../../services/token-share.service';
 import { dd } from '../../utilites/dd';
 import { HttpClient } from '@angular/common/http';
-import { getTokens } from '../../services/app-state.service';
+import { AppStateService, getTokens } from '../../services/app-state.service';
 
 const TOKEN_VALIDATE_API = 'save-temp/check'
 
@@ -22,7 +21,7 @@ export class ValidateSharedTokenAction implements IAuthAction {
         private readonly eventBusListener$: Observable<BusEvent>,
         private _tokenShareService: TokenShareService,
         private http: HttpClient,
-        private _configService: ConfigService,
+        private _appStateService: AppStateService
     ) {}
 
     public execute(remote: ExternalUpdateBody) {
@@ -41,7 +40,7 @@ export class ValidateSharedTokenAction implements IAuthAction {
         const url = remote.backendUrl
         const api = TOKEN_VALIDATE_API
         const accessToken = getTokens()?.access
-        const hostOrigin = (this._configService.getConfig() as any).hostOrigin
+        const hostOrigin = this._appStateService.authConfig.req.hostOrigin;
         
         const payload = {
             hostOrigin: hostOrigin,

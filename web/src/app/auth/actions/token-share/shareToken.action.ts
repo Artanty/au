@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@angular/core';
-import { ConfigService } from '../../services/config.service';
 import { IAuthAction } from '../../models/action.model';
 import { BusEvent, EVENT_BUS_LISTENER, EVENT_BUS_PUSHER, HOST_NAME } from 'typlib';
 import { filter, map, Observable, of, share, switchMap, take, tap } from 'rxjs';
@@ -31,7 +30,6 @@ export class ShareTokenAction implements IAuthAction {
     private readonly eventBusListener$: Observable<BusEvent>,
     private _appStateService: AppStateService,
     private http: HttpClient,
-    private _configService: ConfigService
   ) {}
 
   public execute(remote: ExternalUpdateBody): Observable<ExternalUpdateBody> {    
@@ -43,7 +41,7 @@ export class ShareTokenAction implements IAuthAction {
 
         const back = remote;
 
-        const hostOrigin = (this._configService.getConfig() as any).hostOrigin
+        const hostOrigin = this._appStateService.authConfig.req.hostOrigin
 
         const payload: ShareTokenReq = {
           projectId: back.projectId + '@back',
