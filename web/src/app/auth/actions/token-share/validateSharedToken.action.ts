@@ -8,7 +8,7 @@ import { eventBusFilterByProject } from '../../utilites/eventBusFilterByProject'
 import { ExternalUpdateBody, ExternalUpdates, TokenShareService } from '../../services/token-share.service';
 import { dd } from '../../utilites/dd';
 import { HttpClient } from '@angular/common/http';
-import { TokenStoreService } from '../../services/token-store.service';
+import { getTokens } from '../../services/app-state.service';
 
 const TOKEN_VALIDATE_API = 'save-temp/check'
 
@@ -20,7 +20,6 @@ export class ValidateSharedTokenAction implements IAuthAction {
         private eventBusPusher: (busEvent: BusEvent) => void,
         @Inject(EVENT_BUS_LISTENER)
         private readonly eventBusListener$: Observable<BusEvent>,
-        private _tokenStoreService: TokenStoreService,
         private _tokenShareService: TokenShareService,
         private http: HttpClient,
         private _configService: ConfigService,
@@ -41,7 +40,7 @@ export class ValidateSharedTokenAction implements IAuthAction {
     private _makeRequest(remote: ExternalUpdateBody) {
         const url = remote.backendUrl
         const api = TOKEN_VALIDATE_API
-        const accessToken = this._tokenStoreService.getTokenStore()?.access
+        const accessToken = getTokens()?.access
         const hostOrigin = (this._configService.getConfig() as any).hostOrigin
         
         const payload = {

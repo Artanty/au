@@ -5,8 +5,7 @@ import { BusEvent, EVENT_BUS_LISTENER, EVENT_BUS_PUSHER, HOST_NAME } from 'typli
 import { filter, map, Observable, of, share, switchMap, take, tap } from 'rxjs';
 import { ExternalUpdateBody, ExternalUpdates, TokenShareService } from '../../services/token-share.service';
 import { HttpClient } from '@angular/common/http';
-import { TokenStoreService } from '../../services/token-store.service';
-import { AppStateService } from '../../services/app-state.service';
+import { AppStateService, getTokens } from '../../services/app-state.service';
 
 export interface ShareTokenReq {
   projectId: string
@@ -32,7 +31,6 @@ export class ShareTokenAction implements IAuthAction {
     private readonly eventBusListener$: Observable<BusEvent>,
     private _appStateService: AppStateService,
     private http: HttpClient,
-    private _tokenStoreService: TokenStoreService,
     private _configService: ConfigService
   ) {}
 
@@ -41,7 +39,7 @@ export class ShareTokenAction implements IAuthAction {
     return this._isAuthorized$().pipe(
       switchMap((res: boolean) => {
 
-        const token = this._tokenStoreService.getTokenStore()
+        const token = getTokens()
 
         const back = remote;
 

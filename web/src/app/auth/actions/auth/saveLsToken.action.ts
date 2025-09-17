@@ -3,14 +3,13 @@ import { HOST_NAME } from 'typlib';
 import { IAuthAction } from '../../models/action.model';
 import { ConfigService } from '../../services/config.service';
 import { LoginResponse } from './singInByData.action';
-import { Token, TokenStoreService } from '../../services/token-store.service';
+
 import { dd } from '../../utilites/dd';
 
 @Injectable()
 export class SaveTokenInLsAction implements IAuthAction {
   constructor(
     @Inject(HOST_NAME) private readonly hostName: string,
-    private _tokenStoreService: TokenStoreService
     
   ) {}
 
@@ -24,11 +23,5 @@ export class SaveTokenInLsAction implements IAuthAction {
     localStorage.setItem(`accessToken`, res.accessToken);
     localStorage.setItem(`refreshToken`, res.refreshToken);
 
-    const storeItem: Token = {
-      access: res.accessToken,
-      refresh: res.refreshToken
-    }
-
-    this._tokenStoreService.setTokenStore(storeItem)
   }
 }

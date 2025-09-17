@@ -6,6 +6,7 @@ import { obs$ } from '../utilites/observable-variable';
 import { BusEvent } from 'typlib';
 import { Nullable } from '../utilites/utility.types';
 
+// private _appStateService: AppStateService
 
 export type UserActionPayload = Record<string, any>
 export type UserAction = BusEvent<UserActionPayload>
@@ -17,6 +18,11 @@ export interface ViewState {
   action: string
   payload?: Record<string, string | boolean>
   scope?: string
+}
+
+export interface Tokens {
+  access: string,
+  refresh: string
 }
 
 
@@ -58,5 +64,14 @@ export class AppStateService {
 
 export const getInnerBusEventFlow = (): { from: string, to: string } => ({ from: 'au@web', to: 'au@web' })
 
+export const getTokens = (): Nullable<Tokens> => {
+  if (localStorage.getItem(`accessToken`)) {
+    return {
+      access: localStorage.getItem(`accessToken`) as string,
+      refresh: localStorage.getItem(`refreshToken`) as string    
+    }
+  } else {
+    return null
+  }
+}
 
-// private _appStateService: AppStateService

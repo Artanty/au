@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@angular/core';
 import { BusEvent, EVENT_BUS_PUSHER, HOST_NAME } from 'typlib';
-import { IAuthAction } from '../../models/action.model';
-import { TokenStoreService } from '../../services/token-store.service';
+import { IAuthAction } from '../../models/action.model'
 import { filter, Observable, take } from 'rxjs';
 import { AppStateService } from '../../services/app-state.service';
 
@@ -12,7 +11,6 @@ export class ListenGrantAuthAction implements IAuthAction {
     @Inject(EVENT_BUS_PUSHER)
     private eventBusPusher: (busEvent: BusEvent) => void,
     private _appStateService: AppStateService,
-    private _tokenStoreService: TokenStoreService,
   ) {}
 
   public execute(): Observable<boolean> {
