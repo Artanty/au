@@ -1,20 +1,21 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { ConfigService } from '../../services/config.service';
-import { UserActionService } from '../../services/user-action.service';
+
 import { IAuthAction } from '../../models/action.model';
+import { AppStateService } from '../../services/app-state.service';
 
 @Injectable()
 export class SignUpByDataAction implements IAuthAction {
   constructor(
-    @Inject(UserActionService)
-    private readonly UserActionServ: UserActionService,
+   
     @Inject(HttpClient) private readonly http: HttpClient,
-    @Inject(ConfigService) private ConfigServ: ConfigService
+    @Inject(ConfigService) private ConfigServ: ConfigService,
+    private _appStateService: AppStateService
   ) {}
 
   public execute() {
-    const formDataUserAction = this.UserActionServ.getUserAction()?.payload
+    const formDataUserAction = this._appStateService.userAction.value?.payload
     const config = this.ConfigServ.getConfig()
     let requestData = {} as any
     if (config?.from === 'AU') {

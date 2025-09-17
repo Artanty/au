@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { ConfigService } from '../../services/config.service';
-import { UserActionService } from '../../services/user-action.service';
+
 import { IAuthAction } from '../../models/action.model';
 import { Observable } from 'rxjs';
 
@@ -14,15 +14,12 @@ export interface CheckTokenResponse {
 @Injectable()
 export class CheckTokenAction implements IAuthAction {
 	constructor(
-		@Inject(UserActionService)
-		private readonly UserActionServ: UserActionService,
 		@Inject(HttpClient) private readonly http: HttpClient,
 		@Inject(ConfigService) private ConfigServ: ConfigService
 	) {}
 
 	public execute(): Observable<CheckTokenResponse> {
-		// const formDataUserAction = this.UserActionServ.getUserAction()?.payload
-
+		
 		const lsAccessToken = localStorage.getItem(`accessToken`);
 		const accessToken = lsAccessToken === 'undefined'
 			? null

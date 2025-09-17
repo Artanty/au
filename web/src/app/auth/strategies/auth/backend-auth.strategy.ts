@@ -19,34 +19,31 @@ import { ResetFormValidatorsAction } from '../../actions/auth/resetFormValidator
 import { SaveTokenInLsAction } from '../../actions/auth/saveLsToken.action';
 import { LoginResponse, SignInByDataAction } from '../../actions/auth/singInByData.action';
 import { IAuthAction } from '../../models/action.model';
-import {
-  IUserAction,
-  UserActionService,
-} from '../../services/user-action.service';
+
 import { IAuthStrategy } from '../../models/strategy.model';
 import { SignUpByDataAction } from '../../actions/auth/singUpByData.action';
 import { GoToLoginAction } from '../../actions/auth/goToLogin.action';
 import { RemoveProductAuthTokenAction } from '../../actions/auth/removeLsToken.action';
 import { InitTokenStrategyAction } from '../../actions/auth/initTokenShareStrategy.action';
+import { AppStateService, UserAction } from '../../services/app-state.service';
 
 @Injectable()
 export class BackendAuthStrategy implements IAuthStrategy {
   private unsubscribe$ = new Subject<void>();
 
   constructor(
-    @Inject(UserActionService)
-    private readonly UserActionServ: UserActionService,
-    private injector: Injector
+    private injector: Injector,
+    private _appStateService: AppStateService
   ) {
-    console.log('strategy inited');
-    this.UserActionServ.listenUserAction()
+    console.log('BackendAuthStrategy strategy inited');
+    this._appStateService.userAction.listen
       .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
-      .subscribe((res: IUserAction) => {
-        this.runScenario(res?.action, res?.payload as any);
+      .subscribe((res: UserAction) => {
+        this.runScenario(res.event);
       });
   }
 
-  runScenario(scenario: string, payload?: Record<string, string>) {
+  runScenario(scenario: string) {
     // console.log(scenario)
     switch (scenario) {
       case 'init':

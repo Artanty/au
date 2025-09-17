@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { ConfigService } from '../../services/config.service';
-import { UserActionService } from '../../services/user-action.service';
+
 import { IAuthAction } from '../../models/action.model';
 import { Observable } from 'rxjs';
+import { AppStateService } from '../../services/app-state.service';
 
 export interface LoginResponse {
   "accessToken": string
@@ -21,14 +22,14 @@ export interface LoginResponse {
 @Injectable()
 export class SignInByDataAction implements IAuthAction {
   constructor(
-    @Inject(UserActionService)
-    private readonly UserActionServ: UserActionService,
+   
     @Inject(HttpClient) private readonly http: HttpClient,
-    @Inject(ConfigService) private ConfigServ: ConfigService
+    @Inject(ConfigService) private ConfigServ: ConfigService,
+    private _appStateService: AppStateService
   ) {}
 
   public execute(): Observable<LoginResponse> {
-    const formDataUserAction = this.UserActionServ.getUserAction()?.payload
+    const formDataUserAction = this._appStateService.userAction.value?.payload
 
     let requestData = {} as any
     console.log(formDataUserAction)

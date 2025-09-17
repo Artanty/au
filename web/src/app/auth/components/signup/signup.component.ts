@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { BehaviorSubject, Observable, filter, map, startWith } from 'rxjs';
-import { UserActionService, IUserAction } from '../../services/user-action.service';
 import { IViewState, ViewService } from '../../services/view.service';
+import { AppStateService, getInnerBusEventFlow, UserAction } from '../../services/app-state.service';
 
 @Component({
   selector: 'app-signup',
@@ -22,9 +22,9 @@ export class SignupComponent implements OnInit {
   routerPath: string = 'login'
 
   constructor(
-    @Inject(UserActionService) private UserActionServ: UserActionService,
     @Inject(ViewService) private ViewServ: ViewService,
     @Inject('ROUTER_PATH') private _routerPath$: BehaviorSubject<string>,
+    private _appStateService: AppStateService
   ) {
     this._routerPath$.asObservable().subscribe((res: string) => {
       this.routerPath = `/${res}/login`
@@ -56,14 +56,15 @@ export class SignupComponent implements OnInit {
       return;
     }
 
-    const data: IUserAction = {
-      action: 'SEND_SIGNUP_REQUEST',
+    const data: UserAction = {
+      ...getInnerBusEventFlow(),
+      event: 'SEND_SIGNUP_REQUEST',
       payload: {
         username: this.username,
         password: this.password
       }
     }
-    this.UserActionServ.setUserAction(data)
+    this._appStateService.userAction.next(data)
   }
 
   passwordsMatch(): boolean {

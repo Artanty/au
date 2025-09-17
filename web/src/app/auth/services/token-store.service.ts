@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Nullable } from './user-action.service';
+import { Nullable } from '../utilites/utility.types';
 
 export interface Token {
   access: string,

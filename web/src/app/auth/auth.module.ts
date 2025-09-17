@@ -37,7 +37,7 @@ import { SignInByDataAction } from './actions/auth/singInByData.action';
 import { SignUpByDataAction } from './actions/auth/singUpByData.action';
 import { AskProjectIdsAction } from './actions/token-share/askProjectsIds.action';
 import { TokenShareService } from './services/token-share.service';
-import { UserActionService } from './services/user-action.service';
+
 import { ViewService } from './services/view.service';
 
 import { AskBackUrlsAction } from './actions/token-share/askBackUrls.action';
@@ -121,7 +121,7 @@ import { SetUserDataAction } from './actions/auth/setUserData.action';
     ResetFormValidatorsAction,
     BackendAuthStrategy,
     ViewService,
-    UserActionService,
+    
     RemoveProductAuthTokenAction,
     SignInByDataAction,
     SignUpByDataAction,

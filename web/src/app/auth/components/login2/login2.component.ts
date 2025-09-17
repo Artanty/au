@@ -1,5 +1,4 @@
 import { ChangeDetectorRef, Component, Inject, Injector, OnInit } from '@angular/core';
-import { IUserAction, UserActionService } from '../../services/user-action.service';
 import { IViewState, ViewService } from '../../services/view.service';
 import { BehaviorSubject, Observable, filter, map, startWith, tap, pipe, Subject } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -8,6 +7,7 @@ import { AuthActionMap } from '../../strategies/auth/backend-auth.strategy';
 import { GetProvidersRes, GetProvidersResItem } from './models';
 import { LoginService } from './login.service';
 import { dd } from '../../utilites/dd';
+import { AppStateService, getInnerBusEventFlow, UserAction } from '../../services/app-state.service';
 
 
 @Component({
@@ -57,12 +57,12 @@ export class Login2Component implements OnInit {
   }
 
   constructor(
-    @Inject(UserActionService) private UserActionServ: UserActionService,
     @Inject(ViewService) private ViewServ: ViewService,
     @Inject(HttpClient) private readonly http: HttpClient,
     private injector: Injector,
     private _loginService: LoginService,
-    private _cdr: ChangeDetectorRef
+    private _cdr: ChangeDetectorRef,
+    private _appStateService: AppStateService
   ) {
     this.formMessage$ = this.ViewServ.listenViewState()
       .pipe(
@@ -115,16 +115,19 @@ export class Login2Component implements OnInit {
   onLogin() {
     
     console.log('onLogin')
-    const data: IUserAction = {
-      action: 'SEND_LOGIN_REQUEST',
+    const data: UserAction = {
+      ...getInnerBusEventFlow(),
+      event: 'SEND_LOGIN_REQUEST',
       payload: {
         username: this._username$.getValue(),
         password: this.password,
         provider: this.isExternalProviderType && this.provider ? this.provider : undefined
-      }
+      },
+        
     }
     dd(data)
-    this.UserActionServ.setUserAction(data)
+    this._appStateService.userAction.next(data)
+    // this.UserActionServ.setUserAction(data)
   }
   
   profile() {

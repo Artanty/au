@@ -4,21 +4,21 @@ import { ListenValidateSharedTokenAction } from "../../actions/auth-done/listenV
 import { SendAuthDoneEventAction } from "../../actions/auth-done/sendAuthDoneEvent.action";
 import { SetProductBtnCollapsedAction } from "../../actions/auth-done/setProductBtnCollapsed.action";
 import { IAuthAction } from "../../models/action.model";
-import { UserActionService } from "../../services/user-action.service";
 import { IAuthStrategy } from "../../models/strategy.model";
 import { forkJoin, Subject } from "rxjs";
+import { AppStateService } from "../../services/app-state.service";
 
 @Injectable()
 export class AuthAndShareStrategy implements IAuthStrategy {
   private unsubscribe$ = new Subject<void>();
 
   constructor(
-    @Inject(UserActionService)
-    private readonly UserActionServ: UserActionService,
-    private injector: Injector
+    
+    private injector: Injector,
+   
   ) {}
 
-  runScenario(scenario: string, payload?: Record<string, string>) {
+  runScenario(scenario: string) {
     switch (scenario) {
       case 'init':
         this.handleInitScenario();
