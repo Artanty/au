@@ -10,6 +10,11 @@ import { Nullable } from '../utilites/utility.types';
 export type UserActionPayload = Record<string, any>
 export type UserAction = BusEvent<UserActionPayload>
 
+export interface UserData {
+  userName: string
+}
+
+
 @Injectable({
   providedIn: 'root'
 })
@@ -17,7 +22,8 @@ export class AppStateService {
 
   public userAction = obs$<Nullable<UserAction>>(null)
   public isLoggedIn = obs$<boolean>(false)
-  
+  public userProfile = obs$<Nullable<UserData>>(null)
+
   // private userAction$ = new BehaviorSubject<Nullable<IUserAction>>(null)
 
   // user = new ObservableVariable<User | null>(null);
@@ -43,5 +49,8 @@ export class AppStateService {
   //   });
   // }
 }
-// private _appStateService: AppStateService
+
 export const getInnerBusEventFlow = (): { from: string, to: string } => ({ from: 'au@web', to: 'au@web' })
+
+
+// private _appStateService: AppStateService

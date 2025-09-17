@@ -7,9 +7,9 @@ import { eventBusFilterByProject } from '../../../utilites/eventBusFilterByProje
 import { Injectable } from '@angular/core';
 import { BusEvent, EVENT_BUS_PUSHER, HOST_NAME } from 'typlib';
 import { share, take } from 'rxjs';
-import { UserData, UserProfileService } from '../../../services/user-profile.service';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { AppStateService, UserData } from '../../../services/app-state.service';
 
 export type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | number;
 
@@ -56,7 +56,7 @@ export class UserAvatarComponent implements OnInit, OnChanges {
     @Inject(EVENT_BUS_LISTENER)
     private readonly eventBusListener$: Observable<BusEvent>,
     private router: Router,
-    private _userProfileService: UserProfileService,
+    private _appStateService: AppStateService,
     @Inject(HttpClient) private readonly http: HttpClient,
   ) {}
 
@@ -202,7 +202,7 @@ export class UserAvatarComponent implements OnInit, OnChanges {
   }
 
   private _listenUserData() {
-    this._userProfileService.listenUserData()
+    this._appStateService.userProfile.listen
       .pipe(
         filter(res => res !== null),
         map((res) => {

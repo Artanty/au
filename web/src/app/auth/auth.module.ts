@@ -61,7 +61,7 @@ import { WebComponentWrapperComponent } from './components/_remotes/web-componen
 import { GuiDirective } from './components/_remotes/web-component-wrapper/gui.directive';
 import { UserAvatarComponent } from './components/_remotes/user-avatar/user-avatar.component';
 import { CheckTokenAction } from './actions/auth/checkToken.action';
-import { UserProfileService } from './services/user-profile.service';
+
 import { SetUserDataAction } from './actions/auth/setUserData.action';
 
 @NgModule({

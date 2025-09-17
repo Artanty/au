@@ -1,16 +1,15 @@
 import { Injectable } from '@angular/core';
 import { IAuthAction } from '../../models/action.model';
-import { UserData, UserProfileService } from '../../services/user-profile.service';
-
+import { AppStateService, UserData } from '../../services/app-state.service';
 
 @Injectable()
 export class SetUserDataAction implements IAuthAction {
   constructor(
-    private readonly _userProfileService: UserProfileService,
+    private _appStateService: AppStateService,
   ) {}
 
   public execute(data: UserData): void {
     console.log('SetUserDataAction')
-    this._userProfileService.setUserData(data)
+    this._appStateService.userProfile.next(data)
   }
 }
