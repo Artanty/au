@@ -13,6 +13,11 @@ export type UserAction = BusEvent<UserActionPayload>
 export interface UserData {
   userName: string
 }
+export interface ViewState {
+  action: string
+  payload?: Record<string, string | boolean>
+  scope?: string
+}
 
 
 @Injectable({
@@ -23,6 +28,7 @@ export class AppStateService {
   public userAction = obs$<Nullable<UserAction>>(null)
   public isLoggedIn = obs$<boolean>(false)
   public userProfile = obs$<Nullable<UserData>>(null)
+  public view = obs$<Nullable<ViewState>>(null)
 
   // private userAction$ = new BehaviorSubject<Nullable<IUserAction>>(null)
 

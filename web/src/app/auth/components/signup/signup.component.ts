@@ -1,7 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { BehaviorSubject, Observable, filter, map, startWith } from 'rxjs';
-import { IViewState, ViewService } from '../../services/view.service';
-import { AppStateService, getInnerBusEventFlow, UserAction } from '../../services/app-state.service';
+import { AppStateService, getInnerBusEventFlow, UserAction, ViewState } from '../../services/app-state.service';
 
 @Component({
   selector: 'app-signup',
@@ -16,25 +15,24 @@ export class SignupComponent implements OnInit {
   repeatPassword: string = '';
   passwordsMissmatch: boolean = false
 
-  formMessage$: Observable<IViewState>
+  formMessage$: Observable<ViewState>
   isLoaderVisible$: Observable<boolean>
 
   routerPath: string = 'login'
 
   constructor(
-    @Inject(ViewService) private ViewServ: ViewService,
     @Inject('ROUTER_PATH') private _routerPath$: BehaviorSubject<string>,
     private _appStateService: AppStateService
   ) {
     this._routerPath$.asObservable().subscribe((res: string) => {
       this.routerPath = `/${res}/login`
     })
-    this.formMessage$ = this.ViewServ.listenViewState()
+    this.formMessage$ = this._appStateService.view.listen
       .pipe(
         filter(Boolean),
-        filter((res: IViewState) => res.scope === 'FORM'),
+        filter((res: ViewState) => res.scope === 'FORM'),
       )
-    this.isLoaderVisible$ = this.ViewServ.listenViewState()
+    this.isLoaderVisible$ = this._appStateService.view.listen
       .pipe(
         filter(Boolean),
         filter(res => res.scope === 'VIEW' && res.action === 'DISPLAY_LOADER'),

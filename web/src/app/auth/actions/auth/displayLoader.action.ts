@@ -1,23 +1,24 @@
 import { Inject, Injectable } from "@angular/core";
-import { IViewState, ViewService } from "../../services/view.service";
+
 import { IAuthAction } from "../../models/action.model";
+import { AppStateService, ViewState } from "../../services/app-state.service";
 
 @Injectable()
 export class DisplayLoaderAction implements IAuthAction {
 
-  constructor (
-    @Inject(ViewService) private readonly ViewServ: ViewService
+  constructor(
+    private _appStateService: AppStateService
   ) {}
 
-  public execute (isVisible: boolean) {
-    const viewState: IViewState = {
+  public execute(isVisible: boolean) {
+    const viewState: ViewState = {
       scope: 'VIEW',
       action: 'DISPLAY_LOADER',
       payload: {
         isVisible
       }
     }
-    this.ViewServ.setViewState(viewState)
+    this._appStateService.view.next(viewState)
   }
 
 }

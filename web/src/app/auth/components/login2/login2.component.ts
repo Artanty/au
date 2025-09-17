@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, Inject, Injector, OnInit } from '@angular/core';
-import { IViewState, ViewService } from '../../services/view.service';
+
 import { BehaviorSubject, Observable, filter, map, startWith, tap, pipe, Subject } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { IAuthAction } from '../../models/action.model';
@@ -7,7 +7,7 @@ import { AuthActionMap } from '../../strategies/auth/backend-auth.strategy';
 import { GetProvidersRes, GetProvidersResItem } from './models';
 import { LoginService } from './login.service';
 import { dd } from '../../utilites/dd';
-import { AppStateService, getInnerBusEventFlow, UserAction } from '../../services/app-state.service';
+import { AppStateService, getInnerBusEventFlow, UserAction, ViewState } from '../../services/app-state.service';
 
 
 @Component({
@@ -26,7 +26,7 @@ export class Login2Component implements OnInit {
   provider: any = null
   isExternalProviderType: boolean = false
 
-  formMessage$: Observable<IViewState>
+  formMessage$: Observable<ViewState>
   isLoaderVisible$: Observable<boolean>
   providers$: Observable<GetProvidersResItem[]>
 
@@ -57,20 +57,19 @@ export class Login2Component implements OnInit {
   }
 
   constructor(
-    @Inject(ViewService) private ViewServ: ViewService,
     @Inject(HttpClient) private readonly http: HttpClient,
     private injector: Injector,
     private _loginService: LoginService,
     private _cdr: ChangeDetectorRef,
     private _appStateService: AppStateService
   ) {
-    this.formMessage$ = this.ViewServ.listenViewState()
+    this.formMessage$ = this._appStateService.view.listen
       .pipe(
         filter(Boolean),
-        filter((res: IViewState) => res.scope === 'FORM'),
+        filter((res: ViewState) => res.scope === 'FORM'),
       )
 
-    this.isLoaderVisible$ = this.ViewServ.listenViewState()
+    this.isLoaderVisible$ = this._appStateService.view.listen
       .pipe(
         filter(Boolean),
         filter(res => res.scope === 'VIEW' && res.action === 'DISPLAY_LOADER'),

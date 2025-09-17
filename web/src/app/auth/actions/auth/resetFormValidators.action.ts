@@ -1,19 +1,19 @@
 import { Inject, Injectable } from "@angular/core";
-import { IViewState, ViewService } from "../../services/view.service";
 import { IAuthAction } from "../../models/action.model";
+import { AppStateService, ViewState } from "../../services/app-state.service";
 
 @Injectable()
 export class ResetFormValidatorsAction implements IAuthAction {
-  constructor (
-    @Inject(ViewService) private readonly ViewServ: ViewService
+  constructor(
+    private _appStateService: AppStateService
   ) {}
 
-  public execute () {
-    const viewState: IViewState = {
+  public execute() {
+    const viewState: ViewState = {
       scope: 'FORM',
       action: 'RESET_VALIDATORS'
     }
-    this.ViewServ.setViewState(viewState)
+    this._appStateService.view.next(viewState)
   }
 
 }

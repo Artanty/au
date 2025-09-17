@@ -1,16 +1,16 @@
 import { Inject, Injectable } from "@angular/core";
-import { IViewState, ViewService } from "../../services/view.service";
 import { IAuthAction } from "../../models/action.model";
 import { HttpErrorResponse } from '@angular/common/http';
+import { AppStateService, ViewState } from "../../services/app-state.service";
 
 @Injectable()
 export class DisplayUnknownErrorAction implements IAuthAction {
 
-  constructor (
-    @Inject(ViewService) private readonly ViewServ: ViewService
+  constructor(
+    private _appStateService: AppStateService
   ) {}
 
-  public execute (err: HttpErrorResponse) {
+  public execute(err: HttpErrorResponse) {
     console.log(err)
 
     let errorText
@@ -45,14 +45,14 @@ export class DisplayUnknownErrorAction implements IAuthAction {
       errorText = err.error?.error
     }
 
-    const viewState: IViewState = {
+    const viewState: ViewState = {
       scope: 'FORM',
       action: 'DISPLAY_ERROR',
       payload: {
         message: errorText || 'Неизвестная ошибка'
       }
     }
-    this.ViewServ.setViewState(viewState)
+    this._appStateService.view.next(viewState)
   }
 
 }
