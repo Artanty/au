@@ -112,11 +112,9 @@ export class Login2Component implements OnInit {
   }
 
   onLogin() {
-    
-    console.log('onLogin')
     const data: UserAction = {
       ...getInnerBusEventFlow(),
-      event: 'SEND_LOGIN_REQUEST',
+      event: 'LOGIN',
       payload: {
         username: this._username$.getValue(),
         password: this.password,
@@ -126,7 +124,6 @@ export class Login2Component implements OnInit {
     }
     dd(data)
     this._appStateService.userAction.next(data)
-    // this.UserActionServ.setUserAction(data)
   }
   
   profile() {

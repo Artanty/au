@@ -2,7 +2,8 @@ import { Inject, Injectable } from "@angular/core";
 import { IAuthAction } from "../../models/action.model";
 import { CoreService } from "../../services/core.service";
 import { Router } from "@angular/router";
-import { buildUrl } from "../../services/route-builder";
+import { buildUrl } from "../../utilites/route-builder";
+
 
 @Injectable()
 export class DisplayLoginFormAction implements IAuthAction {

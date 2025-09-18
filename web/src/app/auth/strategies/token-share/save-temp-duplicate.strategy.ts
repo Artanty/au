@@ -4,37 +4,48 @@ import { AskProjectIdsAction } from "../../actions/token-share/askProjectsIds.ac
 import { IAuthAction } from "../../models/action.model";
 import { StoreBackUrlsAction } from "../../actions/token-share/storeBackUrls.action";
 import { AskBackUrlsAction } from "../../actions/token-share/askBackUrls.action";
-import { forkJoin, from, map, mergeMap, Observable, of, switchMap } from "rxjs";
-import { BusEvent } from "typlib";
+import { filter, from, map, mergeMap, of, switchMap, take } from "rxjs";
 import { InitTokenShareStoreAction } from "../../actions/token-share/initTokenShareStore.action";
-import { GetRequiredProjectsIdsAction } from "../../actions/token-share/getRequiredProjectsIds.action";
 import { ShareTokenAction } from "../../actions/token-share/shareToken.action";
-import { dd } from "../../utilites/dd";
 import { ValidateSharedTokenAction } from "../../actions/token-share/validateSharedToken.action";
 import { ExternalUpdateBody, ExternalUpdates } from "../../services/token-share.service";
 import { SetProductBtnLoadingAction } from "../../actions/token-share/setProductBtnLoading.action";
 import { SetProductBtnReadyAction } from "../../actions/token-share/setProductBtnReady.action";
 import { SetProductBtnLockedAction } from "../../actions/token-share/setProductBtnLocked.action";
+import { AppStateService, UserAction } from "../../services/app-state.service";
+import { ResetTokenShareAction } from "../../actions/token-share/resetTokenShare.action";
+import { GetRequiredProjectsIdsAction } from "../../actions/token-share/getRequiredProjectsIds.action";
 
 
 @Injectable()
 export class SaveTempDuplicateStrategy implements IAuthStrategy {
 
   constructor(
-    private injector: Injector
+    private injector: Injector,
+    private _appStateService: AppStateService
   ) {
-
+    this._appStateService.userAction.listen
+      .pipe(filter(Boolean))
+      .subscribe((res: UserAction) => {
+        this.runScenario(res.event);
+      });
   }
   
   runScenario(scenario: string) {
     
     switch (scenario) {
-      case 'init':
+      case 'INIT':
         this.handleInitScenario();
+        break;
+      case 'LOGIN':
+        this.handleInitScenario();
+        break;
+      case 'LOGOUT':
+        this.handleLogout();
         break;
       
       default:
-        throw new Error(`Unknown scenario: ${scenario}`);
+        throw new Error(`Unknown save-temp-duplicate taken-share scenario: ${scenario}`);
     }
   }
   
@@ -57,7 +68,7 @@ export class SaveTempDuplicateStrategy implements IAuthStrategy {
       .get<IAuthAction>(AuthActionMap.get('ASK_PROJECTS_IDS'))
       .execute()
 
-    projectIds$.subscribe((projectIds: string[]) => {
+    projectIds$.pipe(take(1)).subscribe((projectIds: string[]) => {
       
       const externals = this.injector
         .get<IAuthAction>(AuthActionMap.get('INIT_TOKEN_SHARE_STORE'))
@@ -82,7 +93,6 @@ export class SaveTempDuplicateStrategy implements IAuthStrategy {
           const store = this.injector
             .get<IAuthAction>(AuthActionMap.get('STORE_BACK_URLS'))
             .execute(res)
-          // console.log(store)
           of(store as ExternalUpdates).pipe(
             mergeMap(originalData => from(Object.values(originalData)))
           )
@@ -108,16 +118,14 @@ export class SaveTempDuplicateStrategy implements IAuthStrategy {
                   })
               })
             })
-          
         })
     })
+  }
 
-    // this.injector
-    //   .get<IAuthAction>(AuthActionMap.get('VALIDATE_SHARED_TOKEN'))
-    //   .execute()
-    
-    // todo add +1 remote, wait for all validated?
-    // или позволить пользоваться теми, которые успели провериться?
+  handleLogout() {
+    const externals = this.injector
+      .get<IAuthAction>(AuthActionMap.get('RESET_TOKEN_SHARE'))
+      .execute()
   }
 }
 
@@ -131,7 +139,8 @@ export const AuthActionMap = new Map<string, any>([
   ['VALIDATE_SHARED_TOKEN', ValidateSharedTokenAction],
   ['SET_PRODUCT_BTN_LOADING', SetProductBtnLoadingAction],
   ['SET_PRODUCT_BTN_READY', SetProductBtnReadyAction],
-  ['SET_PRODUCT_BTN_LOCKED', SetProductBtnLockedAction]
+  ['SET_PRODUCT_BTN_LOCKED', SetProductBtnLockedAction],
+  ['RESET_TOKEN_SHARE', ResetTokenShareAction]
 ]);
 
 

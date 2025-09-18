@@ -61,6 +61,10 @@ import { CheckTokenAction } from './actions/auth/checkToken.action';
 
 import { SetUserDataAction } from './actions/auth/setUserData.action';
 import { AppStateService } from './services/app-state.service';
+import { RemoveAuthAction } from './actions/auth/removeAuth.action';
+import { SendLogoutRequestAction } from './actions/auth/sendLogoutRequest.action';
+import { GoToHomeAction } from './actions/auth/goToHome.action';
+import { ResetTokenShareAction } from './actions/token-share/resetTokenShare.action';
 
 @NgModule({
   declarations: [
@@ -137,6 +141,10 @@ import { AppStateService } from './services/app-state.service';
     SetProductBtnCollapsedAction,
     CheckTokenAction,
     SetUserDataAction,
+    RemoveAuthAction,
+    SendLogoutRequestAction,
+    GoToHomeAction,
+    ResetTokenShareAction,
     { 
       provide: EVENT_BUS_LISTENER, 
       useFactory: (eventBus$: BehaviorSubject<BusEvent>) => {

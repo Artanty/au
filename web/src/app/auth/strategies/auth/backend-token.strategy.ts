@@ -30,6 +30,9 @@ import { CheckTokenAction } from '../../actions/auth/checkToken.action'
 import { SetUserDataAction } from '../../actions/auth/setUserData.action';
 import { AppStateService, UserAction } from '../../services/app-state.service';
 import { GrantAuthAction } from '../../actions/auth/grantAuth.action';
+import { RemoveAuthAction } from '../../actions/auth/removeAuth.action';
+import { SendLogoutRequestAction } from '../../actions/auth/sendLogoutRequest.action';
+import { GoToHomeAction } from '../../actions/auth/goToHome.action';
 
 @Injectable()
 export class BackendTokenStrategy implements IAuthStrategy {
@@ -52,14 +55,18 @@ export class BackendTokenStrategy implements IAuthStrategy {
       case 'init':
         this.handleInitScenario();
         break;
-      case 'SEND_LOGIN_REQUEST':
-        this.handleSendLoginRequest();
+      case 'LOGIN':
+        this.handleLogin();
         break;
       case 'SEND_SIGNUP_REQUEST':
         this.handleSendSignupRequest();
         break;
+      case 'LOGOUT':
+        this.handleLogout();
+        break;
+        
       default:
-        throw new Error(`Unknown authentication scenario: ${scenario}`);
+        throw new Error(`Unknown backend-token authentication scenario: ${scenario}`);
     }
   }
 
@@ -101,7 +108,7 @@ export class BackendTokenStrategy implements IAuthStrategy {
     }
   }
 
-  handleSendLoginRequest() {
+  handleLogin() {
     this.injector
       .get<IAuthAction>(AuthActionMap.get('RESET_FORM_VALIDATORS'))
       .execute();
@@ -167,6 +174,23 @@ export class BackendTokenStrategy implements IAuthStrategy {
       .subscribe();
   }
 
+  handleLogout() {
+    this.injector
+      .get<IAuthAction>(AuthActionMap.get('REMOVE_AUTH'))
+      .execute(true);
+    this.injector
+      .get<IAuthAction>(AuthActionMap.get('SEND_LOGOUT_REQUEST'))
+      .execute()
+      .subscribe((res: any) => {
+        this.injector
+          .get<IAuthAction>(AuthActionMap.get('REMOVE_TOKEN'))
+          .execute();
+        this.injector
+          .get<IAuthAction>(AuthActionMap.get('GO_TO_HOME'))
+          .execute();
+      })
+  }
+
   catchResponseError(err: HttpErrorResponse) {
     if (err.status === 401) {
       this.injector
@@ -197,6 +221,9 @@ export const AuthActionMap = new Map<string, any>([
   ['GRANT_AUTH', GrantAuthAction],
 
   ['CHECK_TOKEN__GET_USER_DATA', CheckTokenAction],
-  ['SET_USER_DATA', SetUserDataAction]
+  ['SET_USER_DATA', SetUserDataAction],
+  ['REMOVE_AUTH', RemoveAuthAction],
+  ['SEND_LOGOUT_REQUEST', SendLogoutRequestAction],
+  ['GO_TO_HOME', GoToHomeAction]
   
 ]);

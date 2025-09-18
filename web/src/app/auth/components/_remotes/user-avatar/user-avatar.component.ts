@@ -9,7 +9,7 @@ import { BusEvent, EVENT_BUS_PUSHER, HOST_NAME } from 'typlib';
 import { share, take } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { AppStateService, UserData } from '../../../services/app-state.service';
+import { AppStateService, getInnerBusEventFlow, UserAction, UserData } from '../../../services/app-state.service';
 
 export type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | number;
 
@@ -160,42 +160,20 @@ export class UserAvatarComponent implements OnInit, OnChanges {
   }
 
   public onLogoutHandler() {
-    this.logout().subscribe(res => {
-      console.log(res)
-      if (res.success) {
-        this.isOpened = false
-        this.name = ''
-        this.updateAvatar();
-        this.removeLocalStorageValue('accessToken')
-        this.removeLocalStorageValue('refreshToken')
-        this._goToPath('/')
-        this.isLoggedIn = false;
-      }
-    })
-  }
-  // COMMON todo move
-
-  /**
-   * Remove a value from localStorage
-   * @param {string} key - The key to remove
-   * @returns {boolean} - True if successful, false if failed
-   */
-  public removeLocalStorageValue(key: string) {
-    try {
-      localStorage.removeItem(key);
-      return true;
-    } catch (error) {
-      console.error('Error removing localStorage value:', error);
-      return false;
+    const data: UserAction = {
+      ...getInnerBusEventFlow(),
+      event: 'LOGOUT',
+      payload: {},
     }
-  }
-
-  public logout(): Observable<LogoutRes> {
-    const url = `${process.env['AU_BACK_URL']}/auth-token/logout`
+    this._appStateService.userAction.next(data)
+    // make subscription on state, then do:
+    this.isOpened = false
+    this.name = ''
+    this.updateAvatar(); //viewState
     
-    return this.http.post<LogoutRes>(url, {});
+    this._goToPath('/')
+    this.isLoggedIn = false;
   }
-
 
   private _goToPath(routerPath: string): Promise<boolean> {
     return this.router.navigateByUrl(routerPath)

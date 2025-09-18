@@ -1,5 +1,3 @@
-// Obs$
-
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { obs$ } from '../utilites/observable-variable';
@@ -65,31 +63,6 @@ export class AppStateService {
   public userProfile = obs$<Nullable<UserData>>(null)
   public view = obs$<Nullable<ViewState>>(null)
   public authConfig = obs$<Nullable<IAuthDto>>(null)
-
-  // private userAction$ = new BehaviorSubject<Nullable<IUserAction>>(null)
-
-  // user = new ObservableVariable<User | null>(null);
-  // isAuthenticated = new ObservableVariable<boolean>(false);
-  // cartItems = new ObservableVariable<CartItem[]>([]);
-  // theme = new ObservableVariable<'light' | 'dark'>('light');
-  
-  // // Derived state
-  // get cartItemCount$() {
-  //   return this.cartItems.map(items => items.length);
-  // }
-  
-  // constructor() {
-  //   // Initialize from localStorage
-  //   const savedTheme = localStorage.getItem('theme');
-  //   if (savedTheme === 'light' || savedTheme === 'dark') {
-  //     this.theme.value = savedTheme;
-  //   }
-    
-  //   // Persist theme changes
-  //   this.theme.subscribe(theme => {
-  //     localStorage.setItem('theme', theme);
-  //   });
-  // }
 }
 
 export const getInnerBusEventFlow = (): { from: string, to: string } => ({ from: 'au@web', to: 'au@web' })

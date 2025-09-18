@@ -27,7 +27,7 @@ export class AuthAndShareStrategy implements IAuthStrategy {
         throw new Error(`Unknown ${this.constructor.name} scenario: ${scenario}`);
     }
   }
-
+  //todo fix: is not called after logout
   handleInitScenario() {
     const auth$ = this.injector
       .get<IAuthAction>(AuthActionMap.get('LISTEN_GRANT_AUTH'))

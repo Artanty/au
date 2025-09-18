@@ -119,6 +119,10 @@ export class TokenShareService {
     this.setStore(current)
   }  
 
+  public resetStore() {
+    this.setStore(this.initial)
+  }
+
   constructor() {}
 
   private getProjectBodyTemplate(projectId: string): ExternalUpdateBody {
