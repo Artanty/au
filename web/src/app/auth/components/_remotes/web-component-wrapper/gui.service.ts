@@ -1,6 +1,4 @@
 import { Injectable } from "@angular/core";
-import { waitForWebComponent } from "./gui.utils";
-import { dd } from "../../../utilites/dd";
 
 export const ElementsMap = {
   SELECT__SELECT_ONE: 'gui-select',

@@ -46,13 +46,10 @@ export class Login2Component implements OnInit {
 
   public loginOnChange(data: any) {
     console.log(data)
+    this._username$.next(data)
   }
 
   public passwordOnChange(data: any) {
-    console.log(data)
-  }
-
-  private _valueChange(data: any) {
     console.log(data)
   }
 
@@ -96,11 +93,11 @@ export class Login2Component implements OnInit {
       
       // this._username$.next('michael.scott@dundermifflin.com')
       // this.username = 'michael.scott@dundermifflin.com'
-      this.password = 'testpassword123' 
+      this.password = 'testpassword123'
     } else {
       this._username$.next('john@example.com2')
       // this.username = 'john@example.com2' 
-      this.password = 'password123'  
+      this.password = 'password123'
     }
     this._cdr.detectChanges()
   }

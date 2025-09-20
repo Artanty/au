@@ -1,10 +1,9 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
-
 import { dd } from '../utils/dd';
-import { attachToken } from '../middlewares/attachToken';
 import { getUserHandlerAndTokens } from './saveTempController';
 import { getEncodedClientOrigin } from '../utils/getEncodedClientOrigin';
+import { attachApiToken } from '../middlewares/attachApiToken';
 
 dotenv.config();
 
@@ -36,7 +35,7 @@ export class TokenShareController {
       const backendUrlForRequest = body.backendUrl; // mb get it secure? no not show in frontend?
       
       // Get backend service token before making the request
-      const backendServiceToken = await attachToken(
+      const backendServiceToken = await attachApiToken(
         body.projectId, // target project
         backendUrlForRequest, // target URL
         thisBackOrigin // requester url (this back url)
@@ -55,6 +54,7 @@ export class TokenShareController {
           userHandler: savedTempData.userHandler,
           accessToken: savedTempData.accessToken,
           refreshToken: savedTempData.refreshToken,
+          auBackUrl: thisBackOrigin
         }
       };
 

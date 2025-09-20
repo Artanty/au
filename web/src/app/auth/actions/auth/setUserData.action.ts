@@ -9,7 +9,6 @@ export class SetUserDataAction implements IAuthAction {
   ) {}
 
   public execute(data: UserData): void {
-    console.log('SetUserDataAction')
     this._appStateService.userProfile.next(data)
   }
 }

@@ -22,7 +22,7 @@ export class TokenShareStrategyService {
         throw new Error(
           `strategy '${strategy}' doesn't exist in StrategyMap`
         );
-      this.strategy.runScenario('init');
+      this.strategy.runScenario('INIT');
     } catch (err) {
       throw new Error(
         (err instanceof Error ? err.message : String(err))

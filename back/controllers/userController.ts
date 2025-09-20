@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { ensureErr, err } from '../utils/throwError';
-import { createHash } from '../utils/createHash';
+import { encrypt } from '../utils/encrypt';
 import { deleteFile, getUserHandlerAndTokens, sanitizePath, saveTemp } from './saveTempController';
 import { getEncodedClientOrigin } from '../utils/getEncodedClientOrigin';
 
@@ -189,7 +189,7 @@ export class UserController {
 
         const tokens = UserController.generateTokens(mappedUser.id, clientOrigin);
 
-        const userHandler = await createHash(provider.id, mappedUser.id);
+        const userHandler = encrypt(provider.id, mappedUser.id);
 
         const userName = mappedUser.name; // add profile table: proflie.userName ?? mappedUser.name
         
@@ -281,6 +281,20 @@ export class UserController {
       res.status(500).json({ error: 'Check token failed: ' + String(error) });
     }
   }
+
+  public static async encrypt(req: Request, res: Response) {
+    try {
+      const targetUserProviderId = req.body.targetUserProviderId;
+      const targetUserId = req.body.targetUserId;
+      const userHandler = encrypt(targetUserProviderId, targetUserId)
+
+      return res.json({ userHandler })
+    } catch (error: any) {
+      res.status(500).json({ error: 'encrypt user failed: ' + String(error) });
+    }
+    
+  }
+  
 }
 
 

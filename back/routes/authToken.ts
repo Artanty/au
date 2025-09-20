@@ -14,11 +14,6 @@ router.post('/login', UserController.login);
 
 router.post('/profile', UserController.getProfile);
 
-/**
- * todo - think what is it - logout when:
- * - access token is not in db, its on disc + shared
- * - refresh token is not in db, its on disc + shared
- * */
 router.post('/logout', UserController.logout);
 
 // todo - think how to - look prev.

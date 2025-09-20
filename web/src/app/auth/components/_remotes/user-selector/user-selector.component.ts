@@ -6,7 +6,11 @@ import { BehaviorSubject, map, merge, Observable, of, skipWhile, startWith, Subj
 import { LoginService } from '../../login2/login.service';
 import { FormsModule } from '@angular/forms';
 import { GuiDirective } from '../web-component-wrapper/gui.directive';
-  
+
+interface Result {
+  providerId: string,
+  userId: string,
+}
 @Component({
   selector: 'app-user-selector',
   standalone: true,
@@ -17,7 +21,7 @@ import { GuiDirective } from '../web-component-wrapper/gui.directive';
 export class UserSelectorComponent {
 
   @Input() selectedUsers: any[] = [];
-  @Output() valueChange = new EventEmitter<number | string>();
+  @Output() valueChange = new EventEmitter<Result>();
 
   public userSelectorInputs = {}
   public userSelectorOutputs = {}
@@ -26,7 +30,7 @@ export class UserSelectorComponent {
   // filteredUsers: any[] = [];
 
   provider: any = null
-  provider$: any = new Subject<number>()
+  provider$: any = new BehaviorSubject<number | string>(0)
   providers$: Observable<GetProvidersResItem[]>
   providerType: boolean = false;
   users$: Observable<User[]>
@@ -76,14 +80,17 @@ export class UserSelectorComponent {
     this.provider$.next(0)
   }
   
-  public providerOnChange(data: number) {
+  public providerOnChange(data: number | string) {
     this.provider$.next(data)
   }
 
   public userOnChange(data: number | string) {
     this.user$.next(data)
-    this.valueChange.emit(data)
-    console.log(data)
+    const result = {
+      providerId: String(this.provider$.getValue()),
+      userId: String(data),
+    }
+    this.valueChange.emit(result)
   }
 
   ngOnInit() {

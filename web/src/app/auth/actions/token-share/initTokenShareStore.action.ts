@@ -1,6 +1,4 @@
-import { Inject, Injectable } from '@angular/core';
-import { BusEvent, HOST_NAME } from 'typlib';
-import { EVENT_BUS_PUSHER } from '../../auth.component';
+import { Injectable } from '@angular/core';
 import { IAuthAction } from '../../models/action.model';
 import { ExternalUpdates, TokenShareService } from '../../services/token-share.service';
 
@@ -10,10 +8,8 @@ export class InitTokenShareStoreAction implements IAuthAction {
     private _tokenShareService: TokenShareService
   ) {}
 
-  public execute(ids: string[]): ExternalUpdates {
+  public execute(ids: string[]): void {
     this._tokenShareService.addProjects(ids)
- 
-    return this._tokenShareService.getRequiredProjects()
   }
 }
 

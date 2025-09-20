@@ -1,10 +1,9 @@
 import { Inject, Injectable } from '@angular/core';
 import { BusEvent, EVENT_BUS_PUSHER, HOST_NAME } from 'typlib';
 import { IAuthAction } from '../../models/action.model';
-import { dd } from '../../utilites/dd';
 
 import { ExternalUpdateBody, ExternalUpdates, TokenShareService } from '../../services/token-share.service';
-import { filter, Observable, share, take } from 'rxjs';
+import { filter, Observable, take } from 'rxjs';
 
 @Injectable()
 export class ListenValidateSharedTokenAction implements IAuthAction {
@@ -19,8 +18,12 @@ export class ListenValidateSharedTokenAction implements IAuthAction {
     return this._tokenShareService.listenStore()
       .pipe(
         filter((res: ExternalUpdates) => {
-          return Object.values(res).every((el: ExternalUpdateBody) => el.isValidated)
-        }),        
+          if (Object.values(res).length === 1 && Object.values(res)[0].projectId === 'au') { // todo remove au from share config
+            return false
+          } else {
+            return Object.values(res).every((el: ExternalUpdateBody) => el.isValidated)  
+          }
+        }),
         take(1),
       )
   }

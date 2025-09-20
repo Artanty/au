@@ -158,7 +158,7 @@ export function authStrategyAdapter(busEvent: BusEvent): IAuthDto {
       signInByTokenUrl: String(busEvent.payload['signInByTokenUrl']),
     },
     from: 'product',
-    status: String(busEvent.payload?.['status']) ?? 'init',
+    status: String(busEvent.payload?.['status']) ?? 'INIT',
   };
 
   return result;

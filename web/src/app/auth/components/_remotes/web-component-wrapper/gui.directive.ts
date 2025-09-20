@@ -9,8 +9,6 @@ import { ElementsMap, GuiService } from './gui.service';
 import { WebComponentWrapperComponent } from './web-component-wrapper';
 import { Router } from '@angular/router';
 import { buildCustomElName } from './gui.utils';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 
 export const GUI_PLACEHOLDER_TEMPLATE = new InjectionToken<TemplateRef<any>>('GUI_PLACEHOLDER_TEMPLATE');
 export type FormHTMLElement = HTMLElement & { type: string }
@@ -24,7 +22,6 @@ export type FormHTMLElement = HTMLElement & { type: string }
     }
   ],
   standalone: true,
-  
 })
 export class GuiDirective implements OnInit, OnDestroy {
   @Input() inputs: any = {};
@@ -55,10 +52,7 @@ export class GuiDirective implements OnInit, OnDestroy {
   private async _findCustomElement() {
     try {
       const elementKey = buildCustomElName(this.element);
-      // console.log(this.element.type)
-      // console.log(elementKey)
       const customElementName = await this.guiService.getCustomElement(elementKey);
-      // console.log(customElementName)
       await this.replaceWithCustomComponent(customElementName);
     } catch (e: unknown) {
       const text = (e instanceof Error) ? e.message : e;

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { dd } from '../utils/dd';
 
-export async function attachToken(
+export async function attachApiToken(
   targetProject: string,
   targetUrl: string,
   requesterUrl: string

@@ -9,8 +9,8 @@ import { SignupComponent } from './components/signup/signup.component';
 import { BehaviorSubject, filter, Observable, take } from 'rxjs'; 
 import { BusEvent, EVENT_BUS, EVENT_BUS_LISTENER, EVENT_BUS_PUSHER } from 'typlib';
 import { CoreService } from './services/core.service';
-import { AuthActionMap as AuthActionMap1, BackendAuthStrategy } from './strategies/auth/backend-auth.strategy';
-import { AuthActionMap as AuthActionMap2, SaveTempDuplicateStrategy } from './strategies/token-share/save-temp-duplicate.strategy';
+import { BackendAuthStrategy } from './strategies/auth/backend-auth.strategy';
+import { SaveTempDuplicateStrategy } from './strategies/token-share/save-temp-duplicate.strategy';
 import { IAuthAction } from './models/action.model';
 import { GoToLoginAction } from './actions/auth/goToLogin.action';
 import { TestApiComponent } from '../test-api/components/test-api/test-api.component';
@@ -60,11 +60,17 @@ import { UserAvatarComponent } from './components/_remotes/user-avatar/user-avat
 import { CheckTokenAction } from './actions/auth/checkToken.action';
 
 import { SetUserDataAction } from './actions/auth/setUserData.action';
-import { AppStateService } from './services/app-state.service';
+import { AppStateService, UserAction } from './services/app-state.service';
 import { RemoveAuthAction } from './actions/auth/removeAuth.action';
 import { SendLogoutRequestAction } from './actions/auth/sendLogoutRequest.action';
 import { GoToHomeAction } from './actions/auth/goToHome.action';
 import { ResetTokenShareAction } from './actions/token-share/resetTokenShare.action';
+import { ActionFactoryService } from './services/action-factory.service';
+import { PipelineHelperService } from './services/pipeline-helper.service';
+import { dd } from './utilites/dd';
+import { GetExternalsForTokenShare } from './actions/token-share/getExternalsForTokenShare.action';
+import { SaveCurrentUrlAction } from './actions/auth/saveCurrentUrl.action';
+import { GoToLastUrlAction } from './actions/auth/goToLastUrl.action';
 
 @NgModule({
   declarations: [
@@ -145,6 +151,12 @@ import { ResetTokenShareAction } from './actions/token-share/resetTokenShare.act
     SendLogoutRequestAction,
     GoToHomeAction,
     ResetTokenShareAction,
+    //
+    ActionFactoryService,
+    PipelineHelperService,
+    GetExternalsForTokenShare,
+    SaveCurrentUrlAction,
+    GoToLastUrlAction,
     { 
       provide: EVENT_BUS_LISTENER, 
       useFactory: (eventBus$: BehaviorSubject<BusEvent>) => {
@@ -185,7 +197,8 @@ export class AuthModule {
     private readonly _authStrategyService: AuthStrategyService,
     private readonly _tokenShareStrategyService: TokenShareStrategyService,
     private readonly _authDoneStrategyService: AuthDoneStrategyService,
-    private _appStateService: AppStateService
+    private _appStateService: AppStateService,
+    private _tokenShareService: TokenShareService
   ) {
     console.log('au module constructor')
     this.eventBusListener$
@@ -200,6 +213,10 @@ export class AuthModule {
       })
     this.register('UserSelectorComponent', UserSelectorComponent, 'user-selector')
     // this.register('UserAvatarComponent', UserAvatarComponent, 'user-avatar')
+    this._tokenShareService.listenStore()
+      .subscribe((res: any) => {
+        dd(res);
+      });
   }
 
   /**

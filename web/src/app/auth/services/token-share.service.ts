@@ -50,6 +50,11 @@ export class TokenShareService {
     }, {} as ExternalUpdates)
   }
 
+  public getRequiredProjectsArr(): ExternalUpdateBody[] {
+    
+    return Object.values(this.getRequiredProjects())
+  }
+
   public getRequiredProjectsIds(): string[] {
     const data = this.store$.value
     if (!Object.keys(data).length) throw new Error('store is empty')

@@ -61,8 +61,9 @@ export class AppStateService {
   public userAction = obs$<Nullable<UserAction>>(null)
   public isLoggedIn = obs$<boolean>(false)
   public userProfile = obs$<Nullable<UserData>>(null)
-  public view = obs$<Nullable<ViewState>>(null)
+  public view = obs$<Nullable<ViewState>>(null) //todo reset on view change
   public authConfig = obs$<Nullable<IAuthDto>>(null)
+  public lastRoute = obs$<string>('/') // todo get host home route
 }
 
 export const getInnerBusEventFlow = (): { from: string, to: string } => ({ from: 'au@web', to: 'au@web' })

@@ -52,7 +52,7 @@ export class BackendTokenStrategy implements IAuthStrategy {
 
   runScenario(scenario: string) {
     switch (scenario) {
-      case 'init':
+      case 'INIT':
         this.handleInitScenario();
         break;
       case 'LOGIN':
@@ -83,6 +83,7 @@ export class BackendTokenStrategy implements IAuthStrategy {
         ))
         .execute()
         .subscribe((res: any) => {
+          
           this.injector
             .get<IAuthAction>(AuthActionMap.get(
               'SET_USER_DATA'
@@ -186,7 +187,7 @@ export class BackendTokenStrategy implements IAuthStrategy {
           .get<IAuthAction>(AuthActionMap.get('REMOVE_TOKEN'))
           .execute();
         this.injector
-          .get<IAuthAction>(AuthActionMap.get('GO_TO_HOME'))
+          .get<IAuthAction>(AuthActionMap.get('GO_TO_LOGIN'))
           .execute();
       })
   }

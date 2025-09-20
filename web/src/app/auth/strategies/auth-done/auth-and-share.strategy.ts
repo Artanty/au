@@ -5,46 +5,52 @@ import { SendAuthDoneEventAction } from "../../actions/auth-done/sendAuthDoneEve
 import { SetProductBtnCollapsedAction } from "../../actions/auth-done/setProductBtnCollapsed.action";
 import { IAuthAction } from "../../models/action.model";
 import { IAuthStrategy } from "../../models/strategy.model";
-import { forkJoin, Subject } from "rxjs";
-import { AppStateService } from "../../services/app-state.service";
+import { filter, forkJoin, Subject, takeUntil } from "rxjs";
+import { AppStateService, UserAction } from "../../services/app-state.service";
+import { PipelineHelperService } from "../../services/pipeline-helper.service";
 
 @Injectable()
 export class AuthAndShareStrategy implements IAuthStrategy {
   private unsubscribe$ = new Subject<void>();
 
   constructor(
-    
+    private pipeline: PipelineHelperService,
     private injector: Injector,
-   
-  ) {}
+    private _appStateService: AppStateService
+  ) {
+    this._appStateService.userAction.listen
+      .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
+      .subscribe((res: UserAction) => {
+        this.runScenario(res.event);
+      });
+  }
 
   runScenario(scenario: string) {
     switch (scenario) {
-      case 'init':
+      case 'INIT':
         this.handleInitScenario();
         break;
+      case 'LOGIN':
+        this.handleInitScenario();
+        break;
+      case 'SEND_SIGNUP_REQUEST':
+        this.handleInitScenario();
+        break;
+
       default:
-        throw new Error(`Unknown ${this.constructor.name} scenario: ${scenario}`);
+      // throw new Error(`Unknown ${this.constructor.name} scenario: ${scenario}`);
     }
   }
-  //todo fix: is not called after logout
+  
   handleInitScenario() {
-    const auth$ = this.injector
-      .get<IAuthAction>(AuthActionMap.get('LISTEN_GRANT_AUTH'))
-      .execute()
-
-    const tokenValid$ = this.injector
-      .get<IAuthAction>(AuthActionMap.get('LISTEN_VALIDATE_SHARE_TOKEN')) // rename validate?
-      .execute()
+    
+    const auth$ = this.pipeline.exec$('LISTEN_GRANT_AUTH');
+    const tokenValid$ = this.pipeline.exec$('LISTEN_VALIDATE_SHARE_TOKEN');
 
     forkJoin([auth$, tokenValid$]).subscribe(res => {
-      this.injector
-        .get<IAuthAction>(AuthActionMap.get('SEND_AUTH_DONE_EVENT'))
-        .execute()
-      this.injector
-        .get<IAuthAction>(AuthActionMap.get('SET_PRODUCT_BTN_COLLAPSED'))
-        .execute()
-      console.log(9)
+      this.pipeline.exec$('SEND_AUTH_DONE_EVENT');
+      this.pipeline.exec$('SET_PRODUCT_BTN_COLLAPSED');
+      this.pipeline.exec$('GO_TO_LAST_URL');
     })
   }
 }
