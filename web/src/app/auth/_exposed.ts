@@ -4,9 +4,11 @@ import { createCustomElement } from '@angular/elements';
 
 import { CommonModule } from '@angular/common';
 import { UserAvatarComponent } from './components/_remotes/user-avatar/user-avatar.component';
+import { SharedWithComponent } from './components/_remotes/shared-with/shared-with.component';
 
 const mapping: any = {
-  'au-user-avatar': UserAvatarComponent
+  'au-user-avatar': UserAvatarComponent,
+  'au-shared-with': SharedWithComponent
 }
 
 export function defineCustomElement(customElementName: string, injector?: Injector): void {

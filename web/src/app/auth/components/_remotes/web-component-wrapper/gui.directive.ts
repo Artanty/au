@@ -3,7 +3,8 @@ import {
   ViewContainerRef, Input, OnInit, OnDestroy, Injector, TemplateRef,
   ComponentRef, Optional,
   InjectionToken,
-  Inject
+  Inject,
+  ChangeDetectorRef
 } from '@angular/core';
 import { ElementsMap, GuiService } from './gui.service';
 import { WebComponentWrapperComponent } from './web-component-wrapper';
@@ -40,7 +41,8 @@ export class GuiDirective implements OnInit, OnDestroy {
     private injector: Injector,
     private router: Router,
     @Optional() @Inject(GUI_PLACEHOLDER_TEMPLATE) 
-    private injectedPlaceholderTemplate: TemplateRef<any> | null
+    private injectedPlaceholderTemplate: TemplateRef<any> | null,
+    private cdr: ChangeDetectorRef,
   ) {
     this.element = this.el.nativeElement;
   }
@@ -70,7 +72,7 @@ export class GuiDirective implements OnInit, OnDestroy {
       instance.componentName = customElementName;
       instance.inputs = { ...this.inputs, type: this.inputs.type ?? this.element.type };
       instance.outputs = this.outputs;
-      
+      this.cdr.detectChanges()
     } catch {
       this.showPlaceholder('Failed to load custom component');
     }

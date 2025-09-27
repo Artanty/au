@@ -71,6 +71,7 @@ import { dd } from './utilites/dd';
 import { GetExternalsForTokenShare } from './actions/token-share/getExternalsForTokenShare.action';
 import { SaveCurrentUrlAction } from './actions/auth/saveCurrentUrl.action';
 import { GoToLastUrlAction } from './actions/auth/goToLastUrl.action';
+import { SharedWithComponent } from './components/_remotes/shared-with/shared-with.component';
 
 @NgModule({
   declarations: [
@@ -104,7 +105,8 @@ import { GoToLastUrlAction } from './actions/auth/goToLastUrl.action';
     // TestApiModule
     WebComponentWrapperComponent,
     GuiDirective,
-    UserAvatarComponent
+    UserAvatarComponent,
+    SharedWithComponent
   ],
   exports: [AuthComponent],
   providers: [

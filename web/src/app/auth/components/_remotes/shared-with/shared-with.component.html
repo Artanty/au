@@ -1,0 +1,54 @@
+<div class="shared-with-container">
+  <div class="header">
+    <h3>Shared with</h3>
+    <button class="refresh-btn" (click)="refresh()" title="Refresh">
+      <span class="refresh-icon">↻</span>
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <span>Loading shared users...</span>
+  </div>
+
+  <div *ngIf="error" class="error">
+    <span class="error-icon">⚠</span>
+    <span>{{ error }}</span>
+    <button class="retry-btn" (click)="refresh()">Retry</button>
+  </div>
+
+  <div *ngIf="sharedUsers$ | async as sharedUsers" class="users-list">
+    <div *ngIf="sharedUsers.length === 0" class="empty-state">
+      <span class="empty-icon">👥</span>
+      <p>Not shared with anyone yet</p>
+    </div>
+
+    <div *ngFor="let user of sharedUsers" 
+         class="user-item"
+         [class.current-user]="isCurrentUser(user.id)">
+      
+      <div class="avatar-container">
+        <div class="avatar" 
+             [style.backgroundImage]="user.avatarUrl ? 'url(' + user.avatarUrl + ')' : ''">
+          <span *ngIf="!user.avatarUrl">{{ getInitials(user.name) }}</span>
+        </div>
+      </div>
+
+      <div class="user-info">
+        <span class="user-name">{{ user.name }}</span>
+        <span class="user-email">{{ user.email }}</span>
+      </div>
+
+      <div class="access-level">
+        <span class="access-icon" [title]="user.accessLevel + ' access'">
+          {{ getAccessLevelIcon(user.accessLevel) }}
+        </span>
+        <span class="access-text">{{ user.accessLevel }}</span>
+      </div>
+
+      <div class="shared-date">
+        Shared {{ user.sharedAt | date:'mediumDate' }}
+      </div>
+    </div>
+  </div>
+</div>

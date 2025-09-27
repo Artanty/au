@@ -8,24 +8,16 @@ import { UserController } from '../controllers/userController';
 dotenv.config();
 const router = express.Router();
 
-router.post('/register', UserController.register);
+router.post('/register', AuthController.register);
 
-router.post('/login', UserController.login);
+router.post('/login', AuthController.login);
+
+router.post('/logout', AuthController.logout);
+
+router.post('/check-token', AuthController.checkToken);
+
+
 
 router.post('/profile', UserController.getProfile);
-
-router.post('/logout', UserController.logout);
-
-// todo - think how to - look prev.
-router.post('/refresh-token', async (req, res) => {
-  try {
-    const result = await AuthController.refreshToken(req.body);
-    res.status(200).json(result);
-  } catch (error) {
-    res.status(400).json({ error: ensureErr(error) });
-  }
-});
-
-router.post('/check-token', UserController.checkToken);
 
 export default router;

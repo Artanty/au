@@ -6,8 +6,6 @@ import {
   AfterViewInit, 
   OnChanges, 
   SimpleChanges,
-  Injector,
-  ComponentFactoryResolver
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { waitForWebComponent } from './gui.utils';
@@ -28,13 +26,7 @@ export class WebComponentWrapperComponent implements AfterViewInit, OnChanges {
 
   private element: HTMLElement | null = null;
 
-  constructor(
-    private componentFactoryResolver: ComponentFactoryResolver,
-    private injector: Injector
-  ) {}
-
   ngAfterViewInit() {
-    // console.log('componentName: ' + this.componentName)
     this.renderComponent();
   }
 
