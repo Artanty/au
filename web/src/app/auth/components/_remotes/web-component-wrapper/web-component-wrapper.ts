@@ -5,10 +5,10 @@ import {
   ViewContainerRef, 
   AfterViewInit, 
   OnChanges, 
-  SimpleChanges,
+  SimpleChanges
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { waitForWebComponent } from './gui.utils';
+import { waitForWebComponent } from './web-component-utils';
 
 @Component({
   selector: 'app-web-component-wrapper',

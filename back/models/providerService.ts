@@ -19,7 +19,7 @@ export interface FieldMapping {
 
 export class ProviderService {
 
-  static async getProvider(providerId: number): Promise<Provider> {
+  static async getProvider(providerId: string): Promise<Provider> {
     const connection = await createPool().getConnection();
     try {
       // Get provider info
@@ -61,12 +61,12 @@ export class ProviderService {
     }
   }
 
-  static async createExternalModel(providerOrId: number | Provider) {
+  static async createExternalModel(providerOrId: string | Provider): Promise<ExternalUserModel> {
     try {
       let provider: Provider;
-      if (typeof providerOrId === 'number') {
+      if (typeof providerOrId === 'string') {
         provider = await this.getProvider(providerOrId);
-      } else {
+      } else { // todo smth
         provider = providerOrId  
       }
       
@@ -90,7 +90,7 @@ export class ProviderService {
         mappings: provider.mappings
       });
     } catch (error: any) {
-      err(error)
+      return err(error)
     }
   }
 
@@ -119,9 +119,9 @@ export class ProviderService {
    * размэпить полученные столбцы под нужные 
    * вернуть 
    * */
-  static async getProviderUsers(providerId: number) {
+  static async getProviderUsers(providerId: string) {
     try {
-      const provider = await this.getProvider(providerId)
+      const provider = await this.getProvider(String(providerId))
       const externalUserModel = new ExternalUserModel({
         db_host: provider.config.db_host,
         db_port: provider.config.db_port,

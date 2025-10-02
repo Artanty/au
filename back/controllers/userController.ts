@@ -8,6 +8,7 @@ import { ensureErr, err } from '../utils/throwError';
 import { encrypt } from '../utils/encrypt';
 import { deleteFile, getUserHandlerAndTokens, sanitizePath, saveTemp } from './saveTempController';
 import { getEncodedClientOrigin } from '../utils/getEncodedClientOrigin';
+import axios from 'axios';
 
 dotenv.config();
 
@@ -80,6 +81,25 @@ export class UserController {
         code: 'SERVER_ERROR',
         details: ensureErr(error)
       });
+    }
+  }
+
+  public static async getAvatar(userName): Promise<string> {
+    const condencedName = userName.replace(' ', '').trim()
+    try {
+
+      const response = await axios.get(
+        `https://nekos.best/api/v2/search?query=${condencedName}&type=1`, 
+        {
+          timeout: 5000
+        }
+      );
+
+      return response.data.results?.[0]?.url ?? 'NO_AVATAR_URL'
+    
+    } catch (error: unknown) {
+      console.error('getAvatar error: ' + error);
+      return 'GET_AVATAR_ERROR';
     }
   }
 }

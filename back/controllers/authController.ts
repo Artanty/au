@@ -5,9 +5,11 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { ensureErr, err } from '../utils/throwError';
-import { encrypt } from '../utils/encrypt';
+import { decrypt, encrypt } from '../utils/encrypt';
 import { deleteFile, getUserHandlerAndTokens, sanitizePath, saveTemp } from './saveTempController';
 import { getEncodedClientOrigin } from '../utils/getEncodedClientOrigin';
+import { UserController } from './userController';
+import { dd } from '../utils/dd';
 
 dotenv.config();
 
@@ -92,10 +94,10 @@ export class AuthController {
     }    
   }
 
-  private static async handleExternalLogin(req: Request, res: Response, providerId: number, credentials: { email: string, password: string }) {
+  private static async handleExternalLogin(req: Request, res: Response, providerId: string, credentials: { email: string, password: string }) {
     let externalModel;
     try {
-
+      // todo copy to retrieve userName 
       const provider = await ProviderService.getProvider(providerId);
       externalModel = await ProviderService.createExternalModel(provider);
 
@@ -125,6 +127,8 @@ export class AuthController {
         const userHandler = encrypt(provider.id, mappedUser.id);
 
         const userName = mappedUser.name; // add profile table: proflie.userName ?? mappedUser.name
+
+        const avatar = await UserController.getAvatar(userName)
         
         await saveTemp({
           path: clientOrigin,
@@ -132,7 +136,8 @@ export class AuthController {
           data: { 
             userHandler,
             ...tokens,
-            userName: userName
+            userName,
+            avatar,
           }
         })
         
@@ -225,6 +230,56 @@ export class AuthController {
     } catch (error: any) {
       res.status(500).json({ error: 'encrypt user failed: ' + String(error) });
     }
+  }
+
+  public static async decrypt(req: Request, res: Response) {
+    try {
+      const result: any = []
+      const providersIds = new Map<string, Set<string>>()
+      const decryptedUsersHandlers: Record<string, any> = {};
     
-  }  
+      if (req.body.usersHandlers && Array.isArray(req.body.usersHandlers)) {
+        req.body.usersHandlers.forEach(userHandler => {
+          const [providerId, userId] = decrypt(userHandler)
+          decryptedUsersHandlers[userId] = {
+            userHandler,
+            providerId,
+          };
+          let setOfUsers;
+          const isInStore = providersIds.has(providerId)
+          if (isInStore) {
+            setOfUsers = providersIds.get(providerId) as Set<string>
+            setOfUsers.add(userId)
+          } else {
+            setOfUsers = new Set([userId])
+          }
+          providersIds.set(providerId, setOfUsers)
+        })
+
+        const providerPromises = Array.from(providersIds).map(async ([providerId, usersIds]: [string, Set<string>]) => {
+          const provider = await ProviderService.getProvider(providerId);
+          const externalModel = await ProviderService.createExternalModel(provider);
+          const usersData: any[] = await externalModel.getUsersByIds(Array.from(usersIds));
+          return usersData;
+        });
+      
+        const allUsersData = await Promise.all(providerPromises);
+      
+        result.push(...allUsersData.flat());
+      }
+    
+      let enrichedUsersData = result
+        .map(userData => ({ ...userData, ...decryptedUsersHandlers[userData.id] }));
+
+      enrichedUsersData = enrichedUsersData.map(async (enrichedUserData: any) => {
+        const avatar = await UserController.getAvatar(enrichedUserData.name)
+        return { ...enrichedUserData, avatar }
+      })
+      
+      enrichedUsersData = await Promise.all(enrichedUsersData);
+      return res.json({ enrichedUsersData })
+    } catch (error: any) {
+      res.status(500).json({ error: 'decrypt users failed: ' + String(error) });
+    }
+  }
 }

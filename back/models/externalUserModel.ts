@@ -2,6 +2,7 @@ import createPool from "../core/db_connection";
 import mysql from 'mysql2/promise';
 import crypto from 'crypto';
 import { FieldMapping } from "./providerService";
+import { dd } from "../utils/dd";
 
 
 interface ExternalUserConfig {
@@ -19,7 +20,7 @@ export class ExternalUserModel {
 
 
   constructor(private providerConfig: ExternalUserConfig) {
-    console.log(providerConfig)
+    // console.log(providerConfig)
     this.pool = mysql.createPool({
       host: this.providerConfig.db_host,
       port: parseInt(this.providerConfig.db_port),
@@ -53,6 +54,33 @@ export class ExternalUserModel {
         `SELECT ${fields} FROM ${this.providerConfig.user_table}`
       );
       return (rows as any[]) || null;
+    } finally {
+      connection.release();
+    }
+  }
+
+  async getUsersByIds(ids: string[]): Promise<any[]> {
+    const connection = await this.pool.getConnection();
+    try {
+      if (!ids || ids.length === 0) {
+        return [];
+      }
+
+      const filteredMappings = this.filterMappingsByInternal(this.providerConfig.mappings, ['id', 'name'])
+      
+      const fields = this.buildRemappedQueryFields(filteredMappings)
+
+      const id = this.getExternalFieldName(filteredMappings, 'id'); // external Id Field Name
+    
+      // Create placeholders for the IN clause (?, ?, ?)
+      const placeholders = ids.map(() => '?').join(',');
+    
+      const [rows] = await connection.query(
+        `SELECT ${fields} FROM ${this.providerConfig.user_table} WHERE ${id} IN (${placeholders})`,
+        ids
+      );
+    
+      return (rows as any[]) || [];
     } finally {
       connection.release();
     }
@@ -114,5 +142,14 @@ export class ExternalUserModel {
 
   async closePool() {
     await this.pool.end();
+  }
+
+  private getExternalFieldName(mappings: FieldMapping[], internalClaimFieldName: string): string {
+    const found = mappings.find((mapping: FieldMapping) => mapping.internal_claim === internalClaimFieldName)
+    if (!found) {
+      throw new Error(`No internal field with name: ${internalClaimFieldName}`)
+    } else {
+      return found.external_field
+    }
   }
 }

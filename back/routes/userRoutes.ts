@@ -5,6 +5,11 @@ import { AuthController } from '../controllers/authController';
 
 const router = express.Router();
 
+/**
+ * /api/users
+ * */
 router.post('/encrypt', validateApiKey, AuthController.encrypt);
+
+router.post('/decrypt', validateApiKey, AuthController.decrypt);
 
 export default router;
