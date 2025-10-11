@@ -53,6 +53,7 @@ export class GuiDirective {
   ) {}
 
   async ngOnInit() {
+    // this.cdr.markForCheck();
     this.element = this.el.nativeElement;
     this.busEventId = generateRandomId()
     this.useRemoteResource('gui-directive')
@@ -62,7 +63,7 @@ export class GuiDirective {
    * 'gui-direcitive'
    */
   async useRemoteResource(remoteResourceName: string) {
-    //subscribe
+    
     this.eventBusListener$.
       pipe(
         skipWhile(res => (res.event !== 'REMOTE_RESOURCE') || (res.payload.busEventId !== this.busEventId)),
@@ -82,6 +83,7 @@ export class GuiDirective {
             this.outputs
           );
           await directiveClass._findCustomElement()
+          
         }
       })
     

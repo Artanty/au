@@ -45,7 +45,6 @@ module.exports = {
       exposes: {
         './AuthModule': './src/app/auth/auth.module.ts',
         './Component': './src/app/auth/auth.component.ts',
-        './UserSelectorComponent': './src/app/auth/components/_remotes/user-selector/user-selector.component.ts',
         './Exposed': './src/app/auth/_exposed.ts',
       },
       shared: share({

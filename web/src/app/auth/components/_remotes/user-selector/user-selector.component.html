@@ -1,4 +1,4 @@
-<ng-container *ngIf="(providers$ | async)?.length">
+
   <input gui type="radio"
     [inputs]="{
       label: 'Источник',
@@ -8,7 +8,9 @@
     [outputs]="{valueChange: providerTypeOnChange.bind(this)}"
   >
 
-  <ng-container *ngIf="providerType">
+<ng-container *ngIf="(providers$ | async)">
+  
+ <ng-container *ngIf="providerType">
     <select gui
       [inputs]="{
         options$: providers$,
@@ -25,9 +27,7 @@
       }"
       [outputs]="{valueChange: userOnChange.bind(this)}"
     ></select>
-  </ng-container>
-
-  
+  </ng-container>  
 
   <div class="space"></div>
 

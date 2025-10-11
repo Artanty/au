@@ -5,13 +5,19 @@ import { createCustomElement } from '@angular/elements';
 import { CommonModule } from '@angular/common';
 import { UserAvatarComponent } from './components/_remotes/user-avatar/user-avatar.component';
 import { SharedWithComponent } from './components/_remotes/shared-with/shared-with.component';
+import { UserAccessListComponent } from './components/_remotes/user-access-list/user-access-list.component';
+import { dd } from './utilites/dd';
+import { UserSelectorComponent } from './components/_remotes/user-selector/user-selector.component';
 
 const mapping: any = {
   'au-user-avatar': UserAvatarComponent,
-  'au-shared-with': SharedWithComponent
+  'au-shared-with': SharedWithComponent,
+  // 'au-user-access-list': UserAccessListComponent, // некому здесь его искать, только хост может
+  // 'user-selector': UserSelectorComponent
 }
 
 export function defineCustomElement(customElementName: string, injector?: Injector): void {
+  
   if (typeof customElements !== 'undefined' && !customElements.get(customElementName)) {
     // If no injector is provided, use a fallback (less ideal but works)
     const effectiveInjector = injector || (window as any).ngInjector;
@@ -21,7 +27,7 @@ export function defineCustomElement(customElementName: string, injector?: Inject
         injector: effectiveInjector 
       });
       customElements.define(customElementName, customElement);
-      // console.log('customElement: ' + customElementName + ' defined')
+      console.log('customElement: ' + customElementName + ' defined')
     } else {
       console.warn('No injector available for custom element registration');
     }

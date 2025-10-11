@@ -72,6 +72,7 @@ import { GetExternalsForTokenShare } from './actions/token-share/getExternalsFor
 import { SaveCurrentUrlAction } from './actions/auth/saveCurrentUrl.action';
 import { GoToLastUrlAction } from './actions/auth/goToLastUrl.action';
 import { SharedWithComponent } from './components/_remotes/shared-with/shared-with.component';
+import { UserAccessListComponent } from './components/_remotes/user-access-list/user-access-list.component';
 
 @NgModule({
   declarations: [
@@ -105,7 +106,7 @@ import { SharedWithComponent } from './components/_remotes/shared-with/shared-wi
     // TestApiModule
     WebComponentWrapperComponent,
     GuiDirective,
-    UserAvatarComponent,
+    // UserAvatarComponent,
     SharedWithComponent
   ],
   exports: [AuthComponent],
@@ -213,7 +214,10 @@ export class AuthModule {
           }
         }
       })
-    this.register('UserSelectorComponent', UserSelectorComponent, 'user-selector')
+    this.register('UserSelectorComponent', UserSelectorComponent, 'au-user-selector')
+    this.register('UserAccessListComponent', UserAccessListComponent, 'au-user-access-list')
+    //todo перенести в exposed mfe module когда gui-directive-body научится стучаться в exposed.
+
     // this.register('UserAvatarComponent', UserAvatarComponent, 'user-avatar')
     this._tokenShareService.listenStore()
       .subscribe((res: any) => {
@@ -240,6 +244,7 @@ export class AuthModule {
 
     // Register as custom element
     customElements.define(customElementName, customElement);
+    dd('[DEFINED] in auth.module: ' + componentName)
   }
 
   private _sendDoneEvent(busEvent: BusEvent, to?: string): void {

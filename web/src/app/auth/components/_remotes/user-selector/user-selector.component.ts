@@ -1,8 +1,8 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { GetProvidersResItem, User, UserRes } from '../../login2/models';
-import { BehaviorSubject, map, merge, Observable, of, skipWhile, startWith, Subject, switchMap, tap, withLatestFrom } from 'rxjs';
+import { BehaviorSubject, delay, map, merge, Observable, of, skipWhile, startWith, Subject, switchMap, tap, withLatestFrom } from 'rxjs';
 import { LoginService } from '../../login2/login.service';
 import { FormsModule } from '@angular/forms';
 import { GuiDirective } from '../web-component-wrapper/gui.directive';
@@ -16,9 +16,10 @@ interface Result {
   standalone: true,
   imports: [CommonModule, FormsModule, GuiDirective],
   templateUrl: './user-selector.component.html',
-  styleUrl: './user-selector.component.scss'
+  styleUrl: './user-selector.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class UserSelectorComponent {
+export class UserSelectorComponent implements OnInit {
 
   @Input() selectedUsers: any[] = [];
   @Output() valueChange = new EventEmitter<Result>();
@@ -31,9 +32,9 @@ export class UserSelectorComponent {
 
   provider: any = null
   provider$: any = new BehaviorSubject<number | string>(0)
-  providers$: Observable<GetProvidersResItem[]>
+  providers$!: Observable<GetProvidersResItem[]>
   providerType: boolean = false;
-  users$: Observable<User[]>
+  users$!: Observable<User[]>
   // users$: BehaviorSubject<User[]> = new BehaviorSubject<User[]>([]);
   
   user$: Subject<number | string | null> = new Subject()
@@ -42,10 +43,12 @@ export class UserSelectorComponent {
   constructor(
     private http: HttpClient,
     private _loginService: LoginService,
-  ) {
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
     this.providers$ = this._loginService.getProviders().pipe(
       map(res => {
-        // res.unshift({ id: 0, name: 'Выбрать поставщика' })
         return [{ id: 0, name: 'Выбрать поставщика' }, ...res]
       }),
       tap(res => {
@@ -53,8 +56,10 @@ export class UserSelectorComponent {
           // this.provider = res[0].id
           // this.providerOnChange()
         }
-      })
+      }),
     )
+    
+   
 
     this.users$ = this.provider$
       .pipe(
@@ -74,10 +79,10 @@ export class UserSelectorComponent {
         }),
       )
   }
-
   public providerTypeOnChange(data: boolean) {
     this.providerType = data
     this.provider$.next(0)
+    this.cdr.detectChanges();
   }
   
   public providerOnChange(data: number | string) {
@@ -93,7 +98,5 @@ export class UserSelectorComponent {
     this.valueChange.emit(result)
   }
 
-  ngOnInit() {
-   
-  }
+ 
 }
