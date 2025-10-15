@@ -33,3 +33,6 @@ AuthStrategyService и TokenShareStrategyService
 достать юзера
 
 
+---
+design ref user with tags
+https://codesandbox.io/p/sandbox/users-list-ui-design-61gr6?file=%2Findex.html

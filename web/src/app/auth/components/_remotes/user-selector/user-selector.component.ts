@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectorRef, Chan
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { GetProvidersResItem, User, UserRes } from '../../login2/models';
-import { BehaviorSubject, delay, map, merge, Observable, of, skipWhile, startWith, Subject, switchMap, tap, withLatestFrom } from 'rxjs';
+import { BehaviorSubject, delay, map, merge, Observable, of, skip, skipWhile, startWith, Subject, switchMap, takeUntil, tap, withLatestFrom } from 'rxjs';
 import { LoginService } from '../../login2/login.service';
 import { FormsModule } from '@angular/forms';
 import { GuiDirective } from '../web-component-wrapper/gui.directive';
@@ -34,9 +34,11 @@ export class UserSelectorComponent implements OnInit {
   provider$: any = new BehaviorSubject<number | string>(0)
   providers$!: Observable<GetProvidersResItem[]>
   providerType: boolean = false;
+  providerType$ = new BehaviorSubject<boolean>(false)
+
   users$!: Observable<User[]>
   // users$: BehaviorSubject<User[]> = new BehaviorSubject<User[]>([]);
-  
+  // users: (User | any)[] = [];
   user$: Subject<number | string | null> = new Subject()
   isProviderChanged$: Subject<number> = new Subject()
 
@@ -53,20 +55,44 @@ export class UserSelectorComponent implements OnInit {
       }),
       tap(res => {
         if (this.providerType && res.length) {
-          // this.provider = res[0].id
+          this.provider = res[0].id
           // this.providerOnChange()
+          
         }
       }),
     )
     
    
 
-    this.users$ = this.provider$
+    // this.users$ = this.provider$
+    //   .pipe(
+    //     startWith(0),
+    //     switchMap((providerId: number) => {
+    //       this.users = []
+    //       console.log(providerId)
+    //       if (Number(providerId) !== 0) {
+    //         return this._loginService.getProviderUsers(Number(providerId));
+    //       } else {
+    //         return of([]);
+    //       }
+    //     }),
+    //     map((res: User[]) => {
+    //       return [{ id: 0, name: 'Выбрать пользователя' }, ...res]
+    //     }),
+    //     tap((res: User[]) => {
+    //       this.user$.next(0)
+    //       this.users = res
+    //     }),
+    //   )
+  }
+
+  get users(): Observable<string> {
+    return this.provider$
       .pipe(
         startWith(0),
         switchMap((providerId: number) => {
           if (Number(providerId) !== 0) {
-            return this._loginService.getProviderUsers(providerId);
+            return this._loginService.getProviderUsers(Number(providerId));
           } else {
             return of([]);
           }
@@ -74,19 +100,33 @@ export class UserSelectorComponent implements OnInit {
         map((res: User[]) => {
           return [{ id: 0, name: 'Выбрать пользователя' }, ...res]
         }),
-        tap(() => {
-          this.user$.next(0)
-        }),
+        takeUntil(this.providerType$.asObservable().pipe(skip(1))),
       )
   }
+
   public providerTypeOnChange(data: boolean) {
+    this.providerType$.next(data)
     this.providerType = data
-    this.provider$.next(0)
-    this.cdr.detectChanges();
+    this.providerOnChange(0)
+    
   }
   
-  public providerOnChange(data: number | string) {
-    this.provider$.next(data)
+  public providerOnChange(providerId: number | string) {
+    this.provider$.next(providerId)
+    this.cdr.detectChanges();
+    // console.log(providerId)
+    // if (Number(providerId) !== 0) {
+    //   this._loginService.getProviderUsers(Number(providerId)).subscribe(res => {
+    //     const result = [{ id: 0, name: 'Выбрать пользователя' }, ...res]
+    //     this.users = result;
+    //     this.cdr.detectChanges();
+    //   })
+    // } else {
+    //   // return of([]);
+    //   this.users = []
+    //   this.cdr.detectChanges();
+    // }
+
   }
 
   public userOnChange(data: number | string) {

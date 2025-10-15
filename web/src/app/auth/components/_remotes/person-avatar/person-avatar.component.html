@@ -1,0 +1,25 @@
+<div 
+      class="avatar" 
+      [class]="sizeClass"
+      [style.background]="backgroundColor"
+      [style.width.px]="customSize"
+      [style.height.px]="customSize"
+      [style.fontSize.px]="fontSize"
+      [attr.aria-label]="name || 'User avatar'"
+      role="img"
+    >
+      @if (displayImage) {
+        <img 
+          [src]="avatarUrl" 
+          [alt]="name" 
+          class="avatar-image" 
+          (error)="onImageError()" 
+          loading="lazy"
+        />
+      }
+      
+      @if (displayInitials) {
+        <span class="avatar-initials">{{ initials }}</span>
+      }
+     
+    </div>

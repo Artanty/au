@@ -1,1 +1,40 @@
-<p>user-access-list works!</p>
+<div class="list-wrapper">
+	<ul>
+		<li *ngFor="let user of userList">
+			<div>
+				<div class="avatar">
+					<app-person-avatar [avatarUrl]="user.avatar"
+					></app-person-avatar>
+				</div>
+				<div class="who">
+					<div class="name">
+					{{ user.name }}
+					</div>
+					<div *ngIf="user.provider" class="provider">
+						{{user.provider}}
+					</div>
+				</div>
+			</div>
+			<div>
+				<div class="role">
+					{{ user.role }}
+				</div>
+				<div class="action">
+					<!-- <a class="actionsBtn" (click)="actionsHandler()"> 
+		   			<i class="mu mu-opts-v" ></i>
+		   	  </a>  -->
+
+		   	  <div gui type="dropdown"
+			   	  [inputs]="{
+			   	  	buttonIcon: 'mu mu-opts-v',
+			   	  	items: menuItems
+			   	  }"
+			   	  [outputs]="{
+							itemSelected: onItemSelect.bind(this, user)
+			   	  }"
+		   	  ></div>
+				</div>
+			</div>
+		</li>
+	</ul>	
+</div>

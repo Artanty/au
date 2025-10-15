@@ -37,13 +37,14 @@
         }"
         [outputs]="{valueChange: loginOnChange.bind(this)}"
       >
-      <input gui type="password"
+      <input gui type="password"  
         [inputs]="{
           label: 'Пароль',
           value: password
         }"
         [outputs]="{valueChange: passwordOnChange.bind(this)}"
       >
+      <div class="mb12"></div>
       <button gui type="submit"
         [inputs]="{
           label: 'Войти'

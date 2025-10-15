@@ -1,0 +1,64 @@
+.list-wrapper {
+	height: 1500px;
+	background: #1c0816;
+	font-family: 'Montserrat', sans-serif;
+	line-height: 1.25;
+	letter-spacing: 1px;
+	padding: 14px;
+}
+
+ul {
+	padding: 0;
+	margin: 0;
+}
+
+ul>li {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 4px 0;
+	border-bottom: 1px solid grey;
+}
+
+ul>li>div {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.avatar {
+	margin-right: 8px;
+}
+
+.who {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+}
+
+.name {
+	color: grey;
+	font-size: 14px;
+}
+
+.provider {
+	color: grey;
+	font-size: 12px;
+}
+
+.role {
+	color: grey;
+	font-size: 14px;
+}
+
+.action {
+	// color: #fff;
+	width: 30px;
+	display: block;
+
+	height: 34px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	cursor: pointer;
+}

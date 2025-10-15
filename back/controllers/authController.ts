@@ -233,6 +233,7 @@ export class AuthController {
   }
 
   public static async decrypt(req: Request, res: Response) {
+    dd('[DECRYPT] START')
     try {
       const result: any = []
       const providersIds = new Map<string, Set<string>>()

@@ -23,7 +23,7 @@
 
     <select gui
       [inputs]="{
-        options$: users$,
+        options: users,
       }"
       [outputs]="{valueChange: userOnChange.bind(this)}"
     ></select>
