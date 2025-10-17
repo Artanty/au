@@ -10,29 +10,25 @@
 					<div class="name">
 					{{ user.name }}
 					</div>
-					<div *ngIf="user.provider" class="provider">
-						{{user.provider}}
+					<div *ngIf="user.providerName" class="provider">
+						{{user.providerName}}
 					</div>
 				</div>
 			</div>
 			<div>
-				<div class="role">
-					{{ user.role }}
+				<div class="accessLevel">
+					{{ user.accessLevel }}
 				</div>
 				<div class="action">
-					<!-- <a class="actionsBtn" (click)="actionsHandler()"> 
-		   			<i class="mu mu-opts-v" ></i>
-		   	  </a>  -->
-
-		   	  <div gui type="dropdown"
-			   	  [inputs]="{
-			   	  	buttonIcon: 'mu mu-opts-v',
-			   	  	items: menuItems
-			   	  }"
-			   	  [outputs]="{
+				   	<div gui type="dropdown"
+					   	[inputs]="{
+					   	  	buttonIcon: 'mu mu-opts-v',
+					   	  	items: menuItems
+					   	}"
+					   	[outputs]="{
 							itemSelected: onItemSelect.bind(this, user)
-			   	  }"
-		   	  ></div>
+					 	}"
+				   	></div>
 				</div>
 			</div>
 		</li>

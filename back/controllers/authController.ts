@@ -239,42 +239,47 @@ export class AuthController {
       const providersIds = new Map<string, Set<string>>()
       const decryptedUsersHandlers: Record<string, any> = {};
     
-      if (req.body.usersHandlers && Array.isArray(req.body.usersHandlers)) {
-        req.body.usersHandlers.forEach(userHandler => {
-          const [providerId, userId] = decrypt(userHandler)
-          decryptedUsersHandlers[userId] = {
-            userHandler,
-            providerId,
-          };
-          let setOfUsers;
-          const isInStore = providersIds.has(providerId)
-          if (isInStore) {
-            setOfUsers = providersIds.get(providerId) as Set<string>
-            setOfUsers.add(userId)
-          } else {
-            setOfUsers = new Set([userId])
-          }
-          providersIds.set(providerId, setOfUsers)
-        })
-
-        const providerPromises = Array.from(providersIds).map(async ([providerId, usersIds]: [string, Set<string>]) => {
-          const provider = await ProviderService.getProvider(providerId);
-          const externalModel = await ProviderService.createExternalModel(provider);
-          const usersData: any[] = await externalModel.getUsersByIds(Array.from(usersIds));
-          return usersData;
-        });
-      
-        const allUsersData = await Promise.all(providerPromises);
-      
-        result.push(...allUsersData.flat());
+      if (!req.body.usersHandlers || !Array.isArray(req.body.usersHandlers)) {
+        throw new Error('no usersHandlers or not array')
       }
+      req.body.usersHandlers.forEach(userHandler => {
+        const [providerId, userId] = decrypt(userHandler)
+        decryptedUsersHandlers[userId] = {
+          userHandler,
+          providerId,
+        };
+        let setOfUsers;
+        const isInStore = providersIds.has(providerId)
+        if (isInStore) {
+          setOfUsers = providersIds.get(providerId) as Set<string>
+          setOfUsers.add(userId)
+        } else {
+          setOfUsers = new Set([userId])
+        }
+        providersIds.set(providerId, setOfUsers)
+      })
+
+      const providers: Record<string, any> = {};
+      const providerPromises = Array.from(providersIds).map(async ([providerId, usersIds]: [string, Set<string>]) => {
+        const provider = await ProviderService.getProvider(providerId);
+        providers[providerId] = provider;
+        const externalModel = await ProviderService.createExternalModel(provider);
+        const usersData: any[] = await externalModel.getUsersByIds(Array.from(usersIds));
+        return usersData;
+      });
+    
+      const allUsersData = await Promise.all(providerPromises);
+    
+      result.push(...allUsersData.flat());
+      
     
       let enrichedUsersData = result
         .map(userData => ({ ...userData, ...decryptedUsersHandlers[userData.id] }));
 
       enrichedUsersData = enrichedUsersData.map(async (enrichedUserData: any) => {
         const avatar = await UserController.getAvatar(enrichedUserData.name)
-        return { ...enrichedUserData, avatar }
+        const providerName = providers[enrichedUserData.providerId]?.name;
+        return { ...enrichedUserData, avatar, providerName }
       })
       
       enrichedUsersData = await Promise.all(enrichedUsersData);

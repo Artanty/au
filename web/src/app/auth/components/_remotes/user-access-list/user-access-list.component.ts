@@ -21,7 +21,6 @@ export class UserAccessListComponent {
     console.log(data)
     this.userList = data.map((el, i) => {
       el.role = 'view'
-      el.provider = el.providerId
       
       return el
     });
