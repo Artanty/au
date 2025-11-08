@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { ensureErr, err } from '../utils/throwError';
 import { encrypt } from '../utils/encrypt';
-import { deleteFile, getUserHandlerAndTokens, sanitizePath, saveTemp } from './saveTempController';
+import { deleteFile, getUserHandlerAndTokens, saveTemp } from './saveTempController';
 import { getEncodedClientOrigin } from '../utils/getEncodedClientOrigin';
 import axios from 'axios';
 

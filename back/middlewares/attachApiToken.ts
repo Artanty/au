@@ -32,7 +32,10 @@ export async function attachApiToken(
   }
 
   const KEY_BACK_URL = process.env.KEY_BACK_URL;
-  
+  // dd(`X-Project-Id ${process.env.PROJECT_ID} 
+  //   X-Project-Domain-Name ${requesterUrl} 
+  //   X-Api-Key ${process.env.BASE_KEY}`
+  // )
   try {
     const response = await axios.post(`${KEY_BACK_URL}/get-token`, {
       targetProject,

@@ -6,10 +6,11 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { ensureErr, err } from '../utils/throwError';
 import { decrypt, encrypt } from '../utils/encrypt';
-import { deleteFile, getUserHandlerAndTokens, sanitizePath, saveTemp } from './saveTempController';
+import { deleteFile, getUserHandlerAndTokens, saveTemp } from './saveTempController';
 import { getEncodedClientOrigin } from '../utils/getEncodedClientOrigin';
 import { UserController } from './userController';
 import { dd } from '../utils/dd';
+import { buildUserDataFileName, getUserDataFileByAccessToken, getUserDataFileByUserHandler } from '../utils/fileStorageService';
 
 dotenv.config();
 
@@ -122,17 +123,35 @@ export class AuthController {
 
         const clientOrigin = getEncodedClientOrigin(req);
 
-        const tokens = AuthController.generateTokens(mappedUser.id, clientOrigin);
-
         const userHandler = encrypt(provider.id, mappedUser.id);
 
+        /**
+         * if file with userData of this user already exists - use it
+         * accessToken is the part of name of file.
+         * Когда придет время делать менеджмент аутентифицированных устройств - нужно будет
+         * 1) разрешить сохранять каждому клиенту свой файл.
+         * таким образом их будет связывать userHandler в названии.
+         * и при желании сеанс пользователя на устройстве можно будет завершить.
+         * 2) обновить getUserDataFileByUserHandler() чтобы он искал не первое совпадение, а совпадение клиента?
+         * или просто удалить этот функционал поиска по userHandler'у.
+         * */
+        const userDataFile = await getUserDataFileByUserHandler(clientOrigin, userHandler);
+
+        const tokens = (userDataFile.exists === true)
+          ? { accessToken: userDataFile.data.accessToken, refreshToken: userDataFile.data.refreshToken }
+          : AuthController.generateTokens(mappedUser.id, clientOrigin)
+        
+        // const fileName = `${userHandler}___${tokens.accessToken}.json`;
+        const fileName = buildUserDataFileName(userHandler, tokens.accessToken)
+        
         const userName = mappedUser.name; // add profile table: proflie.userName ?? mappedUser.name
 
         const avatar = await UserController.getAvatar(userName)
         
         await saveTemp({
           path: clientOrigin,
-          fileName: `userHandler.json`,
+          // fileName: `userHandler.json`,
+          fileName: fileName,
           data: { 
             userHandler,
             ...tokens,
@@ -145,6 +164,7 @@ export class AuthController {
           ...tokens,
           // user: AuthController.sanitizeUser(mappedUser as IUser),
           userName: userName,
+          is_created: !userDataFile.exists,
           // provider: provider.name,
           
         });
@@ -203,16 +223,20 @@ export class AuthController {
         throw new Error('No access token provided.')
       }
       const clientOrigin = getEncodedClientOrigin(req);
-      const savedTempData = await getUserHandlerAndTokens(clientOrigin, 'userHandler.json');
-      if (!savedTempData) {
-        throw new Error('File problem.')
+
+      const savedTempData = await getUserDataFileByAccessToken(clientOrigin, req.body.accessToken);
+      
+      // const savedTempData = await getUserHandlerAndTokens(clientOrigin, 'userHandler.json');
+
+      if (savedTempData.exists === false) {
+        throw new Error(`temp user data file doesn\'t exist. ${JSON.stringify(savedTempData)}`)
       }
       return res.json({
         // data: {
         //   userName: savedTempData.userName,
         // }
 
-        userName: savedTempData.userName,
+        userName: savedTempData.data.userName,
         
       });
     } catch (error: any) {

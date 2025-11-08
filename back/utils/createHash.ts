@@ -50,3 +50,7 @@ function digitsToShiftedSymbolsUniversal(input) {
 		return shiftedSymbols[digit] || digit; // Fallback to original digit
 	});
 }
+
+export function createShortHash(input) {
+	return crypto.createHash('md5').update(input).digest('hex').substring(0, 16);
+}

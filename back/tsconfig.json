@@ -10,7 +10,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-     "noImplicitAny": false,
+    "noImplicitAny": false,
   },
   
   "exclude": ["node_modules"],

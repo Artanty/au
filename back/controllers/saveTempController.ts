@@ -103,41 +103,17 @@
 // }
 import { promises as fs } from 'fs';
 import path from 'path';
+import { sanitizePath } from '../utils/sanitizePath';
+import { STORAGE_ROOT } from '../core/constants';
+import { buildFilePath } from '../utils/buildFilePath';
+import { ensureDirExists } from '../utils/ensureDirExists';
 
-const STORAGE_ROOT = path.join(__dirname, '..', 'storage');
+
 
 export interface SaveTempReq {
   path: string;
   fileName: string;
   data: any;
-}
-
-// Ensure directory exists
-async function ensureDirExists(dirPath: string) {
-  try {
-    await fs.mkdir(dirPath, { recursive: true });
-  } catch (err: unknown) {
-    if ((err as any).code !== 'EEXIST') throw err;
-  }
-}
-
-// Sanitize path components
-export function sanitizePath(input: string) {
-  return input
-    .replace(/\.\./g, '')        // Remove parent directory references
-    .replace(/[^\w\-.%]/g, '_')  // Replace special chars with underscore
-    .replace(/\/+/g, '/')        // Collapse multiple slashes
-    .replace(/^\/|\/$/g, '');    // Trim leading/trailing slashes
-}
-
-/**
- * Builds the full file path from path and filename
- */
-export function buildFilePath(rawPath: string, fileName: string): string {
-  const safePath = sanitizePath(rawPath.toString());
-  const safeFileName = sanitizePath(fileName.toString());
-  const storageDir = path.join(STORAGE_ROOT, safePath);
-  return path.join(storageDir, safeFileName);
 }
 
 /**
@@ -314,3 +290,4 @@ export const listFiles = async (rawPath: string): Promise<string[]> => {
     return [];
   }
 };
+

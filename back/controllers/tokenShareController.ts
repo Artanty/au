@@ -4,6 +4,8 @@ import { dd } from '../utils/dd';
 import { getUserHandlerAndTokens } from './saveTempController';
 import { getEncodedClientOrigin } from '../utils/getEncodedClientOrigin';
 import { attachApiToken } from '../middlewares/attachApiToken';
+import { getUserDataFileByAccessToken } from '../utils/fileStorageService';
+import { createShortHash } from '../utils/createHash';
 
 dotenv.config();
 
@@ -31,6 +33,7 @@ export class TokenShareController {
     try {
       const thisBackOrigin = `${req.protocol}://${req.get('host')}` 
       const clientOrigin = getEncodedClientOrigin(req);
+      const accessToken = body.token; // todo: move token in headers?
       
       const backendUrlForRequest = body.backendUrl; // mb get it secure? no not show in frontend?
       
@@ -42,18 +45,26 @@ export class TokenShareController {
       )
 
       // get saved locally token & user hash
-      const savedTempData = await getUserHandlerAndTokens(clientOrigin, 'userHandler.json')
-
+      // const savedTempData = await getUserHandlerAndTokens(clientOrigin, 'userHandler.json')
+      // const savedTempData = await getUserHandlerAndTokens(clientOrigin, fileName)
+      const savedTempData = await getUserDataFileByAccessToken(clientOrigin, accessToken)
+      if (savedTempData.exists === false) {
+        throw new Error('temp user data file doesn\'t exist')
+      }
+      
       const hostOrigin = req.body.hostOrigin; // todo rename +web
       const encodedHostOrigin = encodeURIComponent(hostOrigin);
+
+      const remoteUserDataFileName = createShortHash(accessToken) + '.json';
       
       const payload = {
         path: encodedHostOrigin, // needed for file path to save creds
-        fileName: `token.json`,
+        // fileName: `token.json`,
+        fileName: remoteUserDataFileName,
         data: {
-          userHandler: savedTempData.userHandler,
-          accessToken: savedTempData.accessToken,
-          refreshToken: savedTempData.refreshToken,
+          userHandler: savedTempData.data.userHandler,
+          accessToken: savedTempData.data.accessToken,
+          refreshToken: savedTempData.data.refreshToken,
           auBackUrl: thisBackOrigin
         }
       };
