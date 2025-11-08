@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { IAuthAction } from '../../models/action.model';
-import { Observable } from 'rxjs';
+import { catchError, Observable } from 'rxjs';
+import { RemoveProductAuthTokenAction } from '../auth/removeLsToken.action'
 
 export interface CheckTokenResponse {
 	error: string
@@ -12,6 +13,7 @@ export interface CheckTokenResponse {
 export class CheckTokenAction implements IAuthAction {
 	constructor(
 		@Inject(HttpClient) private readonly http: HttpClient,
+		@Inject(RemoveProductAuthTokenAction) private readonly _removeTokenAction: RemoveProductAuthTokenAction
 	) {}
 
 	public execute(): Observable<CheckTokenResponse> {
@@ -37,6 +39,12 @@ export class CheckTokenAction implements IAuthAction {
 
 		const url = `${process.env['AU_BACK_URL']}/auth-token/check-token`
 
-		return this.http.post<CheckTokenResponse>(url, requestData);
+		return this.http.post<CheckTokenResponse>(url, requestData)
+			.pipe(
+				catchError((err: any) => {
+					this._removeTokenAction.execute()
+					throw new Error(err)
+				})
+			);
 	}
 }

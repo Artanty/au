@@ -3,7 +3,7 @@ import { IAuthStrategy } from "../../models/strategy.model";
 import { ExternalUpdateBody, ExternalUpdates } from "../../services/token-share.service";
 import { AppStateService, UserAction } from "../../services/app-state.service";
 import { PipelineHelperService } from "../../services/pipeline-helper.service";
-import { filter, from, mergeMap, of, Subscription, switchMap, take } from "rxjs";
+import { catchError, filter, from, mergeMap, of, Subscription, switchMap, take } from "rxjs";
 import { dd } from "../../utilites/dd";
 
 @Injectable()
@@ -83,6 +83,10 @@ export class SaveTempDuplicateStrategy implements IAuthStrategy, OnDestroy {
       switchMap(validatedRemote => {
         this._pipeline.exec('SET_PRODUCT_BTN_READY', validatedRemote);
         return of(validatedRemote);
+      }),
+      catchError((errorWithRemotePojectId: Error) => {
+        // todo: do not allow redirecting to current url of invalidated remote
+        return this._pipeline.exec$('SET_PRODUCT_BTN_LOCKED', errorWithRemotePojectId.message)
       })
     );
   }

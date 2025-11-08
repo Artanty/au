@@ -11,6 +11,10 @@ import { AppStateService, getTokens } from '../../services/app-state.service';
 
 const TOKEN_VALIDATE_API = 'save-temp/check'
 
+interface ValidateTokenRes {
+    validationResult: boolean
+}
+
 @Injectable()
 export class ValidateSharedTokenAction implements IAuthAction {
     constructor(
@@ -28,10 +32,19 @@ export class ValidateSharedTokenAction implements IAuthAction {
         
         
         return this._makeRequest(remote).pipe(
-            tap(() => {
-                this._tokenShareService.setValidState(remote.projectId, true)
+            tap((res: ValidateTokenRes) => {
+                const message = `${remote.projectId} validationResult: ${res.validationResult}`;
+                console.log(message)
+                this._tokenShareService.setValidState(remote.projectId, res.validationResult)
             }),
-            map(() => remote),
+            map((res: ValidateTokenRes) => {
+                if (res.validationResult !== true) {
+                    const message = `${remote.projectId} validationResult: ${res.validationResult}`;
+                    throw new Error(remote.projectId);
+                }
+                return remote;
+                
+            }),
             share()
         )
     }
@@ -46,7 +59,7 @@ export class ValidateSharedTokenAction implements IAuthAction {
             hostOrigin: hostOrigin,
             data: { 
                 accessToken
-            } 
+            }
         }
 
         const maxRetries = 3;
@@ -70,7 +83,7 @@ export class ValidateSharedTokenAction implements IAuthAction {
             }))
     }
 
-    // пеенести это. триггерить только когда все элементы закончили попытку проверить токен.
+    // перенести это. триггерить только когда все элементы закончили попытку проверить токен.
     private _sendAuthDoneEvent() {
         const busEvent: BusEvent = {
             from: `${process.env['PROJECT_ID']}@${process.env['NAMESPACE']}`,
