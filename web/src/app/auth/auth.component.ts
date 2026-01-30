@@ -73,7 +73,9 @@ export class AuthComponent implements OnInit, OnDestroy {
       // .pipe(
       //   filter(res => res !== null),
       // )
-      .subscribe(res => console.log(res))
+      .subscribe(res => {
+        // console.log(res)
+      })
   }
 
   ngOnDestroy(): void {

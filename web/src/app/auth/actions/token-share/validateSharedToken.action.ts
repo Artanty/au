@@ -34,7 +34,7 @@ export class ValidateSharedTokenAction implements IAuthAction {
         return this._makeRequest(remote).pipe(
             tap((res: ValidateTokenRes) => {
                 const message = `${remote.projectId} validationResult: ${res.validationResult}`;
-                console.log(message)
+                // console.log(message)
                 this._tokenShareService.setValidState(remote.projectId, res.validationResult)
             }),
             map((res: ValidateTokenRes) => {

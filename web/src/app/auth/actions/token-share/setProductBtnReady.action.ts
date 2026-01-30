@@ -15,7 +15,7 @@ export class SetProductBtnReadyAction implements IAuthAction {
   ) {}
 
   public execute(project: ExternalUpdateBody): Observable<ExternalUpdateBody> {
-    console.log(project)
+    // console.log(project)
     const { projectId } = project;
     
     const busEvent: BusEvent = {

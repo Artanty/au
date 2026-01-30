@@ -27,7 +27,7 @@ export function defineCustomElement(customElementName: string, injector?: Inject
         injector: effectiveInjector 
       });
       customElements.define(customElementName, customElement);
-      console.log('customElement: ' + customElementName + ' defined')
+      // console.log('customElement: ' + customElementName + ' defined')
     } else {
       console.warn('No injector available for custom element registration');
     }

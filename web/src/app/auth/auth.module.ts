@@ -221,7 +221,7 @@ export class AuthModule {
     // this.register('UserAvatarComponent', UserAvatarComponent, 'user-avatar')
     this._tokenShareService.listenStore()
       .subscribe((res: any) => {
-        dd(res);
+        // dd(res);
       });
   }
 
@@ -244,7 +244,7 @@ export class AuthModule {
 
     // Register as custom element
     customElements.define(customElementName, customElement);
-    dd('[DEFINED] in auth.module: ' + componentName)
+    // dd('[DEFINED] in auth.module: ' + componentName)
   }
 
   private _sendDoneEvent(busEvent: BusEvent, to?: string): void {

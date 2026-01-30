@@ -45,12 +45,12 @@ export class Login2Component implements OnInit {
   }
 
   public loginOnChange(data: any) {
-    console.log(data)
+    // console.log(data)
     this._username$.next(data)
   }
 
   public passwordOnChange(data: any) {
-    console.log(data)
+    // console.log(data)
   }
 
   constructor(
@@ -87,7 +87,7 @@ export class Login2Component implements OnInit {
   }
 
   private mock(isExternal?: boolean) {
-    console.log(isExternal)
+    // console.log(isExternal)
     if (isExternal) {
       this._username$.next('test.user@company.com')
       
@@ -119,19 +119,19 @@ export class Login2Component implements OnInit {
       },
         
     }
-    dd(data)
+    // dd(data)
     this._appStateService.userAction.next(data)
   }
   
   profile() {
     const token = localStorage.getItem(`faq@web-host__accessToken`);
-    console.log(token)
+    // console.log(token)
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`,
     });
     this.http.post('http://localhost:3204/auth-token/profile', null, { headers })
       .subscribe(res => {
-        console.log(res)
+        // console.log(res)
       })
   }
 

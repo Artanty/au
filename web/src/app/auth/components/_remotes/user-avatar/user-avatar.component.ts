@@ -104,7 +104,7 @@ export class UserAvatarComponent implements OnInit, OnChanges {
       this.initials = '?';
       return;
     }
-    console.log(name)
+    // console.log(name)
     const words = name.trim().split(/\s+/).filter(word => word.length > 0);
     
     if (words.length === 0) {
@@ -114,7 +114,7 @@ export class UserAvatarComponent implements OnInit, OnChanges {
     } else {
       this.initials = words[0].charAt(0).toUpperCase() + words[words.length - 1].charAt(0).toUpperCase();
     }
-    console.log(this.initials)
+    // console.log(this.initials)
   }
 
   private setSize(): void {
@@ -190,7 +190,7 @@ export class UserAvatarComponent implements OnInit, OnChanges {
         })
       )
       .subscribe((res: UserData) => {
-        console.log(res)
+        // console.log(res)
         this.generateInitials(res.userName)
         this.isLoggedIn = true;
         this.isOpened = false;
